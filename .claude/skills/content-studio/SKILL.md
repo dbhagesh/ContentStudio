@@ -14,9 +14,21 @@ Run everything from the ContentStudio folder as `node bin/studio.mjs <command>` 
 `studio help <command>` explains any command. Architecture and file map: `README.md` (read it when changing the
 engine or the CLI, not for an ordinary video).
 
-## Templates
+## Channels first (never mix them)
+The studio runs many channels. **Every video belongs to exactly one channel**, and each channel is a self-contained
+folder: `channels/<id>/` holds `channel.json`, `BIBLE.md`, `series.json`, `backlog.json`, and its own `templates/`,
+`characters/` and `audio/`. Its videos live in `projects/<id>/`. `studio channels` lists them.
 
-`studio templates` lists them with what each is for. Today:
+1. **Pick the channel.** Use the one the user names, or the one whose BIBLE fits the topic. If two fit, ask once.
+2. **Read its `BIBLE.md` in full.** Audience, promise, tone, hook formulas, series, do / don't. Every choice follows it.
+3. **Use only what the channel owns or lists.** Its own templates and the shared ones in `channel.json` "templates",
+   and its own cast. The studio refuses anything else; never work around that.
+4. **Start from the backlog.** `studio backlog --channel <id>` shows each episode as idea → making → rendered → posted.
+   Begin with `studio new --channel <id> --from-backlog <episode>`. A new idea goes in first with `studio backlog-add`.
+5. **A new channel:** ask the user what to name it (offer 3 options; never pick the name yourself). Then
+   `studio channel-new <id> --name "…" --handle @…`, and fill every section of its BIBLE before the first episode.
+
+Shared templates (`studio templates`; a channel's own ones say "channel X only"):
 
 | template | for | look |
 |---|---|---|
@@ -27,32 +39,29 @@ engine or the CLI, not for an ordinary video).
 | `paper-atlas` (2D) | a historical event, "how X happened" | cut paper, parchment maps, date ribbons |
 | `tall-tale` (3D) | a funny or clever true story, a con, a loophole | flat cartoon people in a sunny 3D town, one-word captions |
 
-If the topic doesn't point clearly at one, ask once.
+**Before planning, read the chosen template's STYLE.md in full and look at its style-sheet.png.** Shots can only use
+what its kit draws, in its palette. Each template folder also has `example/` (a finished video).
 
-## Channels and characters (consistency first)
-`studio channels` and `studio characters` list them. A **channel** (`channels/<id>/channel.json`) is a brand: its
-cast, default template, voice, music, caption look and publish defaults. A **character** (`characters/<id>/`) is a
-permanent cast member with a stable ID; `character.js` is the only code that draws them.
+## Characters (consistency first)
+A **character** is a permanent cast member with a stable ID: shared in `characters/<id>/`, or a channel's own in
+`channels/<ch>/characters/<id>/`. `character.js` is the only code that draws them.
 
-- **When a video is for a channel** (the user names it, or the topic fits its niche), start it with
-  `studio new <name> --channel <id>`. That applies the channel's template, voice and look, and pins the cast versions.
-  Today: **sakumai** (@SakumaiShorts, cute anime explainers about feelings and the body), cast: **sakumai**.
 - **Before planning,** read each cast member's `CHARACTER.md` and look at their `sheet.png`. Plan shots with the
   character's own expressions, poses, outfits and anchors.
 - **In shots,** draw cast members only through `cast('<id>').draw({...})` (import `{ cast }` from
   `./core/cast.js`). Never draw a character by hand in shots.js, never copy their code into a project, and never
-  change their colours. That's what keeps them identical across every Short.
-- **Something a character can't do yet** (a new pose, expression or outfit): add it to `characters/<id>/character.js`
-  in their style, then:
+  change their colours. That's what keeps them identical across every video.
+- **Voices:** a script line with `"speaker": "<character id>"` is spoken in that character's voice (from
+  `character.json` "voice", overridable in channel.json "voices" or script.json "speakers"). Lines without a speaker
+  use the narrator (script "voice"). Dialogue: one speaker per line, and a speaker change starts a new sentence.
+- **Something a character can't do yet** (a new pose, expression or outfit): add it to their `character.js` in their
+  style, then:
   1. Re-render the sheet (`studio character-sheet <id>`) and look at it.
   2. List the new item in `character.json`.
   3. Bump the minor version and add a changelog line.
 
   Every future video gets it. Changing a character's *look* is a major version bump, and only when the user asks.
-- **New channel:** `channels/<id>/channel.json` (copy sakumai's). **New character:** read `references/new-character.md`. Each template folder has `STYLE.md` (the look rules + the kit's
-component manual), `style-sheet.png` (the look in one picture) and `example/` (a finished video). **Read the chosen
-template's STYLE.md in full and look at its style-sheet.png before planning**: shots can only use what its kit
-draws, in its palette.
+- **New character:** read `references/new-character.md`. **New template:** read `references/new-template.md`.
 
 ## First use on this computer
 `studio doctor` must print **All set**. If not, `studio setup` (Python env + ~0.9 GB of free models, all inside
@@ -66,7 +75,7 @@ Ask only what's unknown, all at once: topic (or "pick 3 ideas"), a short whose *
 royalty-free file), end line / handle. "Just go" means the defaults.
 
 ## 2. The plan (one screen, then wait for "build it")
-Show: title · the full narration, one line per cut, with its caption chunks (`WHAT IF *YOU | SWALLOW *GUM?`) · the
+Show: channel + series · title · the full narration, one line per cut, with its caption chunks (`WHAT IF *YOU | SWALLOW *GUM?`) · the
 shot list, one line each (what we see, what moves, which word it lands on) · new kit components you'll add · facts
 with their sources. Then ask **"Build it?"** and wait.
 
@@ -79,19 +88,22 @@ format, never another creator's script, shots or frames. Check every fact agains
 `script.json` "sources". Health topics: accurate, no gore, no scary misinformation.
 
 ## 3. Build
-1. `studio new <template> <name> --title "…"` → `projects/<name>/` (a copy of the template's example, so it renders
-   immediately). Only `script.json` and `src/shots.js` change per video.
-2. Write `script.json` (lines + `caps` + gaps; format in STYLE.md).
-3. Timing: `studio build <name> --only timing` (AI voice) · `--timing audio:their.m4a` (own recording) ·
+1. `studio new --channel <id> --from-backlog <episode>` (or `studio new <name> --channel <id>`) →
+   `projects/<id>/<name>/`, a copy of the template's example, so it renders immediately. Only `script.json` and
+   `src/shots.js` change per video. Refer to it as `<id>/<name>` in every command.
+2. Write `script.json`: lines + `caps` + gaps (format in STYLE.md), a `speaker` on dialogue lines, and the post words:
+   `title`, `description` (1-2 sentences on what the viewer learns, no spoilers), 5-8 `tags`, and `sources`.
+3. Timing: `studio build <id>/<name> --only timing` (AI voice) · `--timing audio:their.m4a` (own recording) ·
    `--timing estimate` (captions only). It writes `data/lines.json` + `data/words.json`.
 4. Rewrite `src/shots.js`: one shot per line (two for long lines), each starting at `cut(i)`, key moments on words
    with `Wd('word', line)`, sound with `cue(t, type)` (`studio effects` lists the types). Reuse the template kit
    (`templates/<t>/src/core/`); add new components there in the template's look, so later videos get them too.
-5. `studio build <name> --from check` runs check (must say CHECK OK) → cues → mix → review sheet → MP4 in
-   `renders/<name>.mp4`. While iterating on one shot: `studio frames <name> "4.2,4.6"` and look at the frames.
-   `studio preview <name>` plays it in a browser with sound.
+5. `studio build <id>/<name> --from lint` runs the quality gate (must say LINT OK; read every warning too) → check
+   (must say CHECK OK) → cues → mix → review sheet → MP4 in `renders/<name>.mp4`. While iterating on one shot: `studio frames <id>/<name> "4.2,4.6"` and look at the frames.
+   `studio preview <id>/<name>` plays it in a browser with sound.
 
 ## 4. QA: never show a frame you haven't looked at
+The bar is `references/quality.md`: score the video against it and fix anything under 4/5 before the user sees it.
 Read `review/all.jpg` (a time-stamped frame every 0.5 s), then key frames full size. For every frame:
 - **Makes sense?** One visual mode per shot (an x-ray body is x-ray everywhere). Props move with whatever holds them.
   Nothing appears before its cause.
@@ -104,12 +116,13 @@ Fix, rebuild from the step that changed (`--from check` after shot edits, `--fro
 Tell the user what you caught and fixed.
 
 ## 5. Deliver
-Open the MP4 (`open projects/<name>/renders/<name>.mp4`). Also give: `studio share <name>` if it's over ~35 MB, the
+Open the MP4 (`open projects/<id>/<name>/renders/<name>.mp4`). Also give: `studio share <id>/<name>` if it's over ~35 MB, the
 best cover frame (`studio frames`), a title, a caption and 5-8 hashtags. Own-recording mode: give the script with each
 line's timing to read against. Offer one round of precise changes and rebuild only from the step that changed.
 
 ## 6. Publish (YouTube, Instagram), only when the user asks
-Read `references/publishing.md` and follow it exactly. In short:
+Read `references/publishing.md` and follow it exactly (and `references/monetization.md` when setting up a channel's
+publish settings or answering how a channel earns). In short:
 1. `studio publish <project> --to youtube,instagram` is a dry run that shows exactly what would be posted.
 2. Confirm the title, caption, visibility and category with the user.
 3. Post with `--yes`.
@@ -123,9 +136,11 @@ Never post or host anything without the user asking and confirming.
   path to change it for that video alone.
 - A whole video type: edit the template (`templates/<t>/template.json`, its kit, its STYLE.md).
 - A **new video type / animation style**: read `references/new-template.md`.
-- New sounds or music: drop a Python file in `templates/<t>/audio/` or `projects/<name>/audio/` (see
+- New sounds or music: drop a Python file in `templates/<t>/audio/` or `channels/<id>/audio/` (the whole channel) or `projects/<id>/<name>/audio/` (see
   `references/new-template.md` → Sound).
 
 ## Never
 Generate images or video with AI; spend money or credits; upload or post without the user asking and confirming;
-copy another creator's script, shots or frames; overwrite a project without asking; ship a frame you haven't looked at.
+copy another creator's script, shots or frames; overwrite a project without asking; ship a frame you haven't looked at;
+use one channel's template, character or project for another channel; name a channel without asking the user;
+post near-identical variants (YouTube demonetizes mass-produced content).

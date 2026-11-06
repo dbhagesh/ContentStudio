@@ -17,6 +17,7 @@ export const DEFAULTS = {
   voice: { tts: 'kokoro', voice: 'am_michael', speed: 1.0, whisperModel: 'small.en' },
   review: { sheetStep: 0.5, sheetCols: 10 },
   publish: { host: 'litterbox', expiry: '1h' },
+  quality: {},
 };
 
 /** the parts of template.json / project.json the browser engine reads */

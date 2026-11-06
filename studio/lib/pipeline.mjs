@@ -1,9 +1,11 @@
 // The production pipeline as data: an ordered list of named steps over one project.
-//   timing → check → cues → mix → sheet → render
+//   timing → lint → check → cues → mix → sheet → render
 // `studio build` runs it; --from / --only pick a slice ("I changed only the shots": --from check).
 // A step is { name, describe, run(ctx) } and can be added or replaced without touching the CLI.
 import path from 'node:path';
 import { runAudio } from './python.mjs';
+import { lintProject, formatLint } from './lint.mjs';
+import { writeVoices } from './voices.mjs';
 import { withSession } from '../render/session.mjs';
 import * as modes from '../render/modes.mjs';
 
@@ -20,11 +22,21 @@ export const STEPS = [
   {
     name: 'timing', describe: 'narration + word timings (or an estimate)',
     run: ({ p, cfg, opts, log }) => {
+      writeVoices(p, cfg);
       for (const [cmd, ...rest] of timingArgs(opts.timing || 'voice')) {
         const extra = cmd === 'voice' && opts.voice ? ['--voice', opts.voice] : [];
         runAudio(cfg, [cmd, p.dir, ...rest, ...extra], { project: p, quiet: opts.quiet });
         log(`  ${cmd} ✓`);
       }
+    },
+  },
+  {
+    name: 'lint', describe: 'quality gate: title, description, sources, hook, pace, captions, originality',
+    run: ({ p, cfg, log }) => {
+      const r = lintProject(p, cfg);
+      if (r.errors.length) throw new Error(`lint failed (fix these, then build again):\n${formatLint(r)}`);
+      log(`  LINT OK${r.warnings.length ? `, ${r.warnings.length} warning(s):\n${formatLint(r)}` : ''}`);
+      return r;
     },
   },
   {

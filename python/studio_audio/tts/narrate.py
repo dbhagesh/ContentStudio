@@ -5,8 +5,13 @@ sentences and each sentence is spoken in ONE pass so the intonation flows; then 
 in the audio (snapped to the nearest pause, else placed by length). ``"gap"`` on a sentence's last line = the pause
 after it; ``"break": true`` forces a sentence to close.
 
+Several voices: a line's ``"speaker"`` picks a voice from ``speakers`` ({id: {"tts", "voice", "speed", ...}}, built by
+the studio from the cast's character voices, the channel and script.json, in data/voices.json). Lines without one use
+the narrator (script "voice"/"speed"). A sentence never spans two speakers; other sample rates are resampled.
+
 Outputs data/narration.wav (16-bit, provider rate) and data/lines.json (exact line times).
 """
+import json
 import re
 from pathlib import Path
 
@@ -15,6 +20,7 @@ from scipy.io import wavfile
 
 from ..project import data_dir, load_script, write_json
 from .registry import DEFAULT, get_provider
+from scipy.signal import resample_poly
 
 
 def trim(x, sr, thr=0.008):
@@ -39,11 +45,14 @@ def silences(x, sr, thr=0.012, min_len=0.06):
 
 
 def sentence_groups(lines: list) -> list[list[int]]:
-    """Group line indexes into sentences: a line ending in . ? ! (optionally quoted) or with "break" closes one."""
+    """Group line indexes into sentences: a line ending in . ? ! (optionally quoted) or with "break" closes one,
+    and so does a change of speaker."""
     groups, cur = [], []
     for i, ln in enumerate(lines):
         cur.append(i)
-        if re.search(r'[.?!]["\')]*$', ln['text'].strip()) or ln.get('break') or i == len(lines) - 1:
+        nxt = lines[i + 1] if i + 1 < len(lines) else None
+        if (re.search(r'[.?!]["\')]*$', ln['text'].strip()) or ln.get('break') or nxt is None
+                or nxt.get('speaker') != ln.get('speaker')):
             groups.append(cur); cur = []
     return groups
 
@@ -64,30 +73,50 @@ def find_cuts(x, sr, lens):
     return cuts
 
 
-def build_narration(script: dict, provider, voice=None, speed=None, log=print):
-    """Pure-ish core: returns (samples float64 normalised to 0.9 peak, sr, lines_doc)."""
+def build_narration(script: dict, provider, voice=None, speed=None, log=print, speakers=None, provider_for=None):
+    """Pure-ish core: returns (samples float64 normalised to 0.9 peak, sr, lines_doc).
+    ``provider`` speaks the narrator; ``provider_for(name, opts)`` makes the providers other speakers ask for."""
     voice = voice or script.get('voice', provider.default_voice)
     speed = speed or script.get('speed', 1.0)
     SL = script['lines']
+    speakers = speakers or {}
+    cache = {}
     sr_box = {}
 
-    def say(text):
-        x, sr = provider.synthesize(text, voice, speed)
-        sr_box['sr'] = sr
-        return trim(np.asarray(x, dtype=np.float64), sr)
+    def voice_of(i):
+        """(provider, voice, speed) for line i"""
+        sp = SL[i].get('speaker')
+        if not sp or sp not in speakers:
+            if sp: raise SystemExit(f'line {i + 1}: speaker "{sp}" has no voice (known: {", ".join(sorted(speakers)) or "none"})')
+            return provider, voice, speed
+        spec = dict(speakers[sp]); tts = spec.pop('tts', DEFAULT)
+        v = spec.pop('voice', None); s = spec.pop('speed', 1.0); spec.pop('note', None)
+        key = (tts, json.dumps(spec, sort_keys=True))
+        if key not in cache: cache[key] = (provider_for or (lambda n, o: get_provider(n, **o)))(tts, spec)
+        return cache[key], v or cache[key].default_voice, s
+
+    def say(text, i):
+        p, v, s = voice_of(i)
+        x, sr = p.synthesize(text, v, s)
+        x = trim(np.asarray(x, dtype=np.float64), sr)
+        target = sr_box.setdefault('sr', sr)
+        if sr != target:
+            g = np.gcd(int(sr), int(target)); x = resample_poly(x, target // g, sr // g)
+        return x
 
     groups = sentence_groups(SL)
-    first = say(' '.join(SL[i]['text'] for i in groups[0]))   # learn the sample rate before laying out the lead
+    first = say(' '.join(SL[i]['text'] for i in groups[0]), groups[0][0])   # learn the sample rate before laying out the lead
     sr = sr_box['sr']
     out = [np.zeros(int(script.get('lead', 0.4) * sr))]; t = len(out[0]) / sr; lines = [None] * len(SL)
     for gi, g in enumerate(groups):
-        x = first if gi == 0 else say(' '.join(SL[i]['text'] for i in g))
-        lens = [len(say(SL[i]['text'])) for i in g] if len(g) > 1 else [len(x)]
+        x = first if gi == 0 else say(' '.join(SL[i]['text'] for i in g), g[0])
+        lens = [len(say(SL[i]['text'], i)) for i in g] if len(g) > 1 else [len(x)]
         cuts = find_cuts(x, sr, lens)
         n = len(x) / sr
         for j, i in enumerate(g):
             a = 0.0 if j == 0 else cuts[j][1]; b = n if j == len(g) - 1 else cuts[j + 1][0]
             lines[i] = {'i': i, 'text': SL[i]['text'], 'start': round(t + a, 3), 'end': round(t + b, 3)}
+            if SL[i].get('speaker'): lines[i]['speaker'] = SL[i]['speaker']
             log(f'{i:2d} {lines[i]["start"]:6.2f}-{lines[i]["end"]:6.2f}  {SL[i]["text"]}')
         gap = np.zeros(int(float(SL[g[-1]].get('gap', script.get('gap', 0.3))) * sr))
         out += [x, gap]; t += (len(x) + len(gap)) / sr
@@ -101,7 +130,9 @@ def run(project, voice=None, speed=None, provider=None) -> None:
     P = Path(project)
     script = load_script(P)
     provider = provider or get_provider(script.get('tts', DEFAULT))
-    y, sr, doc = build_narration(script, provider, voice, speed, log=lambda s: print(s, flush=True))
+    vf = data_dir(P) / 'voices.json'
+    speakers = {**(json.loads(vf.read_text()).get('speakers', {}) if vf.exists() else {}), **script.get('speakers', {})}
+    y, sr, doc = build_narration(script, provider, voice, speed, log=lambda s: print(s, flush=True), speakers=speakers)
     d = data_dir(P)
     wavfile.write(d / 'narration.wav', sr, (y * 32767).astype(np.int16))
     write_json(d / 'lines.json', doc)

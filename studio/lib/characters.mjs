@@ -3,21 +3,37 @@
 //   characters/<id>/character.js     the ONE drawing code every video uses (export default { draw, ... })
 //   characters/<id>/CHARACTER.md     the bible: look rules, personality, do / don't
 //   characters/<id>/sheet.png        model sheet rendered from the code (studio character-sheet <id>)
-// Characters are served read-only at /characters/<id>/... and can't be overridden per project, so a character
-// looks the same in every video. Improving one = editing it here and bumping its version.
+// Shared characters live in characters/<id>/; a channel's own cast in channels/<ch>/characters/<id>/ (see library.mjs).
+// A character appears only on its channels: the owner, or the ones its character.json "channels" lists.
+// A video's cast is served read-only at /characters/<id>/... (castMounts) and can't be overridden per project, so a
+// character looks the same in every video. Improving one = editing it and bumping its version.
 import fs from 'node:fs';
 import path from 'node:path';
-import { readJson } from './config.mjs';
+import { libraryRoots, scanLibrary, duplicateIds } from './library.mjs';
 
 export const ID_RE = /^[a-z][a-z0-9-]{1,39}$/;
 export const SEMVER_RE = /^\d+\.\d+\.\d+$/;
 
+/** every character: { id, dir, owner (channel id, or null when shared), manifest } */
 export function listCharacters(cfg) {
-  const dir = cfg.charactersDir;
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).sort()
-    .filter((n) => fs.existsSync(path.join(dir, n, 'character.json')))
-    .map((n) => ({ id: n, dir: path.join(dir, n), manifest: readJson(path.join(dir, n, 'character.json')) }));
+  return scanLibrary(libraryRoots(cfg, 'characters', [cfg.charactersDir]), 'character.json');
+}
+
+export const duplicateCharacters = (cfg) => duplicateIds(listCharacters(cfg));
+
+/** the channels a character may appear on (empty = any) */
+export function characterChannels(c) {
+  const listed = Array.isArray(c.manifest.channels) ? c.manifest.channels : [];
+  return c.owner ? [...new Set([c.owner, ...listed])] : listed;
+}
+
+export const canAppearOn = (c, channelId) => { const ok = characterChannels(c); return !ok.length || ok.includes(channelId); };
+
+/** overlay mounts that serve exactly these characters at /characters/<id>/ and nothing else under /characters/ */
+export function castMounts(chars) {
+  const m = Object.fromEntries(chars.map((c) => [`/characters/${c.id}/`, c.dir]));
+  m['/characters/'] = path.join(chars[0]?.dir || '/', '.not-in-cast');
+  return m;
 }
 
 export function loadCharacter(id, cfg) {

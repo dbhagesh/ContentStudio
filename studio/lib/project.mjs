@@ -1,4 +1,5 @@
-// Projects: one video each, in config.projectsDir/<name>/.
+// Projects: one video each. A channel's videos live in config.projectsDir/<channel>/<name>/ (so channels never mix);
+// a video without a channel in config.projectsDir/<name>/.
 //   project.json  { "template": "inside-out", "channel": "sakumai", "cast": { "sakumai": "1.0.0" },
 //                   "title": "...", "created": "...", "overrides": { "captions": {...}, ... }, "publish": {...} }
 //   script.json   the narration (lines + caption chunks), sources, voice, music
@@ -13,29 +14,72 @@ import path from 'node:path';
 import { readJson, runtimeConfig } from './config.mjs';
 import { loadTemplate } from './templates.mjs';
 import { loadChannel } from './channels.mjs';
-import { loadCharacter, castEntry } from './characters.mjs';
+import { loadCharacter, castEntry, canAppearOn, characterChannels, castMounts } from './characters.mjs';
 import { createOverlay } from './overlay.mjs';
 import { ENGINE_DIR } from './paths.mjs';
 
 export const NAME_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const GENERATED = ['data/narration.wav', 'data/mix.wav'];
 
-/** a project name (in projectsDir) or a path to a project folder → absolute folder */
+const isProject = (d) => fs.existsSync(path.join(d, 'project.json'));
+
+/** a project as <channel>/<name>, a bare <name> (when only one channel has it), or a path → absolute folder */
 export function resolveProjectDir(ref, cfg) {
-  if (!ref) throw new Error('which project? give its name (in projects/) or a path');
+  if (!ref) throw new Error('which project? give <channel>/<name>, its name, or a path');
   const asPath = path.resolve(ref);
-  if (fs.existsSync(path.join(asPath, 'project.json'))) return asPath;
+  if (isProject(asPath)) return asPath;
   const named = path.join(cfg.projectsDir, ref);
-  if (fs.existsSync(path.join(named, 'project.json'))) return named;
-  throw new Error(`no project "${ref}" (looked in ${asPath} and ${named}). Create one: studio new <template> <name>`);
+  if (isProject(named)) return named;
+  const hits = ref.includes('/') ? [] : listProjects(cfg).filter((p) => p.name === ref);
+  if (hits.length === 1) return hits[0].dir;
+  if (hits.length > 1) throw new Error(`"${ref}" exists in several channels: say which (${hits.map((p) => p.ref).join(', ')})`);
+  throw new Error(`no project "${ref}" (looked in ${asPath} and ${named}). Create one: studio new <name> --channel <id>`);
 }
 
-const overlayFor = (dir, template, cfg) => createOverlay([dir, template.dir, ENGINE_DIR], { mounts: { '/characters/': cfg.charactersDir } });
+/** the project's name as the CLI takes it: <channel>/<name> inside projectsDir, else the folder path */
+export function projectRef(dir, cfg) {
+  const rel = path.relative(cfg.projectsDir, dir);
+  return rel && !rel.startsWith('..') && !path.isAbsolute(rel) ? rel.split(path.sep).join('/') : dir;
+}
 
-/** the cast a project may draw: its pinned characters, else its channel's cast */
+/** only the video's own cast is served under /characters/ */
+const overlayFor = (dir, template, chars) => createOverlay([dir, template.dir, ENGINE_DIR], { mounts: castMounts(chars) });
+
+/**
+ * the characters a project may draw: its pinned cast, else its channel's. A character appears only on its own
+ * channels (characterChannels), so one channel can never borrow another's cast.
+ */
 function castFor(manifest, channel, cfg) {
   const ids = Object.keys(manifest.cast || {}).length ? Object.keys(manifest.cast) : (channel?.manifest.cast || []);
-  return ids.map((id) => castEntry(loadCharacter(id, cfg)));
+  return ids.map((id) => {
+    const c = loadCharacter(id, cfg);
+    if (!canAppearOn(c, channel?.id)) {
+      throw new Error(`character "${id}" belongs to ${characterChannels(c).join(', ')}; it can't appear in a ${channel ? `"${channel.id}"` : 'channel-less'} video`);
+    }
+    return c;
+  });
+}
+
+/**
+ * a channel makes videos only with its own templates and the shared ones it lists in channel.json "templates";
+ * another channel's template is never allowed. Without a channel, only shared templates.
+ */
+export function assertTemplateAllowed(channel, template) {
+  if (template.owner && template.owner !== channel?.id) {
+    throw new Error(`template "${template.id}" belongs to channel "${template.owner}"`);
+  }
+  const listed = channel?.manifest.templates;
+  if (!template.owner && Array.isArray(listed) && listed.length && !listed.includes(template.id)) {
+    throw new Error(`channel "${channel.id}" uses ${listed.join(', ')} (and its own templates), not "${template.id}" (channel.json "templates")`);
+  }
+}
+
+function assemble(dir, manifest, template, channel, cfg) {
+  const chars = castFor(manifest, channel, cfg);
+  return {
+    overlay: overlayFor(dir, template, chars),
+    runtime: runtimeConfig(template, manifest, { channel, cast: chars.map(castEntry) }),
+  };
 }
 
 export function loadProject(ref, cfg) {
@@ -44,11 +88,12 @@ export function loadProject(ref, cfg) {
   if (!manifest.template) throw new Error(`${dir}/project.json has no "template"`);
   const template = loadTemplate(manifest.template, cfg);
   const channel = manifest.channel ? loadChannel(manifest.channel, cfg) : null;
+  assertTemplateAllowed(channel, template);
   return {
     dir, manifest, template, channel,
     name: path.basename(dir),
-    overlay: overlayFor(dir, template, cfg),
-    runtime: runtimeConfig(template, manifest, { channel, cast: castFor(manifest, channel, cfg) }),
+    ref: projectRef(dir, cfg),
+    ...assemble(dir, manifest, template, channel, cfg),
     script: () => readJson(path.join(dir, 'script.json')),
     /** directories whose *.py files register extra sound effects / music tracks */
     audioPlugins: [path.join(template.dir, 'audio'), channel && path.join(channel.dir, 'audio'), path.join(dir, 'audio'), ...cfg.audioPlugins]
@@ -63,8 +108,7 @@ export function exampleProject(template, cfg) {
   const channel = manifest.channel ? loadChannel(manifest.channel, cfg) : null;
   return {
     dir, template, channel, name: `${template.id}-example`, manifest, isExample: true,
-    overlay: overlayFor(dir, template, cfg),
-    runtime: runtimeConfig(template, manifest, { channel, cast: castFor(manifest, channel, cfg) }),
+    ...assemble(dir, manifest, template, channel, cfg),
     script: () => readJson(path.join(dir, 'script.json')),
     audioPlugins: [path.join(template.dir, 'audio')].filter((d) => fs.existsSync(d)),
   };
@@ -72,12 +116,14 @@ export function exampleProject(template, cfg) {
 
 /**
  * Start a new video from a template's example (so it renders straight away), then rewrite script.json + shots.js.
- * With a channel: its default template, voice, speed and music are applied, and its cast is pinned at today's versions.
+ * With a channel: it goes in projects/<channel>/, the template must be one the channel allows, its voice, speed and
+ * music are applied, and its cast is pinned at today's versions.
  */
 export function createProject({ template, name, title, cfg, parent, channel }) {
   if (!NAME_RE.test(name)) throw new Error(`project name "${name}": use lowercase letters, digits and dashes`);
   if (!template) throw new Error('which template? (studio templates)');
-  const dir = path.join(parent || cfg.projectsDir, name);
+  assertTemplateAllowed(channel, template);
+  const dir = path.join(parent || (channel ? path.join(cfg.projectsDir, channel.id) : cfg.projectsDir), name);
   if (fs.existsSync(dir)) throw new Error(`${dir} already exists: pick another name`);
   fs.mkdirSync(path.dirname(dir), { recursive: true });
   fs.cpSync(path.join(template.dir, 'example'), dir, { recursive: true });
@@ -96,9 +142,16 @@ export function createProject({ template, name, title, cfg, parent, channel }) {
   return dir;
 }
 
-export function listProjects(cfg) {
-  if (!fs.existsSync(cfg.projectsDir)) return [];
-  return fs.readdirSync(cfg.projectsDir).sort()
-    .filter((n) => fs.existsSync(path.join(cfg.projectsDir, n, 'project.json')))
-    .map((n) => ({ name: n, dir: path.join(cfg.projectsDir, n), manifest: readJson(path.join(cfg.projectsDir, n, 'project.json')) }));
+/** every project: projectsDir/<name>/ and projectsDir/<channel>/<name>/, optionally only one channel's */
+export function listProjects(cfg, { channel } = {}) {
+  const root = cfg.projectsDir, out = [];
+  if (!fs.existsSync(root)) return out;
+  const dirs = (d) => fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => path.join(d, e.name)).sort();
+  for (const d of dirs(root)) {
+    if (isProject(d)) out.push(d);
+    else for (const sub of dirs(d)) if (isProject(sub)) out.push(sub);
+  }
+  return out
+    .map((dir) => ({ name: path.basename(dir), ref: projectRef(dir, cfg), dir, manifest: readJson(path.join(dir, 'project.json')) }))
+    .filter((p) => !channel || p.manifest.channel === channel);
 }

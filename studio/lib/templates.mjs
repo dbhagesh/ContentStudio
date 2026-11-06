@@ -1,24 +1,21 @@
-// Template registry. A template is any folder with a template.json inside one of config.templatesDirs:
+// Template registry. A template is any folder with a template.json inside one of config.templatesDirs (shared) or a
+// channel's own channels/<ch>/templates/ (only that channel can use it; see library.mjs):
 //   template.json · STYLE.md · style-sheet.png · src/ (its kit, overrides of engine files) · example/ (a project that renders)
 // Drop a folder in, and `studio templates` lists it; nothing else needs registering.
 import fs from 'node:fs';
 import path from 'node:path';
-import { readJson } from './config.mjs';
 import { ENGINE_DIR } from './paths.mjs';
+import { libraryRoots, scanLibrary, duplicateIds } from './library.mjs';
 
 export const RENDERERS = ['2d', '3d'];
 
+/** every template: { id, dir, owner (channel id, or null when shared), manifest } */
 export function listTemplates(cfg) {
-  const out = [];
-  for (const dir of cfg.templatesDirs) {
-    if (!fs.existsSync(dir)) continue;
-    for (const name of fs.readdirSync(dir).sort()) {
-      const tdir = path.join(dir, name), mf = path.join(tdir, 'template.json');
-      if (fs.existsSync(mf)) out.push({ id: name, dir: tdir, manifest: readJson(mf) });
-    }
-  }
-  return out;
+  return scanLibrary(libraryRoots(cfg, 'templates', cfg.templatesDirs), 'template.json');
 }
+
+/** template ids defined twice (a channel's template can't reuse a shared template's id) */
+export const duplicateTemplates = (cfg) => duplicateIds(listTemplates(cfg));
 
 export function loadTemplate(id, cfg) {
   const all = listTemplates(cfg), t = all.find((x) => x.id === id);

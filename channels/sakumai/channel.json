@@ -8,6 +8,9 @@
   "cast": [
     "sakumai"
   ],
+  "templates": [
+    "inside-out"
+  ],
   "defaults": {
     "template": "inside-out",
     "voice": "af_heart",
@@ -47,7 +50,8 @@
         "anime",
         "reels"
       ]
-    }
+    },
+    "links": []
   },
   "references": [
     "https://www.youtube.com/shorts/CJ5KQSk0vXE"

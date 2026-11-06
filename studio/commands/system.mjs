@@ -4,8 +4,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { findChrome } from '../render/chrome.mjs';
 import { venvPython, audioEnv } from '../lib/python.mjs';
-import { listTemplates, validateTemplate } from '../lib/templates.mjs';
-import { listCharacters, validateCharacter } from '../lib/characters.mjs';
+import { listTemplates, validateTemplate, duplicateTemplates } from '../lib/templates.mjs';
+import { listCharacters, validateCharacter, duplicateCharacters } from '../lib/characters.mjs';
 import { listChannels, validateChannel } from '../lib/channels.mjs';
 import { PYTHON_DIR } from '../lib/paths.mjs';
 
@@ -25,8 +25,8 @@ function checks(cfg) {
   const py = venvPython(cfg), env = audioEnv(cfg);
   const kokoro = path.join(cfg.studioHome, 'models/kokoro');
   const whisper = path.join(cfg.studioHome, 'models/whisper');
-  const tplErrs = listTemplates(cfg).flatMap((t) => validateTemplate(t).map((e) => `${t.id}: ${e}`));
-  const chErrs = listCharacters(cfg).flatMap((c) => validateCharacter(c).map((e) => `${c.id}: ${e}`));
+  const tplErrs = [...listTemplates(cfg).flatMap((t) => validateTemplate(t).map((e) => `${t.id}: ${e}`)), ...duplicateTemplates(cfg).map((id) => `template id "${id}" is defined twice`)];
+  const chErrs = [...listCharacters(cfg).flatMap((c) => validateCharacter(c).map((e) => `${c.id}: ${e}`)), ...duplicateCharacters(cfg).map((id) => `character id "${id}" is defined twice`)];
   const chanErrs = listChannels(cfg).flatMap((c) => validateChannel(c, cfg).map((e) => `${c.id}: ${e}`));
   return [
     ['node', node >= 22, `v${process.versions.node}`, 'need Node.js 22+ (brew install node)'],

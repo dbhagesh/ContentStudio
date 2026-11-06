@@ -1,7 +1,8 @@
 # Adding a permanent character
 
-Characters live in `characters/<id>/` and are served read-only at `/characters/<id>/` to every video, so a character
-looks identical in every Short and on every channel that casts them. Use `characters/sakumai/` as the reference
+A channel's own characters live in `channels/<channel>/characters/<id>/` (the default for a new character: only that
+channel can cast them); shared ones in `characters/<id>/`. Either way they are served read-only at `/characters/<id>/` to every video, so a character
+looks identical in every Short and on every channel that casts them. Use `channels/sakumai/characters/sakumai/` as the reference
 implementation.
 
 ## The ID

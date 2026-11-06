@@ -1,0 +1,38 @@
+{
+  "id": "strange-file",
+  "name": "The Strange File",
+  "handle": "@TheStrangeFile",
+  "url": "https://www.youtube.com/@TheStrangeFile",
+  "instagram": null,
+  "about": "History's strangest true events, unsolved mysteries and weird laws, told as case files.",
+  "cast": [],
+  "templates": [],
+  "defaults": {
+    "template": null,
+    "voice": null,
+    "speed": 1,
+    "music": "bed",
+    "overrides": {}
+  },
+  "publish": {
+    "targets": [
+      "youtube",
+      "instagram"
+    ],
+    "tags": [],
+    "footer": "",
+    "links": [],
+    "youtube": {
+      "category": "education",
+      "privacy": "private",
+      "madeForKids": false,
+      "syntheticMedia": false,
+      "language": "en"
+    },
+    "instagram": {
+      "shareToFeed": true,
+      "thumbOffsetMs": 1500,
+      "hashtags": []
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "penny-explains",
+  "name": "Penny Explains",
+  "handle": "@PennyExplains",
+  "url": "https://www.youtube.com/@PennyExplains",
+  "instagram": null,
+  "about": "Money explained in 60 seconds by Penny, a sly calico cat: how money really works and how companies make money from you.",
+  "cast": [],
+  "templates": [],
+  "defaults": {
+    "template": null,
+    "voice": null,
+    "speed": 1,
+    "music": "bed",
+    "overrides": {}
+  },
+  "publish": {
+    "targets": [
+      "youtube",
+      "instagram"
+    ],
+    "tags": [],
+    "footer": "",
+    "links": [],
+    "youtube": {
+      "category": "education",
+      "privacy": "private",
+      "madeForKids": false,
+      "syntheticMedia": false,
+      "language": "en"
+    },
+    "instagram": {
+      "shareToFeed": true,
+      "thumbOffsetMs": 1500,
+      "hashtags": []
+    }
+  }
+}

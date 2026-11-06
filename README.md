@@ -12,11 +12,12 @@ templates, layered configuration, a command-line tool and tests.
 ```bash
 node bin/studio.mjs doctor                      # what's installed ("All set")
 node bin/studio.mjs setup                       # once: Python env + free voice/Whisper models, all inside .studio/
-node bin/studio.mjs templates                   # the video types
-node bin/studio.mjs new inside-out my-video     # a new project (a copy of the template's example)
-#   …edit projects/my-video/script.json and src/shots.js…
-node bin/studio.mjs build my-video              # voice → timing → check → cues → mix → review sheet → MP4
-open projects/my-video/renders/my-video.mp4
+node bin/studio.mjs channels                    # the channels (each one a self-contained folder)
+node bin/studio.mjs backlog --channel sakumai    # its episode ideas and where each one is
+node bin/studio.mjs new --channel sakumai --from-backlog why-blush
+#   …write projects/sakumai/why-blush/script.json and src/shots.js…
+node bin/studio.mjs build sakumai/why-blush     # voice → timing → lint → check → cues → mix → review sheet → MP4
+open projects/sakumai/why-blush/renders/why-blush.mp4
 ```
 
 With Claude Code in this folder, just ask ("make a Deep Dive short about cracking your knuckles"). The project skill
@@ -24,18 +25,42 @@ With Claude Code in this folder, just ask ("make a Deep Dive short about crackin
 
 Needs: Node.js 22+, ffmpeg, Google Chrome, Python 3.10+ (for the env). `npm link` makes `studio` a global command.
 
-## Channels and characters
+## Channels (the unit the studio scales by)
 
-Characters are permanent, reusable cast members with stable IDs; channels are brands that cast them.
+A channel is one self-contained folder. Adding the n-th channel is `studio channel-new <id> --name "…"`; no shared
+code changes, and nothing in one channel's folder is visible to another.
 
 ```
-characters/<id>/   character.json (id, version, palette, expressions, poses, outfits, voice) · character.js (the only
-                   drawing code) · CHARACTER.md (the bible) · sheet.png (model sheet, rendered from the code) · refs/
-channels/<id>/     channel.json: cast, default template / voice / music / caption look, publish defaults
+channels/<id>/
+  channel.json     name, handle, cast, shared templates it may use, defaults (template, voice, music, caption look),
+                   voices (per speaker), quality (lint thresholds), publish (targets, tags, footer, links, per platform)
+  BIBLE.md         audience, promise, tone, hook formulas, series, look, do / don't, titles, monetization
+  series.json      recurring formats        backlog.json   episode ideas (status is read from what exists)
+  templates/<t>/   templates only this channel uses
+  characters/<c>/  characters only this channel uses
+  audio/           its own music and stings
+projects/<id>/<episode>/   its videos
+```
+
+**No mixing, enforced:** a channel can't use another channel's template or character (refused when creating, loading
+or validating), the renderer serves only the video's own cast, credentials are per channel, and the originality
+check compares a script only with its own channel's videos.
+
+## Characters
+
+Characters are permanent, reusable cast members with stable IDs: shared ones in `characters/<id>/`, a channel's own in
+`channels/<ch>/characters/<id>/`.
+
+```
+<id>/   character.json (id, version, palette, expressions, poses, outfits, voice) · character.js (the only
+        drawing code) · CHARACTER.md (the bible) · sheet.png (model sheet, rendered from the code) · refs/
 ```
 
 - `studio new <name> --channel sakumai` makes a video with the channel's template, voice and look, and pins its
   cast versions in `project.json`.
+- **Voices:** a script line's `"speaker"` speaks in that character's voice (character.json `voice` < channel.json
+  `voices` < script.json `speakers`). Engines: `kokoro` (built in), `voicestudio` and `http` (any local server with
+  the OpenAI-compatible speech API).
 - Shots draw a character with `cast('sakumai').draw({ x, y, s, pose, expression, outfit, xray, t, talk })`.
 - Characters are served read-only from the library, so a project can't change how they look.
 - Improving a character means editing it in the library and bumping its version. `studio check` notes when a project
@@ -46,15 +71,17 @@ channels/<id>/     channel.json: cast, default template / voice / music / captio
 
 | group | commands |
 |---|---|
-| projects | `templates [--validate]` · `new <template> <name>` · `new <name> --channel <id>` · `list` |
-| cast | `characters [--validate]` · `character-sheet <id>` · `channels [--validate]` |
+| projects | `templates [--validate]` · `new <name> --channel <id>` · `new --channel <id> --from-backlog <ep>` · `new <template> <name>` · `list [--channel <id>]` |
+| channel | `backlog --channel <id>` · `backlog-add --channel <id> --id … --title …` · `lint <project>` |
+| cast | `channels [--validate]` · `channel-new <id> --name "…"` · `characters [--validate]` · `character-sheet <id>` |
 | audio | `voice` · `words [--audio file]` · `estimate` · `mix` · `voices` · `effects` |
 | render | `check` · `cues` · `sheet` · `frames <times>` · `render [--draft]` · `preview` · `stylesheet <template>` |
 | pipeline | `build [--timing voice\|estimate\|audio:<file>\|keep] [--from step] [--only a,b] [--skip a,b]` · `selftest` |
 | publish | `accounts` · `connect <youtube\|instagram> --channel <id>` · `disconnect` · `publish <project> --to youtube,instagram [--yes]` · `share` · `host` |
 | system | `doctor` · `setup` |
 
-`<project>` is a name in `projects/`, a path, or `@<template>` for that template's own example.
+`<project>` is `<channel>/<name>`, a bare name when only one channel has it, a path, or `@<template>` for that
+template's own example.
 
 ## Layout
 
@@ -71,11 +98,11 @@ engine/                     the browser runtime shared by every template
   src/core/                 lib (math, primitives) · timing · captions (configurable) · config · random (seeded) ·
                             board (style sheets) · engine (three.js film look, configurable) · human · sdf
   fonts/  vendor/three/     stored once
-characters/<id>/            permanent cast members (character.js, CHARACTER.md, sheet.png)
-channels/<id>/              brands: cast + defaults
-templates/<id>/             one video type: template.json · STYLE.md · style-sheet.png · src/ (its kit) · example/
+channels/<id>/              one folder per channel: channel.json · BIBLE.md · series · backlog · its own templates/ characters/ audio/
+characters/<id>/            shared permanent cast members (character.js, CHARACTER.md, sheet.png)
+templates/<id>/             shared video types: template.json · STYLE.md · style-sheet.png · src/ (its kit) · example/
 python/studio_audio/        voice (TTS provider registry, Kokoro) · align (Whisper) · estimate · mix (effect/music registries, plugins)
-projects/<name>/            your videos: project.json · script.json · src/shots.js · data/ · renders/ · review/
+projects/<channel>/<name>/  your videos: project.json · script.json · src/shots.js · data/ · renders/ · review/
 tests/                      unit/ (fast) · render/ (headless Chrome) · python/tests (audio)
 .studio/                    venv + models (git-ignored, rebuilt by `studio setup`)
 .claude/skills/content-studio/   the workflow skill (local to this folder)
@@ -91,21 +118,24 @@ path. Existing relative imports (`./core/lib.js`, `three`) work unchanged.
 **Layered configuration.**
 - Studio: built-in defaults < `studio.config.json` < `studio.config.local.json` (per machine, git-ignored) < env
   (`FPS`, `CHROME`, `SOFTWARE_GL`, `QS`, `STUDIO_HOME`, `STUDIO_WHISPER_MODEL`).
-- Runtime (what the browser engine sees): engine defaults < `template.json` < `project.json` → `overrides`.
+- Runtime (what the browser engine sees): engine defaults < `template.json` < channel `defaults.overrides` <
+  `project.json` → `overrides`.
   Keys: `player` (renderer, camera punch/push/flash, fades, seed), `captions` (position, size, colours, stroke),
   `engine3d` (tone mapping, far plane, grade), `fonts`, `sheet`.
 
 **Generated pages.** `index.html` and `sheet.html` are generated from the config (fonts → `@font-face`, 3D → WebGL
 canvas + import map), so templates carry no boilerplate.
 
-**Pipeline as data.** `studio/lib/pipeline.mjs` holds the steps (`timing → check → cues → mix → sheet → render`);
-`build` runs all or a slice of them.
+**Pipeline as data.** `studio/lib/pipeline.mjs` holds the steps (`timing → lint → check → cues → mix → sheet →
+render`); `build` runs all or a slice of them. `lint` is the quality gate (`studio/lib/lint.mjs`): it blocks a channel
+video with no description, tags or sources, over-long captions, or phrasing that repeats the channel's other videos.
 
 **Plug-ins.**
-- Templates: a folder in any `templatesDirs` entry.
+- Channels: a folder in `channels/` (`studio channel-new`).
+- Templates: a folder in any `templatesDirs` entry, or in a channel's `templates/`.
 - Commands: a file in `studio/commands/`.
 - Sound effects and music: `@effect` / `@track` in a `.py` file in `templates/<id>/audio/` or `projects/<name>/audio/`.
-- TTS engines: a provider in `python/studio_audio/tts/`.
+- TTS engines: a provider in `python/studio_audio/tts/` (kokoro, voicestudio, http).
 - Platforms to publish to: a file in `studio/publish/exporters/` (`{ id, needs, status, connect, plan, publish }`).
 - Temporary hosts: an entry in `studio/publish/hosts.mjs`.
 
@@ -120,6 +150,8 @@ npm run test:py       # audio: timing, alignment, narration, every effect/track,
 npm run test:render   # headless Chrome: every template boots + renders deterministically, overrides, full pipeline
 node bin/studio.mjs selftest   # every template end to end with the real voice
 ```
+
+Working from a git worktree (parallel work): link the one shared env first, `ln -s /path/to/ContentStudio/.studio .studio`.
 
 ## Migration notes (from faceless-shorts)
 - **Deduplicated:** the six copies of capture/mix/lib/timing/board/engine/fonts/three.js now exist once (16 MB → 10 MB).

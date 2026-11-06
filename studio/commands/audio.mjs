@@ -1,5 +1,6 @@
 // Narration, timing and sound: thin wrappers over python/studio_audio, run in the studio's own env.
 import { loadProject } from '../lib/project.mjs';
+import { writeVoices } from '../lib/voices.mjs';
 import { runAudio } from '../lib/python.mjs';
 
 const P = (ref, cfg) => loadProject(ref, cfg);
@@ -11,6 +12,7 @@ export const commands = [
     options: { voice: { type: 'string' }, speed: { type: 'string' } },
     run({ positionals: [ref], values, cfg }) {
       const p = P(ref, cfg);
+      writeVoices(p, cfg);
       runAudio(cfg, ['voice', p.dir, ...(values.voice ? ['--voice', values.voice] : []), ...(values.speed ? ['--speed', values.speed] : [])], { project: p });
     },
   },

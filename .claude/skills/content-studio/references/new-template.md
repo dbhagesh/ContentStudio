@@ -1,6 +1,8 @@
 # Adding a new video type (template)
 
-A template is a folder in `templates/` (or any folder listed in `studio.config.json` → `templatesDirs`). Drop it in and
+A template built for one channel goes in `channels/<channel>/templates/<id>/` (only that channel can use it); a
+template meant for many channels goes in `templates/` (or any folder in `studio.config.json` → `templatesDirs`), and a
+channel lists it in channel.json "templates". Template ids are unique across both. Drop it in and
 `studio templates` picks it up; nothing else is registered anywhere. The studio serves every page from three layers,
 first hit wins:
 

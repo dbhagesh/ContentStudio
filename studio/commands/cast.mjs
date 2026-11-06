@@ -1,7 +1,7 @@
 // Characters and channels: the permanent cast and the brands that use it.
 import path from 'node:path';
-import { listCharacters, loadCharacter, validateCharacter, castEntry } from '../lib/characters.mjs';
-import { listChannels, validateChannel } from '../lib/channels.mjs';
+import { listCharacters, loadCharacter, validateCharacter, castEntry, castMounts, characterChannels } from '../lib/characters.mjs';
+import { listChannels, validateChannel, channelTemplates, scaffoldChannel } from '../lib/channels.mjs';
 import { createOverlay } from '../lib/overlay.mjs';
 import { ENGINE_DIR } from '../lib/paths.mjs';
 import { withSession } from '../render/session.mjs';
@@ -11,7 +11,7 @@ import * as modes from '../render/modes.mjs';
 export function characterStage(c, cfg) {
   return {
     dir: c.dir, name: c.id, isExample: true,
-    overlay: createOverlay([ENGINE_DIR], { mounts: { '/characters/': cfg.charactersDir } }),
+    overlay: createOverlay([ENGINE_DIR], { mounts: castMounts([c]) }),
     runtime: {
       id: 'character', title: c.manifest.name, format: {}, player: {}, captions: {}, engine3d: {}, sheet: {},
       fonts: [{ family: 'Inter', weight: 900, file: 'fonts/Inter-Black.otf' }, { family: 'Inter', weight: 800, file: 'fonts/Inter-ExtraBold.otf' }],
@@ -40,7 +40,7 @@ export const commands = [
       if (!all.length) { console.log(`no characters yet in ${cfg.charactersDir}`); return 0; }
       const bad = report(all, values.validate && validateCharacter, (c) => {
         const m = c.manifest;
-        return `${c.id.padEnd(14)} v${m.version}  ${m.name}  ·  channels: ${(m.channels || []).join(', ') || '-'}\n${' '.repeat(16)}${m.description || ''}\n${' '.repeat(16)}${m.expressions?.length || 0} expressions · ${m.poses?.length || 0} poses · outfits: ${(m.outfits || []).join(', ')}`;
+        return `${c.id.padEnd(14)} v${m.version}  ${m.name}  ·  channels: ${characterChannels(c).join(', ') || 'any'}\n${' '.repeat(16)}${m.description || ''}\n${' '.repeat(16)}${m.expressions?.length || 0} expressions · ${m.poses?.length || 0} poses · outfits: ${(m.outfits || []).join(', ')}`;
       });
       if (values.validate) console.log(bad ? `${bad} problem(s)` : `all ${all.length} characters valid`);
       return bad ? 1 : 0;
@@ -65,10 +65,20 @@ export const commands = [
       if (!all.length) { console.log(`no channels yet in ${cfg.channelsDir}`); return 0; }
       const bad = report(all, values.validate && ((ch) => validateChannel(ch, cfg)), (ch) => {
         const m = ch.manifest, d = m.defaults || {};
-        return `${ch.id.padEnd(14)} ${m.name} ${m.handle || ''}  ·  cast: ${(m.cast || []).join(', ') || '-'}\n${' '.repeat(16)}template ${d.template || '-'} · voice ${d.voice || '-'} · music ${d.music || '-'}${m.url ? ' · ' + m.url : ''}`;
+        return `${ch.id.padEnd(14)} ${m.name} ${m.handle || ''}  ·  cast: ${(m.cast || []).join(', ') || '-'}\n${' '.repeat(16)}templates ${channelTemplates(ch, cfg).map((t) => t.id + (t.id === d.template ? '*' : '')).join(', ') || '-'} · voice ${d.voice || '-'} · music ${d.music || '-'}${m.url ? ' · ' + m.url : ''}`;
       });
       if (values.validate) console.log(bad ? `${bad} problem(s)` : `all ${all.length} channels valid`);
       return bad ? 1 : 0;
+    },
+  },
+  {
+    name: 'channel-new', group: 'cast', summary: 'create a new channel folder (channel.json, BIBLE.md, series, backlog, own templates/characters)',
+    usage: 'channel-new <id> --name "Channel Name" [--handle @Handle] [--about "..."]',
+    options: { name: { type: 'string' }, handle: { type: 'string' }, about: { type: 'string' } },
+    run({ positionals: [id], values, cfg }) {
+      const dir = scaffoldChannel({ id, name: values.name, handle: values.handle, about: values.about, cfg });
+      console.log(`${dir}\nnext: fill BIBLE.md, add its cast (channels/${id}/characters/) and templates (channels/${id}/templates/ or shared ones in "templates"), then studio channels --validate`);
+      return 0;
     },
   },
 ];

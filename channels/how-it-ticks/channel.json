@@ -1,0 +1,38 @@
+{
+  "id": "how-it-ticks",
+  "name": "How It Ticks",
+  "handle": "@HowItTicks",
+  "url": "https://www.youtube.com/@HowItTicks",
+  "instagram": null,
+  "about": "How everyday things really work, shown in 3D: machines, gadgets and the body, taken apart.",
+  "cast": [],
+  "templates": [],
+  "defaults": {
+    "template": null,
+    "voice": null,
+    "speed": 1,
+    "music": "bed",
+    "overrides": {}
+  },
+  "publish": {
+    "targets": [
+      "youtube",
+      "instagram"
+    ],
+    "tags": [],
+    "footer": "",
+    "links": [],
+    "youtube": {
+      "category": "education",
+      "privacy": "private",
+      "madeForKids": false,
+      "syntheticMedia": false,
+      "language": "en"
+    },
+    "instagram": {
+      "shareToFeed": true,
+      "thumbOffsetMs": 1500,
+      "hashtags": []
+    }
+  }
+}

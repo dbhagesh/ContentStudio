@@ -37,7 +37,7 @@ export const commands = [
     options: { crf: { type: 'string' } },
     run({ positionals: [ref], values, cfg }) {
       const p = loadProject(ref, cfg), src = path.join(p.dir, `renders/${p.name}.mp4`), out = path.join(p.dir, `renders/${p.name}-share.mp4`);
-      if (!fs.existsSync(src)) throw new Error(`render it first: studio render ${p.name}`);
+      if (!fs.existsSync(src)) throw new Error(`render it first: studio render ${p.ref || p.name}`);
       const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', src, '-c:v', 'libx264', '-crf', values.crf || '21', '-preset', 'slow', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', out], { stdio: 'inherit' });
       if (r.status) throw new Error('ffmpeg failed');
       console.log(`${out} (${(fs.statSync(out).size / 1e6).toFixed(1)} MB)`);
@@ -103,11 +103,11 @@ export const commands = [
     options: { to: { type: 'string' }, yes: { type: 'boolean' }, privacy: { type: 'string' }, 'publish-at': { type: 'string' }, file: { type: 'string' }, force: { type: 'boolean' } },
     async run({ positionals: [ref], values, cfg }) {
       const p = loadProject(ref, cfg);
-      if (!p.channel) throw new Error(`project "${p.name}" has no channel: publishing uses a channel's accounts (set "channel" in project.json)`);
+      if (!p.channel) throw new Error(`project "${p.ref}" has no channel: publishing uses a channel's accounts (set "channel" in project.json)`);
       const file = path.resolve(values.file || path.join(p.dir, `renders/${p.name}.mp4`));
-      if (!fs.existsSync(file)) throw new Error(`no render at ${file}: studio build ${p.name}`);
+      if (!fs.existsSync(file)) throw new Error(`no render at ${file}: studio build ${p.ref || p.name}`);
       const stale = staleInputs(p, file);
-      if (stale.length) throw new Error(`the render is older than ${stale.join(', ')}: rebuild (studio build ${p.name} --from check) before publishing`);
+      if (stale.length) throw new Error(`the render is older than ${stale.join(', ')}: rebuild (studio build ${p.ref || p.name} --from check) before publishing`);
       const targets = list(values.to).length ? list(values.to) : p.channel.manifest.publish?.targets || [];
       if (!targets.length) throw new Error('where to? --to youtube,instagram');
       const plans = [];

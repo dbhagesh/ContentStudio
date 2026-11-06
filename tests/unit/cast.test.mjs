@@ -59,7 +59,7 @@ test('characters are served only from the library, never overridden by a project
   fs.mkdirSync(path.join(dir, 'characters/sakumai'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'characters/sakumai/character.js'), 'export default {}');
   const f = loadProject(dir, cfg).overlay.resolve('/characters/sakumai/character.js');
-  assert.equal(f, path.join(cfg.charactersDir, 'sakumai/character.js'));
+  assert.equal(f, path.join(loadCharacter('sakumai', cfg).dir, 'character.js'));
   assert.equal(loadProject(dir, cfg).overlay.resolve('/characters/../package.json'), null);
 });
 

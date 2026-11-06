@@ -1,0 +1,38 @@
+{
+  "id": "ink-and-ember",
+  "name": "Ink & Ember",
+  "handle": "@InkAndEmber",
+  "url": "https://www.youtube.com/@InkAndEmber",
+  "instagram": null,
+  "about": "Original serialized manga micro-dramas in black-and-white ink with ember-red colour bursts.",
+  "cast": [],
+  "templates": [],
+  "defaults": {
+    "template": null,
+    "voice": null,
+    "speed": 1,
+    "music": "bed",
+    "overrides": {}
+  },
+  "publish": {
+    "targets": [
+      "youtube",
+      "instagram"
+    ],
+    "tags": [],
+    "footer": "",
+    "links": [],
+    "youtube": {
+      "category": "education",
+      "privacy": "private",
+      "madeForKids": false,
+      "syntheticMedia": false,
+      "language": "en"
+    },
+    "instagram": {
+      "shareToFeed": true,
+      "thumbOffsetMs": 1500,
+      "hashtags": []
+    }
+  }
+}
