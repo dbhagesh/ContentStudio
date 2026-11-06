@@ -1,3 +1,32 @@
 {
-  "series": []
+  "series": [
+    {
+      "id": "how-they-make-money",
+      "name": "How They Make Money From You",
+      "format": "One everyday product or 'free' service, the hidden money machine behind it, and the exact moment you pay. Hook (the friendly-looking thing) → follow one dollar → the trap reveal → the number they hope you never do → Penny's smug last line.",
+      "hookFormula": "Why does [company] actually WANT you to [thing that sounds good for you]?",
+      "example": "Why does your credit card want you to pay the minimum?"
+    },
+    {
+      "id": "money-myths",
+      "name": "Money Myths",
+      "format": "A belief most people hold, busted with one chart or one receipt. Hook (state the myth like it's true) → Penny's 'nope' → what really happens, step by step → the surprising real rule → loop back to the myth.",
+      "hookFormula": "Everyone thinks [common belief]. [Short contradiction].",
+      "example": "Everyone thinks banks lend out your savings. They don't even need them."
+    },
+    {
+      "id": "the-math-of",
+      "name": "The Math Of…",
+      "format": "One number worked out on screen: a calculator, a ticking counter and a precise chart. Hook (the end result as a shock) → the inputs → the math, animated → the twist that changes the number → one rule of thumb to remember.",
+      "hookFormula": "This [small number] turns into [big number]. Here's the math.",
+      "example": "Seven percent a year doubles your money in about ten years. Here's the rule of 72."
+    },
+    {
+      "id": "rich-tricks",
+      "name": "Rich People Tricks, Explained",
+      "format": "A legal, well-known move wealthy people or big companies use, explained plainly and neutrally (what it is, why it works, who it works for), never as a how-to. Penny wears her monocle. Hook (the move sounds impossible) → how it works in three steps → the catch → why most people never see it.",
+      "hookFormula": "How do [rich people / billionaires / airlines] [do impossible-sounding thing]?",
+      "example": "How does an airline earn billions selling miles it gives away for free?"
+    }
+  ]
 }
