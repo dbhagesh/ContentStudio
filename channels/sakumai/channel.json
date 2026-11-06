@@ -8,11 +8,9 @@
   "cast": [
     "sakumai"
   ],
-  "templates": [
-    "inside-out"
-  ],
+  "templates": [],
   "defaults": {
-    "template": "inside-out",
+    "template": "sakumai-studio",
     "voice": "af_heart",
     "speed": 1.0,
     "music": "bed",

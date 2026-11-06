@@ -1,0 +1,211 @@
+{
+ "duration": 36.352,
+ "cues": [
+  {
+   "t": 0.15,
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "t": 2.02,
+   "type": "boing",
+   "gain": 0.55
+  },
+  {
+   "t": 2.857,
+   "type": "whoosh"
+  },
+  {
+   "t": 4.84,
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "t": 5.617,
+   "type": "whoosh"
+  },
+  {
+   "t": 5.817,
+   "type": "slide",
+   "dur": 1.2,
+   "gain": 0.5
+  },
+  {
+   "t": 6.46,
+   "type": "sparkle",
+   "gain": 0.7
+  },
+  {
+   "t": 8.897,
+   "type": "whoosh"
+  },
+  {
+   "t": 10.84,
+   "type": "pop"
+  },
+  {
+   "t": 10.94,
+   "type": "sparkle",
+   "gain": 0.5,
+   "dur": 0.6
+  },
+  {
+   "t": 11.589,
+   "type": "whoosh"
+  },
+  {
+   "t": 12.62,
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "t": 13.979,
+   "type": "whoosh"
+  },
+  {
+   "t": 14.86,
+   "type": "sparkle",
+   "dur": 1
+  },
+  {
+   "t": 15.28,
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "t": 16.14,
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "t": 16.34,
+   "type": "slide",
+   "dur": 1,
+   "gain": 0.5
+  },
+  {
+   "t": 17.713,
+   "type": "whoosh"
+  },
+  {
+   "t": 17.863,
+   "type": "heartbeat",
+   "gain": 0.7
+  },
+  {
+   "t": 18.333,
+   "type": "heartbeat",
+   "gain": 0.7
+  },
+  {
+   "t": 18.733,
+   "type": "heartbeat",
+   "gain": 0.7
+  },
+  {
+   "t": 19.333,
+   "type": "whoosh"
+  },
+  {
+   "t": 19.92,
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "t": 20.88,
+   "type": "slide",
+   "dur": 1.0199999999999996,
+   "gain": 0.5
+  },
+  {
+   "t": 21.9,
+   "type": "boing",
+   "gain": 0.5
+  },
+  {
+   "t": 22.374,
+   "type": "whoosh"
+  },
+  {
+   "t": 22.94,
+   "type": "sparkle",
+   "dur": 0.8
+  },
+  {
+   "t": 23.968,
+   "type": "zip",
+   "gain": 0.6
+  },
+  {
+   "t": 24.7,
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "t": 25.428,
+   "type": "whoosh"
+  },
+  {
+   "t": 26.06,
+   "type": "sparkle",
+   "dur": 0.9,
+   "gain": 0.7
+  },
+  {
+   "t": 27.158,
+   "type": "whoosh"
+  },
+  {
+   "t": 27.458,
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "t": 27.458,
+   "type": "slide",
+   "dur": 1.6,
+   "gain": 0.45
+  },
+  {
+   "t": 29.838,
+   "type": "whoosh"
+  },
+  {
+   "t": 30.38,
+   "type": "pop"
+  },
+  {
+   "t": 30.9,
+   "type": "sparkle",
+   "gain": 0.6,
+   "dur": 0.6
+  },
+  {
+   "t": 31.49,
+   "type": "whoosh"
+  },
+  {
+   "t": 32.62,
+   "type": "sparkle",
+   "dur": 0.8
+  },
+  {
+   "t": 33.37,
+   "type": "whoosh"
+  },
+  {
+   "t": 33.8,
+   "type": "pop"
+  },
+  {
+   "t": 34.06,
+   "type": "sparkle",
+   "dur": 1
+  },
+  {
+   "t": 34.94,
+   "type": "chirp",
+   "gain": 0.5
+  }
+ ]
+}
