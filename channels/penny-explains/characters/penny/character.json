@@ -1,0 +1,21 @@
+{
+  "id": "penny",
+  "name": "Penny",
+  "version": "1.0.0",
+  "kind": "canvas2d",
+  "module": "character.js",
+  "description": "The Penny Explains host: a sly, charming calico cat with green eyes and a gold cent pendant on a teal collar, who explains how money really works.",
+  "channels": ["penny-explains"],
+  "voice": { "id": "af_bella", "speed": 1.0, "note": "provisional until the bake-off" },
+  "palette": {
+    "fur": "#FFFDF8", "ginger": "#EE8A3C", "patch": "#2F2A33", "iris": "#56BC6C", "nose": "#F0899A",
+    "collar": "#1F8A8A", "gold": "#F5B83D", "line": "#2B2028"
+  },
+  "expressions": ["neutral", "smile", "smug", "grin", "wink", "happy", "surprised", "shock", "suspicious", "angry", "sad", "thinking", "greedy"],
+  "poses": ["stand", "wave", "point", "present", "coin", "count", "think", "shrug", "facepalm", "hips", "cheer", "hold"],
+  "outfits": ["classic", "banker", "fancy"],
+  "modes": ["xray"],
+  "anchors": ["top", "head", "face", "eyeL", "eyeR", "nose", "mouth", "neck", "pendant", "chest", "belly", "hips", "handL", "handR", "tail", "feet", "bubble"],
+  "references": [],
+  "changelog": [{ "version": "1.0.0", "date": "2026-11-07", "note": "First design, drawn in code: calico cat, cent pendant, 13 expressions, 12 poses, 3 outfits." }]
+}

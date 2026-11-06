@@ -1,0 +1,15 @@
+{
+  "id": "money-desk",
+  "title": "Money Desk",
+  "description": "Flat 2D finance explainer for Penny Explains: graph-paper desk, precise animated charts, ticking counters, coins, bills, receipts, price tags, a calculator, red trap reveals and before/after cards, presented by Penny.",
+  "useFor": ["how money works, how companies make money from you, money myths, the math of a number (Penny Explains only)"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "30-50 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "Inter", "weight": 800, "file": "fonts/Inter-ExtraBold.otf" }
+  ],
+  "player": { "renderer": "2d", "punch": 0.09, "punchDur": 0.3, "flash": 0.35, "zoom": 0.05, "background": "#FBF5E9" },
+  "captions": { "y": 1430, "size": 138, "highlight": "#FFC93C", "stroke": "#1D1B26", "strokeWidth": 28 },
+  "sheet": { "canvases": [] },
+  "defaults": { "voice": "af_bella", "music": "bed", "youtube": { "category": "27" } }
+}
