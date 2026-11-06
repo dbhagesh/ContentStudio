@@ -1,0 +1,22 @@
+{
+  "id": "sakumai",
+  "name": "Sakumai",
+  "version": "1.0.0",
+  "kind": "canvas2d",
+  "module": "character.js",
+  "description": "The Sakumai channel's mascot: a cute pink-haired anime schoolgirl who explains how feelings and the body work.",
+  "channels": ["sakumai"],
+  "voice": { "id": "af_heart", "speed": 1.0, "note": "provisional: confirm against the channel's existing videos" },
+  "palette": {
+    "hair": "#F7A9CB", "hairLight": "#FCC9DE", "skin": "#FFE7DA", "iris": "#9A7BE6", "bow": "#E2384A",
+    "cardigan": "#F9E5AC", "collar": "#2E3D7A", "skirt": "#34468A", "shoes": "#77462C", "line": "#7A4258"
+  },
+  "expressions": ["neutral", "smile", "happy", "love", "surprised", "serious", "shy", "sad", "angry", "shock", "sleepy", "wink", "starry"],
+  "poses": ["stand", "wave", "cheek", "books", "think", "point", "cheer", "shrug", "hips", "heart", "phone", "fists"],
+  "outfits": ["uniform", "casual", "pajamas"],
+  "modes": ["xray"],
+  "anchors": ["top", "head", "face", "mouth", "neck", "chest", "heart", "stomach", "belly", "hips", "knees", "feet", "handL", "handR", "bubble"],
+  "references": ["refs/butterflies-short-xray.jpg", "refs/butterflies-short-uniform.jpg"],
+  "source": "https://www.youtube.com/shorts/CJ5KQSk0vXE",
+  "changelog": [{ "version": "1.0.0", "date": "2026-11-06", "note": "Redrawn in code from 'Why Do You Get Butterflies Around Your Crush?' frames." }]
+}

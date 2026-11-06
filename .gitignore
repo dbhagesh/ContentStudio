@@ -1,0 +1,14 @@
+# local env + models (rebuilt by `studio setup`)
+.studio/
+# your videos (each is its own folder; commit them separately if you want)
+projects/*
+!projects/.gitkeep
+# per-machine overrides
+studio.config.local.json
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+templates/*/example/review/
+templates/*/example/renders/
+templates/*/example/data/*.wav

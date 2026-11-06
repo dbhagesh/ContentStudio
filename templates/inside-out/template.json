@@ -1,0 +1,11 @@
+{
+  "id": "inside-out",
+  "title": "Inside Out",
+  "description": "Flat 2D 'What happens if…?' explainer: a simple hero, x-ray cutaways, bold 1-3 word captions, punchy cuts.",
+  "useFor": ["body / health / science what-if, lighter and faster than Deep Dive"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "25-40 s" },
+  "fonts": [{ "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" }],
+  "player": { "renderer": "2d" },
+  "captions": {},
+  "defaults": { "voice": "am_michael", "music": "bed", "youtube": { "category": "27" } }
+}

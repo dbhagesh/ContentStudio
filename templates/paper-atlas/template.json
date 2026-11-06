@@ -1,0 +1,15 @@
+{
+  "id": "paper-atlas",
+  "title": "Paper Atlas",
+  "description": "History in cut paper: parchment maps, crimson routes, gold date ribbons, period figures.",
+  "useFor": ["a historical event, how-X-happened"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "30-45 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "Inter", "weight": 800, "file": "fonts/Inter-Black.otf" },
+    { "family": "Caladea", "weight": 700, "file": "fonts/Caladea-Bold.ttf" }
+  ],
+  "player": { "renderer": "2d", "punch": 0.06, "punchDur": 0.25, "flash": 0 },
+  "sheet": { "canvases": [] },
+  "defaults": { "voice": "bm_george", "music": "tension", "youtube": { "category": "27" } }
+}

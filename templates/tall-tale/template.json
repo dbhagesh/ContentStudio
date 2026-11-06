@@ -1,0 +1,16 @@
+{
+  "id": "tall-tale",
+  "title": "Tall Tale 3D",
+  "description": "Funny true stories: flat 2D cartoon people (big round heads, ink outlines) acting in a sunny 3D small-town world, camera always moving, one-word captions.",
+  "useFor": ["a funny or clever true story, a con, a loophole, this-guy-did-X"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "40-60 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "Inter", "weight": 800, "file": "fonts/Inter-ExtraBold.otf" },
+    { "family": "Caladea", "weight": 700, "file": "fonts/Caladea-Bold.ttf" }
+  ],
+  "player": { "renderer": "3d", "fadeOut": 0.4 },
+  "engine3d": { "toneMapping": "neutral", "far": 800, "grade": { "vignette": 0.18, "grain": 0.008, "warm": 0.02, "sat": 1.12 } },
+  "sheet": { "canvases": [["gl", 1080, 1920], ["gl2", 1280, 860]] },
+  "defaults": { "voice": "am_michael", "music": "bounce", "youtube": { "category": "23" } }
+}

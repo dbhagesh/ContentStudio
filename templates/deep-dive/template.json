@@ -1,0 +1,16 @@
+{
+  "id": "deep-dive",
+  "title": "Deep Dive 3D",
+  "description": "The flagship, Zack D. Films-like: sculpted 3D people in sunlit sets, glowing x-ray bodies, camera journeys through blood vessels, shallow focus.",
+  "useFor": ["body / health / science what-happens-if"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "30-45 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "Inter", "weight": 800, "file": "fonts/Inter-ExtraBold.otf" }
+  ],
+  "player": { "renderer": "3d", "fadeOut": 0.4 },
+  "captions": { "y": 1480, "size": 118, "maxW": 940, "letterSpacing": -1, "stroke": "#111", "strokeWidth": 22, "shadowOffset": 6 },
+  "engine3d": { "toneMapping": "aces", "far": 120 },
+  "sheet": { "canvases": [["gl", 1080, 1920], ["gl2", 1280, 860]] },
+  "defaults": { "voice": "am_michael", "music": "tension", "youtube": { "category": "27" } }
+}

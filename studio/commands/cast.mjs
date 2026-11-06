@@ -1,0 +1,74 @@
+// Characters and channels: the permanent cast and the brands that use it.
+import path from 'node:path';
+import { listCharacters, loadCharacter, validateCharacter, castEntry } from '../lib/characters.mjs';
+import { listChannels, validateChannel } from '../lib/channels.mjs';
+import { createOverlay } from '../lib/overlay.mjs';
+import { ENGINE_DIR } from '../lib/paths.mjs';
+import { withSession } from '../render/session.mjs';
+import * as modes from '../render/modes.mjs';
+
+/** a bare stage for drawing one character outside any video (model sheets, tests) */
+export function characterStage(c, cfg) {
+  return {
+    dir: c.dir, name: c.id, isExample: true,
+    overlay: createOverlay([ENGINE_DIR], { mounts: { '/characters/': cfg.charactersDir } }),
+    runtime: {
+      id: 'character', title: c.manifest.name, format: {}, player: {}, captions: {}, engine3d: {}, sheet: {},
+      fonts: [{ family: 'Inter', weight: 900, file: 'fonts/Inter-Black.otf' }, { family: 'Inter', weight: 800, file: 'fonts/Inter-ExtraBold.otf' }],
+      cast: [castEntry(c)],
+    },
+  };
+}
+
+function report(items, validate, describe) {
+  let bad = 0;
+  for (const it of items) {
+    console.log(describe(it));
+    if (validate) { const errs = validate(it); bad += errs.length; for (const e of errs) console.log(`${' '.repeat(16)}✗ ${e}`); }
+  }
+  return bad;
+}
+
+export const commands = [
+  {
+    name: 'characters', group: 'cast', summary: 'list the permanent characters (--validate checks them)',
+    usage: 'characters [--validate] [--json]',
+    options: { validate: { type: 'boolean' }, json: { type: 'boolean' } },
+    run({ values, cfg }) {
+      const all = listCharacters(cfg);
+      if (values.json) { console.log(JSON.stringify(all.map((c) => c.manifest), null, 2)); return 0; }
+      if (!all.length) { console.log(`no characters yet in ${cfg.charactersDir}`); return 0; }
+      const bad = report(all, values.validate && validateCharacter, (c) => {
+        const m = c.manifest;
+        return `${c.id.padEnd(14)} v${m.version}  ${m.name}  ·  channels: ${(m.channels || []).join(', ') || '-'}\n${' '.repeat(16)}${m.description || ''}\n${' '.repeat(16)}${m.expressions?.length || 0} expressions · ${m.poses?.length || 0} poses · outfits: ${(m.outfits || []).join(', ')}`;
+      });
+      if (values.validate) console.log(bad ? `${bad} problem(s)` : `all ${all.length} characters valid`);
+      return bad ? 1 : 0;
+    },
+  },
+  {
+    name: 'character-sheet', group: 'cast', summary: "render a character's model sheet from its code (default: characters/<id>/sheet.png)",
+    usage: 'character-sheet <id> [out.png]',
+    async run({ positionals: [id, out], cfg }) {
+      if (!id) throw new Error('which character? (studio characters)');
+      const c = loadCharacter(id, cfg), file = out ? path.resolve(out) : path.join(c.dir, 'sheet.png');
+      await withSession(characterStage(c, cfg), cfg, (s) => modes.stylesheet(s, file), { page: 'character', query: `id=${encodeURIComponent(id)}` });
+      console.log(file);
+    },
+  },
+  {
+    name: 'channels', group: 'cast', summary: 'list the channels and their cast (--validate checks them)',
+    usage: 'channels [--validate]',
+    options: { validate: { type: 'boolean' } },
+    run({ values, cfg }) {
+      const all = listChannels(cfg);
+      if (!all.length) { console.log(`no channels yet in ${cfg.channelsDir}`); return 0; }
+      const bad = report(all, values.validate && ((ch) => validateChannel(ch, cfg)), (ch) => {
+        const m = ch.manifest, d = m.defaults || {};
+        return `${ch.id.padEnd(14)} ${m.name} ${m.handle || ''}  ·  cast: ${(m.cast || []).join(', ') || '-'}\n${' '.repeat(16)}template ${d.template || '-'} · voice ${d.voice || '-'} · music ${d.music || '-'}${m.url ? ' · ' + m.url : ''}`;
+      });
+      if (values.validate) console.log(bad ? `${bad} problem(s)` : `all ${all.length} channels valid`);
+      return bad ? 1 : 0;
+    },
+  },
+];

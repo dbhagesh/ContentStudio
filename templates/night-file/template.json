@@ -1,0 +1,15 @@
+{
+  "id": "night-file",
+  "title": "Night File 3D",
+  "description": "Unsolved mysteries / true crime: dark 3D places with one light, faceless people (the subject glows red), typewriter dates, case-file inserts.",
+  "useFor": ["creepy, unexplained, true crime, this-happened-in-1971"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "30-45 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "FreeMono", "weight": 700, "file": "fonts/FreeMonoBold.ttf" }
+  ],
+  "player": { "renderer": "3d", "fadeOut": 0.4 },
+  "engine3d": { "toneMapping": "aces", "far": 120 },
+  "sheet": { "canvases": [["gl", 1080, 1920], ["gl2", 1280, 860]] },
+  "defaults": { "voice": "am_onyx", "music": "tension", "youtube": { "category": "27" } }
+}

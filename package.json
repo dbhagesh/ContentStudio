@@ -1,0 +1,16 @@
+{
+  "name": "content-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Template-driven, fully local video studio: script → AI voice → word-synced captions → code-drawn 2D/3D animation → MP4.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "bin": { "studio": "bin/studio.mjs" },
+  "scripts": {
+    "studio": "node bin/studio.mjs",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:py": ".studio/venv/bin/python -m unittest discover -s python/tests -t python",
+    "test:render": "node --test --test-concurrency=1 \"tests/render/*.test.mjs\"",
+    "test:all": "npm test && npm run test:py && npm run test:render"
+  }
+}

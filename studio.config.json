@@ -1,0 +1,10 @@
+{
+  "projectsDir": "projects",
+  "studioHome": ".studio",
+  "templatesDirs": ["templates"],
+  "audioPlugins": [],
+  "render": { "fps": 30, "chrome": null, "softwareGL": false, "quality": "", "crf": 18, "preset": "veryfast" },
+  "voice": { "tts": "kokoro", "voice": "am_michael", "speed": 1.0, "whisperModel": "small.en" },
+  "review": { "sheetStep": 0.5, "sheetCols": 10 },
+  "publish": { "host": "litterbox", "expiry": "1h" }
+}

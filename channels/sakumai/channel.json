@@ -1,0 +1,55 @@
+{
+  "id": "sakumai",
+  "name": "Sakumai",
+  "handle": "@SakumaiShorts",
+  "url": "https://www.youtube.com/@SakumaiShorts",
+  "instagram": null,
+  "about": "Cute anime Shorts that explain feelings and the body: crushes, nerves, sleep, blushing. Hosted by Sakumai.",
+  "cast": [
+    "sakumai"
+  ],
+  "defaults": {
+    "template": "inside-out",
+    "voice": "af_heart",
+    "speed": 1.0,
+    "music": "bed",
+    "overrides": {
+      "captions": {
+        "stroke": "#2A1A3A",
+        "highlight": "#FFD43B"
+      }
+    }
+  },
+  "publish": {
+    "targets": [
+      "youtube",
+      "instagram"
+    ],
+    "tags": [
+      "sakumai",
+      "anime",
+      "shorts",
+      "psychology",
+      "science"
+    ],
+    "footer": "Sakumai explains how your feelings and body work 💗",
+    "youtube": {
+      "category": "education",
+      "privacy": "private",
+      "madeForKids": false,
+      "syntheticMedia": false,
+      "language": "en"
+    },
+    "instagram": {
+      "shareToFeed": true,
+      "thumbOffsetMs": 1500,
+      "hashtags": [
+        "anime",
+        "reels"
+      ]
+    }
+  },
+  "references": [
+    "https://www.youtube.com/shorts/CJ5KQSk0vXE"
+  ]
+}
