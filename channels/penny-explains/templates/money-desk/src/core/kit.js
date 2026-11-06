@@ -259,17 +259,17 @@ export function statement(x, y, w, { title = 'STATEMENT', rows = [], hi = -1, hi
  * Bars grow from the baseline; each value label counts up with its bar and sits on top of it.
  */
 export function barChart(o) {
-  const { x, y, w, h, bars, max, p = 1, ticks = [], fmt = (v) => fmtNum(v), title = null, stagger = 0.25, labelSize = 40, valueSize = 52 } = o;
-  if (title) text(title, x + w / 2, y - 60, 46, P.ink, { spacing: 1, maxW: w });
+  const { x, y, w, h, bars, max, p = 1, ticks = [], fmt = (v) => fmtNum(v), title = null, stagger = 0.25, labelSize = 46, valueSize = 64, tickSize = 40 } = o;
+  if (title) text(title, x + w / 2, y - 70, 50, P.ink, { spacing: 1, maxW: w });
   ctx.save();
-  for (const tv of ticks) { const yy = y + h - tv / max * h; line([[x, yy], [x + w, yy]], P.grid, 3); text(fmt(tv), x - 16, yy, 30, P.inkSoft, { align: 'right', weight: 800 }); }
+  for (const tv of ticks) { const yy = y + h - tv / max * h; line([[x, yy], [x + w, yy]], P.grid, 4); text(fmt(tv), x - 18, yy, tickSize, P.inkSoft, { align: 'right', weight: 800 }); }
   const n = bars.length, gap = w / n, bw = Math.min(200, gap * 0.62);
   bars.forEach((b, i) => {
     const k = eio(clamp((p - i * stagger / Math.max(1, n - 1)) / (1 - stagger))), v = b.value * k, bh = v / max * h, cx = x + gap * (i + 0.5);
     rr(cx - bw / 2 + 8, y + h - bh + 10, bw, bh, [16, 16, 0, 0]); ctx.fillStyle = P.shadow; ctx.fill();
     if (bh > 1) { rr(cx - bw / 2, y + h - bh, bw, bh, [16, 16, 0, 0]); ctx.fillStyle = b.color || P.teal; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = P.ink; ctx.stroke(); }
-    if (k > 0) text(b.text ? b.text(v) : fmt(v), cx, y + h - bh - 42, valueSize, b.color === P.red ? P.red : P.ink, { maxW: gap - 10 });
-    text(b.label, cx, y + h + 46, labelSize, P.ink, { weight: 900, maxW: gap - 10 });
+    if (k > 0) text(b.text ? b.text(v) : fmt(v), cx, y + h - bh - valueSize * 0.75, valueSize, b.color === P.red ? P.red : P.ink, { maxW: gap - 10 });
+    text(b.label, cx, y + h + labelSize * 1.05, labelSize, P.ink, { weight: 900, maxW: gap - 10 });
   });
   line([[x - 6, y + h], [x + w + 6, y + h]], P.ink, 7);
   ctx.restore();
@@ -280,12 +280,12 @@ export function barChart(o) {
  * Every point comes from data; the head of each line carries a dot (and its value with endLabel).
  */
 export function lineChart(o) {
-  const { x, y, w, h, xMin, xMax, yMin, yMax, series, p = 1, xTicks = [], yTicks = [], fmtX = (v) => fmtNum(v), fmtY = (v) => fmtNum(v), xLabel = null, yLabel = null, endDot = true, endLabel = null } = o;
+  const { x, y, w, h, xMin, xMax, yMin, yMax, series, p = 1, xTicks = [], yTicks = [], fmtX = (v) => fmtNum(v), fmtY = (v) => fmtNum(v), xLabel = null, yLabel = null, endDot = true, endLabel = null, tickSize = 40 } = o;
   const X = (v) => x + (v - xMin) / (xMax - xMin) * w, Y = (v) => y + h - (v - yMin) / (yMax - yMin) * h;
-  for (const tv of yTicks) { line([[x, Y(tv)], [x + w, Y(tv)]], P.grid, 3); text(fmtY(tv), x - 16, Y(tv), 30, P.inkSoft, { align: 'right', weight: 800 }); }
-  for (const tv of xTicks) { line([[X(tv), y + h], [X(tv), y + h + 14]], P.ink, 5); text(fmtX(tv), X(tv), y + h + 44, 32, P.inkSoft, { weight: 800 }); }
-  if (xLabel) text(xLabel, x + w / 2, y + h + 96, 34, P.ink, { weight: 900, spacing: 1 });
-  if (yLabel) text(yLabel, x, y - 44, 34, P.ink, { weight: 900, align: 'left', spacing: 1 });
+  for (const tv of yTicks) { line([[x, Y(tv)], [x + w, Y(tv)]], P.grid, 4); text(fmtY(tv), x - 18, Y(tv), tickSize, P.inkSoft, { align: 'right', weight: 800 }); }
+  for (const tv of xTicks) { line([[X(tv), y + h], [X(tv), y + h + 16]], P.ink, 6); text(fmtX(tv), X(tv), y + h + tickSize * 1.25, tickSize, P.inkSoft, { weight: 800 }); }
+  if (xLabel) text(xLabel, x + w / 2, y + h + tickSize * 2.6, tickSize, P.ink, { weight: 900, spacing: 1 });
+  if (yLabel) text(yLabel, x, y - tickSize * 1.3, tickSize, P.ink, { weight: 900, align: 'left', spacing: 1 });
   const xEnd = lerp(xMin, xMax, clamp(p));
   for (const s of series) {
     const pts = []; const d = s.data;
@@ -321,20 +321,28 @@ export function splitBar(o) {
 }
 
 // ═════════════════════════ THE TRAP + VERDICTS ═════════════════════════
-/** a cartoon spring trap with a coin as bait. close 0 = open, 1 = snapped shut (drive it from time). s = 1 → ~520 wide */
+/** a cartoon jaw trap with a coin as bait. close 0 = open (jaws spread), 1 = snapped shut. s = 1 → ~560 wide */
 export function trap(x, y, s = 1, close = 0, bait = true) {
+  const R = 130;
   ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-  ell(0, 40, 270, 40, P.shadow);
-  rr(-230, 0, 460, 40, 14); ctx.fillStyle = '#6B6F80'; ctx.fill(); ctx.lineWidth = OUT; ctx.strokeStyle = P.ink; ctx.stroke();
-  rr(-40, -20, 80, 30, 8); ctx.fillStyle = P.redDark; ctx.fill(); ctx.stroke();
-  if (bait && close < 0.5) coin(0, -60, 46, 0, 0);
-  const a = lerp(1.32, 0.04, eob(clamp(close)));       // each jaw's angle from upright: ~flat (open) → upright (shut)
+  ell(0, 34, 300, 36, P.shadow);
+  rr(-250, 0, 500, 36, 14); ctx.fillStyle = '#6B6F80'; ctx.fill(); ctx.lineWidth = OUT; ctx.strokeStyle = P.ink; ctx.stroke();
+  for (const sd of [-1, 1]) { ctx.beginPath(); ctx.ellipse(sd * 190, 4, 44, 22, 0, 0, TAU); ctx.fillStyle = '#9DA2B4'; ctx.fill(); ctx.lineWidth = 5; ctx.stroke(); }
+  rr(-46, -22, 92, 26, 8); ctx.fillStyle = P.redDark; ctx.fill(); ctx.lineWidth = 5; ctx.stroke();
+  if (bait && close < 0.4) coin(0, -64, 44, 0, 0);
+  const th = lerp(0.95, 0, eob(clamp(close)));          // how far each jaw is tipped outward from upright
   for (const sd of [-1, 1]) {
-    ctx.save(); ctx.translate(sd * 10, 10); ctx.rotate(sd * a);
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -230);
-    ctx.lineWidth = 18; ctx.strokeStyle = P.ink; ctx.lineCap = 'round'; ctx.stroke();
-    ctx.lineWidth = 10; ctx.strokeStyle = '#9DA2B4'; ctx.stroke();
-    for (let i = 0; i < 6; i++) { const yy = -40 - i * 34; ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(-sd * 26, yy - 14); ctx.lineTo(0, yy - 26); ctx.fillStyle = '#C7CBD8'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = P.ink; ctx.stroke(); }
+    ctx.save(); ctx.translate(0, 0); ctx.rotate(sd * th);
+    // the jaw: half of a ring (radius R) from the pivot up and over to the top, teeth pointing inward
+    const half = () => { ctx.beginPath(); ctx.arc(0, -R, R, Math.PI / 2, 3 * Math.PI / 2, sd > 0); };
+    half(); ctx.lineWidth = 30; ctx.strokeStyle = P.ink; ctx.lineCap = 'round'; ctx.stroke();
+    half(); ctx.lineWidth = 18; ctx.strokeStyle = '#B9BDCB'; ctx.stroke();
+    for (let i = 1; i < 8; i++) {
+      const f = Math.PI / 2 + i * Math.PI / 8, py = -R + Math.sin(f) * R;
+      const qx = sd < 0 ? Math.cos(f) * R : -Math.cos(f) * R, nx = -qx / R, ny = (-R - py) / R, tx = -ny, ty = nx;
+      ctx.beginPath(); ctx.moveTo(qx + tx * 11, py + ty * 11); ctx.lineTo(qx + nx * 30, py + ny * 30); ctx.lineTo(qx - tx * 11, py - ty * 11); ctx.closePath();
+      ctx.fillStyle = '#E3E6EE'; ctx.fill(); ctx.lineWidth = 3.5; ctx.strokeStyle = P.ink; ctx.lineJoin = 'round'; ctx.stroke();
+    }
     ctx.restore();
   }
   ctx.restore();
