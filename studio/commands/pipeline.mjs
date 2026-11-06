@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { loadProject, createProject } from '../lib/project.mjs';
 import { listTemplates } from '../lib/templates.mjs';
+import { loadChannel } from '../lib/channels.mjs';
 import { runPipeline, selectSteps, STEPS } from '../lib/pipeline.mjs';
 
 const list = (s) => (s ? s.split(',').map((x) => x.trim()).filter(Boolean) : undefined);
@@ -41,10 +42,11 @@ export const commands = [
       for (const t of tpls) {
         const t0 = Date.now(), logs = [];
         try {
-          const dir = createProject({ template: t, name: t.id, cfg, parent: root });
+          const channel = t.owner ? loadChannel(t.owner, cfg) : null;   // a channel's own template renders with its cast
+          const dir = createProject({ template: t, name: t.id, cfg, parent: root, channel });
           const p = loadProject(dir, cfg);
-          await runPipeline(p, cfg, { timing: values['no-voice'] ? 'estimate' : 'voice', draft: true, start: 2, end: 6, out: path.join(dir, 'renders/selftest.mp4'), quiet: true },
-            { log: (m) => logs.push(m) });
+          const opts = { timing: values['no-voice'] ? 'estimate' : 'voice', draft: true, start: 2, end: 6, out: path.join(dir, 'renders/selftest.mp4'), quiet: true, skip: ['lint'] };
+          await runPipeline(p, cfg, opts, { steps: selectSteps(opts), log: (m) => logs.push(m) });
           const db = meanVolume(path.join(dir, 'renders/selftest.mp4'));
           if (db <= -50) throw new Error(`clip is silent (${db} dB)`);
           console.log(`${t.id.padEnd(13)} ok, ${((Date.now() - t0) / 1000).toFixed(0)} s · sheet: ${path.join(dir, 'review/all.jpg')}`);
