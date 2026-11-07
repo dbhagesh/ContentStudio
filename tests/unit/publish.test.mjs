@@ -209,7 +209,7 @@ test('instagram: plan (caption rules, audio re-encode) and the Reel publishing f
 });
 
 test('publish bookkeeping: history guards double posts; stale renders are caught', () => {
-  const dir = createProject({ template: loadTemplate('inside-out', cfg), name: 'pub', cfg, channel });
+  const dir = createProject({ template: loadTemplate(channel.manifest.defaults.template, cfg), name: 'pub', cfg, channel });
   recordPublish(dir, { to: 'youtube', id: 'V', url: 'u', at: 'now' });
   assert.deepEqual(history(loadProject(dir, cfg).manifest).map((h) => h.to), ['youtube']);
   const render = path.join(dir, 'renders/pub.mp4');

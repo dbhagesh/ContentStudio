@@ -2,7 +2,7 @@
 //   channels/<id>/channel.json   {
 //     id, name, handle, url, instagram, about,
 //     cast: ["sakumai", ...]            the characters that appear on this channel
-//     templates: ["inside-out", ...]    shared templates it may use (its own templates/ are always allowed)
+//     templates: ["inside-out", ...]    shared templates it may use; [] = only its own templates/; no key = any
 //     defaults: { template, voice, speed, music, overrides: { captions, player, ... } }
 //     publish:  { targets, tags, footer, links, youtube: {...}, instagram: {...} }
 //   }
@@ -34,10 +34,10 @@ export function loadChannel(id, cfg) {
   return c;
 }
 
-/** the templates a channel can make videos with: its own, plus the shared ones it lists (all shared ones if none) */
+/** the templates a channel can make videos with: its own, plus the shared ones it lists ([] = none, no key = all) */
 export function channelTemplates(ch, cfg) {
   const listed = ch.manifest.templates;
-  return listTemplates(cfg).filter((t) => (t.owner ? t.owner === ch.id : !Array.isArray(listed) || !listed.length || listed.includes(t.id)));
+  return listTemplates(cfg).filter((t) => (t.owner ? t.owner === ch.id : !Array.isArray(listed) || listed.includes(t.id)));
 }
 
 export function validateChannel(ch, cfg) {

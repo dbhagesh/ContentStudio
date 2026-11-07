@@ -55,7 +55,7 @@ test('a channel project: channel template + voice + music, cast pinned, look ove
 
 test('characters are served only from the library, never overridden by a project', () => {
   const ch = loadChannel('sakumai', cfg);
-  const dir = createProject({ template: loadTemplate('inside-out', cfg), name: 'no-override', cfg, channel: ch });
+  const dir = createProject({ template: loadTemplate(ch.manifest.defaults.template, cfg), name: 'no-override', cfg, channel: ch });
   fs.mkdirSync(path.join(dir, 'characters/sakumai'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'characters/sakumai/character.js'), 'export default {}');
   const f = loadProject(dir, cfg).overlay.resolve('/characters/sakumai/character.js');

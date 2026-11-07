@@ -69,8 +69,8 @@ export function assertTemplateAllowed(channel, template) {
     throw new Error(`template "${template.id}" belongs to channel "${template.owner}"`);
   }
   const listed = channel?.manifest.templates;
-  if (!template.owner && Array.isArray(listed) && listed.length && !listed.includes(template.id)) {
-    throw new Error(`channel "${channel.id}" uses ${listed.join(', ')} (and its own templates), not "${template.id}" (channel.json "templates")`);
+  if (!template.owner && Array.isArray(listed) && !listed.includes(template.id)) {
+    throw new Error(`channel "${channel.id}" uses ${listed.length ? listed.join(', ') + ' and ' : ''}its own templates, not "${template.id}" (channel.json "templates")`);
   }
 }
 

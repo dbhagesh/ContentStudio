@@ -81,6 +81,10 @@ test('a shared template a channel does not list is refused; listed ones are fine
   const ch = loadChannel('alpha', cfg);
   assert.throws(() => createProject({ template: loadTemplate('deep-dive', cfg), name: 'x', cfg, channel: ch }), /not "deep-dive"/);
   assert.ok(createProject({ template: loadTemplate('inside-out', cfg), name: 'ok', cfg, channel: ch }));
+  writeJson(f, { ...m, templates: [] });
+  const own = loadChannel('alpha', cfg);
+  assert.deepEqual(channelTemplates(own, cfg).map((t) => t.id), ['alpha-style'], '[] = only its own templates');
+  assert.throws(() => createProject({ template: loadTemplate('inside-out', cfg), name: 'y', cfg, channel: own }), /its own templates, not "inside-out"/);
 });
 
 test('only the video\'s own cast is served under /characters/', () => {

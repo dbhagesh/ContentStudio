@@ -9,6 +9,12 @@ import { createProject, loadProject } from '../../studio/lib/project.mjs';
 import { loadTemplate } from '../../studio/lib/templates.mjs';
 import { testConfig, tmpDir, writeJson } from './helpers.mjs';
 
+/** a scaffolded channel owns no templates yet: let it use shared ones */
+function allowShared(cfg, id, templates) {
+  const f = path.join(cfg.channelsDir, id, 'channel.json');
+  writeJson(f, { ...JSON.parse(fs.readFileSync(f, 'utf8')), templates });
+}
+
 const good = {
   title: 'Why Do You Blush?', description: 'Your cheeks go red for a reason: here is what adrenaline does to your face.',
   tags: ['blushing', 'anime', 'science'], sources: ['a', 'b'],
@@ -45,6 +51,7 @@ test('originality: repeating another video of the channel is an error', () => {
 test('backlog: add, status from reality, start a project from an episode', () => {
   const cfg = { ...testConfig(), channelsDir: tmpDir() };
   scaffoldChannel({ id: 'chan', name: 'Chan', cfg });
+  allowShared(cfg, 'chan', ['inside-out']);
   const ch = loadChannel('chan', cfg);
   addEpisode(ch, { id: 'why-blush', title: 'Why Do You Blush?', sources: ['s1', 's2'] });
   assert.throws(() => addEpisode(ch, { id: 'why-blush', title: 'again' }), /already/);
@@ -63,6 +70,7 @@ test('backlog: add, status from reality, start a project from an episode', () =>
 test('lintProject: errors block channel videos, scratch videos only get warnings', () => {
   const cfg = { ...testConfig(), channelsDir: tmpDir() };
   scaffoldChannel({ id: 'chan', name: 'Chan', cfg });
+  allowShared(cfg, 'chan', ['inside-out']);
   const ch = loadChannel('chan', cfg), t = loadTemplate('inside-out', cfg);
   const a = loadProject(createProject({ template: t, name: 'a', cfg, channel: ch }), cfg);
   assert.ok(lintProject(a, cfg).errors.some((e) => /description/.test(e)));

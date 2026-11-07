@@ -15,7 +15,7 @@ test('character voices map to audio speakers; engine settings pass through', () 
 
 test('speakers: cast voices < channel voices; script speakers count as known', () => {
   const cfg = testConfig();
-  const p = loadProject(createProject({ template: loadTemplate('inside-out', cfg), name: 'v', cfg, channel: loadChannel('sakumai', cfg) }), cfg);
+  const p = loadProject(createProject({ template: loadTemplate(loadChannel('sakumai', cfg).manifest.defaults.template, cfg), name: 'v', cfg, channel: loadChannel('sakumai', cfg) }), cfg);
   assert.equal(resolveSpeakers(p, cfg).sakumai.voice, 'af_heart');
   p.channel.manifest.voices = { sakumai: { engine: 'voicestudio', id: 'saku' }, narrator: { id: 'bf_emma' } };
   assert.deepEqual(resolveSpeakers(p, cfg).sakumai, { tts: 'voicestudio', voice: 'saku' });
@@ -24,7 +24,7 @@ test('speakers: cast voices < channel voices; script speakers count as known', (
 
 test('writeVoices writes data/voices.json and refuses voiceless speakers', () => {
   const cfg = testConfig();
-  const dir = createProject({ template: loadTemplate('inside-out', cfg), name: 'w', cfg, channel: loadChannel('sakumai', cfg) });
+  const dir = createProject({ template: loadTemplate(loadChannel('sakumai', cfg).manifest.defaults.template, cfg), name: 'w', cfg, channel: loadChannel('sakumai', cfg) });
   const p = loadProject(dir, cfg);
   writeVoices(p, cfg);
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'data/voices.json'), 'utf8')).speakers.sakumai.tts, 'kokoro');
