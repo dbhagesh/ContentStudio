@@ -1,0 +1,91 @@
+{
+  "title": "The Day Boston Drowned in Molasses",
+  "description": "In 1919 a giant storage tank burst in Boston's North End and sent a wave of molasses through the streets. The Archivist opens the file: what happened, why it was so deadly, and the strange detail that made the rescue so hard.",
+  "tags": [
+    "great molasses flood",
+    "boston history",
+    "strange history",
+    "1919",
+    "true story",
+    "the strange file"
+  ],
+  "voice": "bm_fable",
+  "speed": 1.0,
+  "lead": 0.4,
+  "outro": 1.1,
+  "gap": 0.28,
+  "music": "tension",
+  "sources": [
+    "HISTORY.com, 'The Great Molasses Flood of 1919' (https://www.history.com/articles/the-great-molasses-flood-of-1919): on January 15, 1919, around 12:40 p.m., a tank on Commercial Street in the North End owned by United States Industrial Alcohol released 2.3 million gallons; a fifteen-foot wall of syrup moved at 35 mph; 21 dead and 150 injured; in April 1925 auditor Hugh W. Ogden ruled the company responsible and USIA agreed to pay $628,000.",
+    "Smithsonian Magazine, 'The Sticky Science Behind the Deadly Boston Molasses Disaster' (https://www.smithsonianmag.com/smart-news/why-boston-molasses-disaster-was-so-deadly-180961209/): Harvard students led by Nicole Sharp presented to the American Physical Society that the extra cold made the molasses 'easily four or more times as viscous'; 21 killed and 150 severely injured; 35 mph wave; the company reportedly changed the tank's color to brown-red to cover its leaks."
+  ],
+  "lines": [
+    {
+      "text": "In nineteen nineteen,",
+      "caps": "In *1919,"
+    },
+    {
+      "text": "Boston was flooded with molasses.",
+      "caps": "Boston was | flooded with *molasses."
+    },
+    {
+      "text": "An oddly warm January day, just after noon.",
+      "caps": "An oddly *warm | *January day, | just after *noon."
+    },
+    {
+      "text": "By the harbor stood a tank fifty feet tall,",
+      "caps": "By the *harbor, | a *tank | fifty feet *tall,"
+    },
+    {
+      "text": "holding over two million gallons of molasses.",
+      "caps": "over two *million | gallons of *molasses."
+    },
+    {
+      "text": "It leaked so badly,",
+      "caps": "It *leaked | so badly,"
+    },
+    {
+      "text": "they reportedly painted it brown to hide the drips.",
+      "caps": "*reportedly | painted it *brown | hide the *drips."
+    },
+    {
+      "text": "Then, without warning, the tank split open.",
+      "caps": "Then, without *warning, | the tank | split *open."
+    },
+    {
+      "text": "A wave, reportedly twenty-five feet high,",
+      "caps": "A *wave, | reportedly | *25 feet high,"
+    },
+    {
+      "text": "raced through the streets.",
+      "caps": "raced through | the *streets."
+    },
+    {
+      "text": "It bent the elevated railway,",
+      "caps": "It *bent | the elevated *railway,"
+    },
+    {
+      "text": "and twenty-one people lost their lives.",
+      "caps": "and *21 people | lost their *lives."
+    },
+    {
+      "text": "The strange part? As it cooled, it thickened like glue,",
+      "caps": "The strange *part? | As it *cooled, | it *thickened | like *glue,"
+    },
+    {
+      "text": "trapping people and slowing the rescue.",
+      "caps": "*trapping people, | slowing the *rescue."
+    },
+    {
+      "text": "Years later, the company was found responsible.",
+      "caps": "Years *later, | the company was | found *responsible."
+    },
+    {
+      "text": "Locals say, on hot days, the North End still smells sweet.",
+      "caps": "Locals *say, | on hot *days, | the North *End | still smells *sweet.",
+      "gap": 0.3
+    }
+  ],
+  "episode": "molasses-flood",
+  "series": "strange-but-true"
+}

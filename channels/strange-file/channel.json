@@ -4,26 +4,26 @@
   "handle": "@TheStrangeFile",
   "url": "https://www.youtube.com/@TheStrangeFile",
   "instagram": null,
-  "about": "History's strangest true events, unsolved mysteries and weird laws, told as case files.",
-  "cast": [],
+  "about": "History's strangest true events, unsolved mysteries and weird laws, told as case files. Kept by the Archivist.",
+  "cast": ["the-archivist"],
   "templates": [],
   "defaults": {
-    "template": null,
-    "voice": null,
-    "speed": 1,
-    "music": "bed",
-    "overrides": {}
+    "template": "case-file",
+    "voice": "bm_fable",
+    "speed": 1.0,
+    "music": "tension",
+    "overrides": {
+      "captions": { "y": 1570 }
+    }
   },
+  "quality": { "lengthS": [28, 50] },
   "publish": {
-    "targets": [
-      "youtube",
-      "instagram"
-    ],
-    "tags": [],
-    "footer": "",
+    "targets": ["youtube", "instagram"],
+    "tags": ["strange history", "true story", "history facts", "unsolved mysteries", "the strange file", "weird history"],
+    "footer": "Every file is checked against its sources (listed above). New case files every week from the Archivist. 🗂️",
     "links": [],
     "youtube": {
-      "category": "education",
+      "category": "entertainment",
       "privacy": "private",
       "madeForKids": false,
       "syntheticMedia": false,
@@ -32,7 +32,7 @@
     "instagram": {
       "shareToFeed": true,
       "thumbOffsetMs": 1500,
-      "hashtags": []
+      "hashtags": ["strangehistory", "history", "truestory", "unsolved", "historyfacts"]
     }
   }
 }

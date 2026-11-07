@@ -1,0 +1,7 @@
+{
+  "template": "case-file",
+  "channel": "strange-file",
+  "title": "Case File example",
+  "cast": { "the-archivist": "1.0.0" },
+  "overrides": {}
+}
