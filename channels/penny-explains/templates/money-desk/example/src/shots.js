@@ -1,194 +1,281 @@
-// WHAT IF YOU SWALLOW GUM?: the shot list (the only file that changes per video, with script.json).
-// A shot: { id, at, cam: [cx, cy], zoom, note, draw(lt, d, t) }  · lt = time in shot, d = shot length, t = film time.
-// It runs until the next shot's `at`; the last one ends at T.dur. Cut = L(i) - 0.08 (picture changes just before the line).
-// Sound: cue(t, type, { gain, dur }): types tools/mix.py knows are listed in STYLE.md.
-import { ctx, C, W, H, clamp, lerp, seg, eo, eio, eob, rnd, bigText } from './core/lib.js';
+// WHY YOUR CARD WANTS YOU TO PAY THE MINIMUM: the shot list (with script.json, the only per-video files).
+// A shot: { id, at, cam: [cx, cy], zoom, note, draw(lt, d, t) } · lt = time in shot, d = shot length, t = film time.
+// Every number on screen comes from simulate() below (the same math as script.json "sources").
+import { ctx, W, H, clamp, lerp, seg, eo, eio, eob } from './core/lib.js';
 import { L, Le, Wd, T } from './core/timing.js';
+import { cast } from './core/cast.js';
 import * as K from './core/kit.js';
+const { P } = K;
+
+/** $B at APR a, paying `pay(balance, interest)` each month; → { months, interest, paid, hist: [balance at month m] } */
+function simulate(B, apr, pay) {
+  const r = apr / 12, hist = [B]; let m = 0, interest = 0, paid = 0;
+  while (B > 0.005 && m < 1200) { const i = B * r; interest += i; const p = Math.min(pay(B, i), B + i); B = B + i - p; paid += p; m++; hist.push(Math.max(0, B)); }
+  return { months: m, interest, paid, hist };
+}
+const BAL = 3000, APR = 0.22;
+const MIN = simulate(BAL, APR, (b, i) => Math.max(i + b * 0.01, 25));     // minimum = interest + 1%, at least $25
+const FLAT = simulate(BAL, APR, () => 150);
+const FIRST_INT = BAL * APR / 12, FIRST_MIN = FIRST_INT + BAL * 0.01;       // $55 + $30 = $85
+// the script's spoken numbers must match the math: 15 years, ~$4,400, just over 2 years, under $800
+if (MIN.months !== 180 || Math.round(MIN.interest) !== 4433 || FLAT.months !== 26 || FLAT.interest >= 800 || Math.round(FIRST_MIN) !== 85) throw new Error('numbers drifted from the script');
 
 export function buildShots() {
   const S = [], CUES = [];
   const add = (o) => (S.push(o), o);
   const cue = (t, type, o = {}) => CUES.push({ t: +t.toFixed(3), type, ...o });
   const cut = (i) => (i === 0 ? 0 : L(i) - 0.08);
+  const penny = cast('penny');
+  /** Penny peeking up from the bottom edge, below the captions (head ≈ y 1610-1900) */
+  const peek = (o) => penny.draw({ x: 880, y: 2340, s: 0.74, flip: -1, ...o });
+  const pop = (lt, at, dur = 0.3) => (lt > at ? eob(seg(lt, at, at + dur)) : 0);
 
-  // ── 1 · HOOK: he pops the gum, chews, gulps ─────────────────────────────
+  // ── 1 · HOOK: the card floats in, Penny eyes it; "minimum" turns her suspicious ─────────────
   {
-    const st = cut(0), gulp = Wd('swallow', 0) - st, shock = Wd('gum', 0) - st;
-    add({ id: 'S01', at: st, cam: [540, 820], note: 'room, gum to mouth, gulp, shock',
-      draw(lt) {
-        K.room();
-        const arm = K.armPose(K.armPose(K.armPose(K.ARM.down, K.ARM.mouth, 0.55), K.ARM.mouth, eio(seg(lt, 0, 0.3))), K.ARM.down, eio(seg(lt, 0.4, 0.8)));
-        const shocked = lt > shock;
-        const shake = shocked ? Math.sin(lt * 70) * 6 * Math.max(0, 1 - (lt - shock) * 2) : 0;
-        K.man({ x: 540 + shake, y: 1180, s: 1.6, arm, holding: lt < 0.32 ? (x, y) => K.gum(x, y, 0.55, 0.3) : null,
-          mouth: shocked ? 'o' : lt < 0.32 ? 'smile' : 'chew', chew: Math.abs(Math.sin(lt * 14)), eyes: shocked ? 'wide' : 'n', brow: shocked ? 1 : 0 });
-        if (lt > gulp && lt < gulp + 0.75) bigText('GULP!', 830, 560, 92, C.white, -0.18, eob(seg(lt, gulp, gulp + 0.15)));
-        K.shockLines(540, 625, 300, shocked ? clamp((lt - shock) * 5) : 0);
+    const st = cut(0), mn = Wd('minimum', 0) - st;
+    add({ id: 'S01', at: st, cam: [540, 760], zoom: 0.08, note: 'desk, big card floats in, MINIMUM DUE tag on "minimum", Penny suspicious',
+      draw(lt, d, t) {
+        K.desk(t, 1180);
+        const k = eob(seg(lt, 0, 0.45));
+        K.creditCard(lerp(1300, 760, k), 330 + Math.sin(t * 2) * 12, 1.15, -0.12 + Math.sin(t * 1.6) * 0.03);
+        K.pill('MINIMUM DUE', 790, 560, 50, P.gold, P.ink, pop(lt, mn));
+        const sus = lt > mn;
+        penny.draw({ x: 330, y: 1215, s: 0.92, t, pose: sus ? 'think' : 'stand', poseFrom: sus ? 'stand' : null, poseK: eio(seg(lt, mn, mn + 0.3)),
+          expression: sus ? 'suspicious' : 'neutral', look: [1, -0.4], talk: 0 });
       } });
-    cue(st + 0.3, 'pop', { gain: 0.6 }); cue(st + gulp, 'gulp'); cue(st + shock, 'boing', { gain: 0.5 });
+    cue(st + 0.05, 'whoosh'); cue(st + mn, 'pop'); cue(st + mn + 0.25, 'boing', { gain: 0.5 });
   }
 
-  // ── 2 · X-RAY: it slides down into the stomach ──────────────────────────
+  // ── 2 · "Say you owe three thousand dollars": the balance ticks up ──────────────────────────
+  const balanceCard = (lt, v, extra) => {
+    K.paper();
+    K.card(110, 300, 860, 560, { title: 'YOUR CARD', titleFill: P.teal });
+    K.label('BALANCE', 540, 470, 52, P.inkSoft, { weight: 900, spacing: 4 });
+    K.counter(v, 540, 640, 190, { prefix: '$' });
+    if (extra) extra();
+  };
   {
-    const st = cut(1), arrive = Wd('stomach', 1) - st + 0.15;
-    add({ id: 'S02', at: st, cam: [540, 1050], zoom: 0.3, note: 'x-ray body, gum travels mouth to stomach',
+    const st = cut(1), owe = Wd('owe', 1) - st, th = Wd('dollars', 1) - st;
+    add({ id: 'S02', at: st, cam: [540, 600], note: 'balance counter ticks 0 → $3,000 from "owe" to "dollars"',
       draw(lt, d, t) {
-        K.xray(t);
-        const [gx, gy] = K.foodAt(eio(seg(lt, 0.15, arrive)));
-        const pulse = lt > arrive ? Math.max(0, Math.sin((lt - arrive) * 8)) * Math.exp(-(lt - arrive) * 1.5) : 0;
-        K.man({ x: 540, y: 1120, s: 1.5, xray: true, mouth: 'o', eyes: 'wide', brow: 1, inside: [gx, gy, lt * 2], pulse });
+        balanceCard(lt, Math.round(K.tick(0, BAL, seg(lt, owe, th + 0.2))));
+        peek({ t, expression: 'neutral', look: [0.6, -1] });
       } });
-    cue(st, 'whoosh'); cue(st + 0.2, 'slide', { dur: arrive - 0.2 }); cue(st + arrive, 'plop');
+    cue(st, 'whoosh'); cue(st + owe, 'slide', { dur: th + 0.2 - owe, gain: 0.5 }); cue(st + th + 0.2, 'ding', { gain: 0.6 });
   }
 
-  // ── 3 · STOMACH: acid gets to work ──────────────────────────────────────
+  // ── 3 · "at twenty-two percent": the APR seal slams on ───────────────────────────────────────
   {
-    const st = cut(2), work = Wd('work', 2) - st;
-    add({ id: 'S03', at: st, cam: [540, 900], note: 'inside stomach, acid bubbles, sizzle on "work"',
+    const st = cut(2), tw = Wd('twenty', 2) - st, avg = Wd('average', 2) - st;
+    add({ id: 'S03', at: st, cam: [700, 520], zoom: 0.07, note: '22% APR seal slams on "twenty", Fed source footnote on "average"',
       draw(lt, d, t) {
-        K.insideStomach(t);
-        const bob = Math.sin(lt * 2.4) * 18;
-        K.gum(540, 820 + bob, 3.4, Math.sin(lt * 1.7) * 0.12);
-        if (lt > work) { ctx.save(); ctx.globalAlpha = clamp((lt - work) * 4);
-          for (let i = 0; i < 10; i++) { const an = i / 10 * Math.PI * 2 + lt, r1 = 190 + Math.sin(lt * 12 + i) * 12;
-            ctx.strokeStyle = C.yellow; ctx.lineWidth = 10; ctx.lineCap = 'round'; ctx.beginPath();
-            ctx.moveTo(540 + Math.cos(an) * r1, 820 + bob + Math.sin(an) * r1 * 0.7); ctx.lineTo(540 + Math.cos(an) * (r1 + 50), 820 + bob + Math.sin(an) * (r1 + 50) * 0.7); ctx.stroke(); }
-          ctx.restore(); }
+        balanceCard(lt, BAL, () => {
+          K.pctBadge(830, 330, 0.95, '22%', P.red, pop(lt, tw, 0.25));
+          if (lt > tw) K.label('APR', 830, 470, 48, P.red, { weight: 900, spacing: 4 });
+          K.pill('ABOUT THE US AVERAGE', 540, 960, 46, P.ink, P.white, pop(lt, avg));
+          K.footnote('Federal Reserve G.19: ~22% on cards charged interest, 2025', 540, 1060, clamp((lt - avg) * 3));
+        });
+        peek({ t, expression: lt > tw ? 'surprised' : 'neutral', look: [0.3, -1] });
       } });
-    cue(st, 'whoosh'); cue(st, 'bubbles', { dur: L(3) - st }); cue(st + work, 'sizzle', { dur: 1.0 });
+    cue(st, 'whoosh'); cue(st + tw, 'stamp'); cue(st + avg, 'pop', { gain: 0.6 });
   }
 
-  // ── 4 · sugar dissolves, the base stays ─────────────────────────────────
+  // ── 4 · the statement: minimum due $85 ───────────────────────────────────────────────────────
   {
-    const st = cut(3), sugar = Wd('sugar', 3) - st, base = Wd('base', 3) - st;
-    add({ id: 'S04', at: st, cam: [540, 820], note: 'sugar specks fly off, GUM BASE tag on "base"',
+    const st = cut(3), ef = Wd('eighty', 3) - st;
+    add({ id: 'S04', at: st, cam: [540, 700], note: 'statement prints, MINIMUM DUE $85.00 boxed in gold on "eighty-five"',
       draw(lt, d, t) {
-        K.insideStomach(t + 3);
-        const bob = Math.sin(lt * 2.4) * 14;
-        for (let i = 0; i < 26; i++) {
-          const s0 = sugar + rnd(i) * 1.0, p = seg(lt, s0, s0 + 1.1); if (p <= 0 || p >= 1) continue;
-          const an = rnd(i + 40) * Math.PI * 2, dd = 120 + eo(p) * 380;
-          ctx.save(); ctx.globalAlpha = 1 - p; ctx.translate(540 + Math.cos(an) * dd, 820 + Math.sin(an) * dd * 0.8); ctx.rotate(p * 4 + i);
-          if (i % 2) { ctx.fillStyle = C.white; ctx.fillRect(-14, -14, 28, 28); } else { ctx.beginPath(); ctx.arc(0, 0, 13, 0, 7); ctx.fillStyle = C.yellow; ctx.fill(); }
-          ctx.restore();
+        K.paper();
+        K.statement(540, 380, 820, { s: 1.15, title: 'MONTHLY STATEMENT', p: clamp(lt / 0.6), hi: 2, hiA: clamp((lt - ef) * 4), hiColor: P.gold,
+          rows: [['BALANCE', K.fmtMoney(BAL)], ['APR', '22%', P.red], ['MINIMUM DUE', K.fmtMoney(FIRST_MIN, 2)]] });
+        K.burst(540, 1060, 1.4, lt > ef ? 1 - seg(lt, ef + 0.3, ef + 0.8) : 0);
+        K.pill('DUE THIS MONTH', 540, 1060, 50, P.ink, P.white, pop(lt, ef));
+        peek({ t, expression: lt > ef ? 'smile' : 'neutral', look: [0.2, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + 0.1, 'tock', { gain: 0.4 }); cue(st + 0.35, 'tock', { gain: 0.4 }); cue(st + ef, 'ding');
+  }
+
+  // ── 5 · "Easy, right? But watch where it goes." ─────────────────────────────────────────────
+  {
+    const st = cut(4), wt = Wd('watch', 4) - st, gs = Wd('goes', 4) - st;
+    add({ id: 'S05', at: st, cam: [540, 700], zoom: 0.06, note: 'Penny shrugs "easy", then points: $85 in coins flies off on "goes"',
+      draw(lt, d, t) {
+        K.desk(t, 1180);
+        const turn = lt > wt;
+        const o = { x: 420, y: 1210, s: 0.95, t, pose: turn ? 'present' : 'shrug', poseFrom: turn ? 'shrug' : 'stand', poseK: turn ? eio(seg(lt, wt, wt + 0.3)) : eio(seg(lt, 0, 0.3)),
+          expression: turn ? 'suspicious' : 'grin', look: turn ? [1, -0.2] : [0, 0] };
+        penny.draw(o);
+        if (!turn || lt < gs) K.pill('$85', 820, 520, 70, P.green, P.white, turn ? 1 : pop(lt, 0.25));
+        K.coinFlow(820, 600, 1250, 250, seg(lt, gs, gs + 0.8), 7, 42, 160);
+        if (lt > gs) K.arrow(900, 420, 260, -0.6, clamp((lt - gs) * 4), P.red);
+      } });
+    cue(st, 'whoosh'); cue(st + 0.25, 'pop', { gain: 0.6 }); cue(st + gs, 'zip');
+  }
+
+  // ── 6-7 · where the $85 goes: $55 interest, $30 debt ────────────────────────────────────────
+  const split = (lt, pRed, pGreen, extra) => {
+    K.paper();
+    K.label('WHERE YOUR $85 GOES', 540, 360, 64, P.ink, { spacing: 1 });
+    K.splitBar({ x: 90, y: 450, w: 900, h: 170, p: pGreen > 0 ? 0.5 + pGreen * 0.5 : pRed * 0.5, size: 54,
+      parts: [{ value: FIRST_INT, color: P.red, label: '$55 INTEREST' }, { value: BAL * 0.01, color: P.green, label: '$30' }] });
+    if (extra) extra();
+  };
+  {
+    const st = cut(5), it = Wd('interest', 5) - st;
+    add({ id: 'S06', at: st, cam: [540, 600], note: 'red $55 fills the bar, 65% seal + "THE BANK KEEPS IT" on "interest"',
+      draw(lt, d, t) {
+        split(lt, seg(lt, 0.15, it + 0.1), 0, () => {
+          K.pctBadge(260, 880, 0.9, '65%', P.red, pop(lt, it, 0.25));
+          if (lt > it) K.label('OF YOUR PAYMENT', 260, 1080, 42, P.red, { weight: 900 });
+          K.pill('THE BANK KEEPS IT', 750, 880, 42, P.red, P.white, pop(lt, it + 0.15));
+        });
+        peek({ t, expression: lt > it ? 'angry' : 'suspicious', look: [-0.4, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + 0.15, 'slide', { dur: it - 0.05, gain: 0.5 }); cue(st + it, 'stamp');
+  }
+  {
+    const st = cut(6), th = Wd('thirty', 6) - st, db = Wd('debt', 6) - st;
+    add({ id: 'S07', at: st, cam: [540, 650], note: 'green $30 completes the bar on "thirty"; balance only drops to $2,970 on "debt"',
+      draw(lt, d, t) {
+        split(lt, 1, seg(lt, th - 0.1, th + 0.3), () => {
+          K.card(190, 760, 700, 330, { title: 'BALANCE AFTER', titleFill: P.ink });
+          K.counter(Math.round(K.tick(BAL, BAL - BAL * 0.01, seg(lt, db, db + 0.5))), 540, 980, 130, { prefix: '$', color: lt > db ? P.green : P.ink });
+        });
+        peek({ t, pose: 'facepalm', poseFrom: 'stand', poseK: eio(seg(lt, db, db + 0.3)), expression: lt > db ? 'sad' : 'neutral', look: [-0.4, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + th, 'pop'); cue(st + db, 'tock', { gain: 0.6 });
+  }
+
+  // ── 8 · the 15-year line ─────────────────────────────────────────────────────────────────────
+  const data = MIN.hist.map((b, m) => [m / 12, b]);
+  {
+    const st = cut(7), yr = Wd('years', 7) - st, end = Le(7) - st + 0.1;
+    add({ id: 'S08', at: st, cam: [560, 700], zoom: 0.04, note: 'balance line drawn month by month over 15 years; "15 YEARS" lands on "years"',
+      draw(lt, d, t) {
+        K.paper();
+        const p = eio(seg(lt, 0.2, yr + 0.15));
+        K.lineChart({ x: 220, y: 380, w: 760, h: 640, xMin: 0, xMax: 15, yMin: 0, yMax: 3000, xTicks: [0, 5, 10, 15], yTicks: [0, 1000, 2000, 3000],
+          fmtX: (v) => String(v), fmtY: (v) => K.fmtMoney(v), xLabel: 'YEARS', yLabel: 'WHAT YOU OWE', p, series: [{ data, color: P.red, area: 'rgba(229,72,59,0.12)' }] });
+        K.pill(`YEAR ${Math.max(1, Math.ceil(p * 15 - 1e-6))}`, 820, 300, 50, lt > yr ? P.red : P.ink, P.white, 1);
+        K.footnote('assumes $3,000 at 22% APR, no new purchases\nminimum = interest + 1% of the balance (at least $25)', 540, 1170, 1);
+      } });
+    cue(st, 'whoosh'); cue(st + 0.2, 'slide', { dur: yr - 0.05, gain: 0.45 }); cue(st + yr + 0.15, 'thud');
+  }
+
+  // ── 9 · the receipt: $4,433 of interest ──────────────────────────────────────────────────────
+  {
+    const st = cut(8), fo = Wd('four', 8) - st, it = Wd('interest', 8) - st;
+    add({ id: 'S09', at: st, cam: [540, 560], zoom: 0.06, note: 'receipt prints: borrowed, interest (red), total paid',
+      draw(lt, d, t) {
+        K.paper();
+        K.receipt(540, 200, 1.3, { title: '15 YEARS OF MINIMUMS', w: 640, p: seg(lt, 0.1, it + 0.2) * 1.0,
+          rows: [['BORROWED', K.fmtMoney(BAL)], ['INTEREST', K.fmtMoney(MIN.interest), P.red]], total: ['TOTAL PAID', K.fmtMoney(MIN.paid), P.red] });
+        peek({ t, expression: lt > fo ? 'shock' : 'surprised', look: [-0.3, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + 0.25, 'tock', { gain: 0.4 }); cue(st + fo, 'ding'); cue(st + it + 0.15, 'tock', { gain: 0.5 });
+  }
+
+  // ── 10 · more than you borrowed ──────────────────────────────────────────────────────────────
+  {
+    const st = cut(9), mo = Wd('more', 9) - st;
+    add({ id: 'S10', at: st, cam: [540, 700], zoom: 0.1, note: 'bars: borrowed $3,000 vs interest $4,433; Penny shocked',
+      draw(lt, d, t) {
+        K.paper();
+        K.barChart({ x: 230, y: 360, w: 760, h: 640, max: 5000, ticks: [0, 2500, 5000], fmt: (v) => K.fmtMoney(v), p: eo(seg(lt, 0, 0.55)), stagger: 0.35,
+          bars: [{ label: 'BORROWED', value: BAL, color: P.teal }, { label: 'INTEREST', value: MIN.interest, color: P.red }] });
+        peek({ t, expression: 'shock', look: [-0.5, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + mo, 'slam', { gain: 0.6 });
+  }
+
+  // ── 11-12 · before / after: minimum vs a flat $150 ──────────────────────────────────────────
+  const minYears = MIN.months / 12;
+  const compare = (lt, pCards, res, resAt) => {
+    K.paper();
+    K.beforeAfter({ x: 40, y: 260, w: 1000, h: 860, p: pCards,
+      left: { title: 'MINIMUM', color: P.red, draw(cx, cy) {
+        K.label('PAY', cx, cy - 280, 40, P.inkSoft, { weight: 900, spacing: 3 });
+        K.label('$85 → $25', cx, cy - 210, 64, P.ink);
+        if (res > 0) {
+          const k = seg(res, 0, 0.6);
+          K.counter(Math.round(K.tick(0, minYears, k)), cx, cy - 40, 104, { suffix: ' YRS', color: P.red });
+          K.counter(Math.round(K.tick(0, MIN.interest, seg(res, resAt, resAt + 0.6))), cx, cy + 150, 92, { prefix: '$', color: P.red, sc: res > resAt ? 1 : 0 });
+          if (res > resAt) K.label('INTEREST', cx, cy + 240, 38, P.inkSoft, { weight: 900, spacing: 3 });
         }
-        K.gum(540, 820 + bob, 3.4, Math.sin(lt * 1.7) * 0.12);
-        K.tag('GUM BASE', 540, 500, 540, 700 + bob, 66, lt > base ? eob(seg(lt, base, base + 0.3)) : 0);
-      } });
-    cue(st, 'whoosh'); cue(st + sugar, 'sparkle', { dur: 1.2 }); cue(st + base, 'pop');
-  }
-
-  // ── 5 · your body can't break it down (enzymes bounce off) ──────────────
-  {
-    const st = cut(4), end = cut(5), P = 1.05;
-    add({ id: 'S05', at: st, cam: [540, 800], note: 'enzyme chompers bounce off stretchy gum',
-      draw(lt) {
-        ctx.fillStyle = C.bg; ctx.fillRect(-300, -300, W + 600, H + 600);
-        const sx = Math.abs(Math.sin(lt * 3.2));
-        K.gum(540, 780, 4.4, 0, 1 + 0.32 * sx, 1 - 0.16 * sx);
-        K.pill('GUM BASE', 540, 430, 52, C.ink, C.white, eob(seg(lt, 0.1, 0.4)));
-        for (const sd of [-1, 1]) {
-          const cyc = lt % P, first = lt < P, contact = 540 + sd * (250 + sx * 70);
-          const x = cyc < 0.45 ? lerp(first ? 540 + sd * 720 : 540 + sd * 430, contact + sd * 85, eio(cyc / 0.45)) : lerp(contact + sd * 85, 540 + sd * 430, eo((cyc - 0.45) / 0.6));
-          K.chomper(x, 800, 92, 0.12 + 0.5 * Math.abs(Math.sin(lt * 16)), sd > 0);
-          if (cyc > 0.43 && cyc < 0.65) K.burst(contact, 790, 1, 1 - (cyc - 0.43) / 0.22);
-          if (lt > 0.5) K.redX(x, 640, 0.17, Math.min(1, clamp((cyc - 0.45) * 6) * clamp((1 - cyc) * 8)));
+      } },
+      right: { title: '$150 FLAT', color: P.green, draw(cx, cy) {
+        K.label('PAY', cx, cy - 280, 40, P.inkSoft, { weight: 900, spacing: 3 });
+        K.label('$150', cx, cy - 210, 64, P.ink);
+        if (res > 0) {
+          const k = seg(res, 0, 0.6);
+          K.counter(Math.round(K.tick(0, FLAT.months, k)), cx, cy - 40, 104, { suffix: ' MOS', color: P.green });
+          K.counter(Math.round(K.tick(0, FLAT.interest, seg(res, resAt, resAt + 0.6))), cx, cy + 150, 92, { prefix: '$', color: P.green, sc: res > resAt ? 1 : 0 });
+          if (res > resAt) K.label('INTEREST', cx, cy + 240, 38, P.inkSoft, { weight: 900, spacing: 3 });
         }
+      } } });
+    K.footnote('same $3,000 at 22% APR · for education, not advice', 540, 1190, 1);
+  };
+  {
+    const st = cut(10), fl = Wd('hundred', 10) - st;
+    add({ id: 'S11', at: st, cam: [540, 690], note: 'two cards: MINIMUM vs $150 FLAT (right card pops on "hundred")',
+      draw(lt) { compare(lt, clamp(seg(lt, 0, 0.35) * 0.5 + seg(lt, fl - 0.1, fl + 0.25) * 0.5 + (lt > fl + 0.25 ? 0.5 : 0)), 0, 0); } });
+    cue(st, 'whoosh'); cue(st + 0.1, 'pop', { gain: 0.5 }); cue(st + fl, 'pop');
+  }
+  {
+    const st = cut(11), go = Wd('gone', 11) - st, un = Wd('under', 11) - st;
+    add({ id: 'S12', at: st, cam: [540, 690], zoom: 0.04, note: 'results tick in: 15 YRS / $4,433 vs 26 MOS / $771; green check',
+      draw(lt) {
+        compare(lt, 1, Math.max(0, lt - go + 0.1), un - go);
+        K.check(905, 1065, 0.2, lt > un + 0.7 ? eob(seg(lt, un + 0.7, un + 1.0)) : 0);
       } });
-    cue(st, 'whoosh'); for (let k = 0; st + k * P + 0.45 < end; k++) cue(st + k * P + 0.45, 'boing', { gain: 0.7 });
+    cue(st, 'whoosh'); cue(st + go, 'slide', { dur: 0.6, gain: 0.4 }); cue(st + un, 'slide', { dur: 0.6, gain: 0.4 }); cue(st + un + 0.7, 'ding');
   }
 
-  // ── 6 · seven years? total myth (X slams on "myth") ─────────────────────
+  // ── 13 · THE TRAP: the minimum is the bait ───────────────────────────────────────────────────
   {
-    const st = cut(5), slam = Wd('myth', 5) - st - 0.05;
-    add({ id: 'S06', at: st, cam: [540, 800], note: 'calendar 7 YEARS drops, red X slams on "myth"',
-      draw(lt) {
-        ctx.fillStyle = C.bg; ctx.fillRect(-300, -300, W + 600, H + 600);
-        const shake = lt > slam ? Math.sin(lt * 90) * 18 * Math.max(0, 1 - (lt - slam) * 4) : 0;
-        ctx.save(); ctx.translate(shake, 0);
-        const drop = eob(seg(lt, 0, 0.45));
-        K.calendar(540, lerp(-400, 780, drop), 1, '7', 'YEARS', lerp(-0.25, -0.04, drop));
-        if (lt > slam) { const p = seg(lt, slam, slam + 0.2); K.redX(540, 780, lerp(1.9, 1, eo(p)), clamp(p * 3)); }
+    const st = cut(12), pl = Wd('plan', 12) - st, bz = Wd('business', 12) - st, md = Wd('model', 12) - st;
+    add({ id: 'S13', at: st, cam: [600, 820], zoom: 0.1, note: 'vault: trap baited with MINIMUM DUE, snaps on "business", TRAP stamp on "model"',
+      draw(lt, d, t) {
+        K.vault(t, lt > bz ? 1 : 0.35);
+        const snap = seg(lt, bz, bz + 0.16), shake = lt > bz ? Math.sin(lt * 80) * 10 * Math.max(0, 1 - (lt - bz) * 3) : 0;
+        K.trap(540 + shake, 1000, 1.5, snap, true);
+        if (snap < 0.5) K.pill('MINIMUM DUE', 540, 760, 48, P.gold, P.ink, 1);
+        K.stamp('TRAP', 540, 420, 1.2, P.red, -0.14, seg(lt, md, md + 0.25));
+        peek({ t, expression: lt > md ? 'smug' : 'suspicious', look: [-0.6, -1] });
+      } });
+    cue(st, 'whoosh'); cue(st + pl, 'tock', { gain: 0.5 }); cue(st + bz, 'slam'); cue(st + md, 'stamp');
+  }
+
+  // ── 14 · the minimum payment warning on your statement, by law ──────────────────────────────
+  {
+    const st = cut(13), stt = Wd('statement', 13) - st, law = Wd('law', 13) - st;
+    add({ id: 'S14', at: st, cam: [540, 640], note: 'the statement warning box (time + total at the minimum); "REQUIRED BY LAW" on "law"',
+      draw(lt, d, t) {
+        K.paper();
+        K.card(70, 300, 940, 640, { title: 'MINIMUM PAYMENT WARNING', titleFill: P.red });
+        const k = clamp((lt - 0.2) * 3);
+        ctx.save(); ctx.globalAlpha *= k;
+        K.label('IF YOU PAY ONLY THE MINIMUM:', 540, 470, 44, P.ink, { weight: 900 });
+        K.label('PAID OFF IN', 300, 590, 40, P.inkSoft, { weight: 900, spacing: 2 });
+        K.label('TOTAL YOU PAY', 780, 590, 40, P.inkSoft, { weight: 900, spacing: 2 });
+        K.label('15 YEARS', 300, 690, 84, P.red); K.label(K.fmtMoney(MIN.paid), 780, 690, 84, P.red);
+        K.footnote('every US card statement shows this box\n(numbers here: our $3,000 example)', 540, 830, 1, P.inkSoft, 30);
         ctx.restore();
+        K.pill('REQUIRED BY LAW · CARD ACT 2009', 540, 1060, 42, P.ink, P.white, pop(lt, law));
+        peek({ t, x: 880, pose: 'point', hands: { r: [200, -900] }, expression: 'smug', look: [-0.5, -1] });
       } });
-    cue(st, 'whoosh'); cue(st + 0.4, 'thud'); cue(st + slam + 0.1, 'slam');
+    cue(st, 'whoosh'); cue(st + stt, 'pop', { gain: 0.5 }); cue(st + law, 'stamp');
   }
 
-  // ── 7 · it moves through your gut ───────────────────────────────────────
+  // ── 15 · "Go look." Penny winks ──────────────────────────────────────────────────────────────
   {
-    const st = cut(6), gut = K.makeGut();
-    add({ id: 'S07', at: st, cam: [540, 760], note: 'gum travels the whole x-ray intestine',
+    const st = cut(14), lk = Wd('look', 14) - st;
+    add({ id: 'S15', at: st, cam: [540, 760], zoom: 0.06, note: 'close-up: Penny winks at camera, holding her cent pendant up',
       draw(lt, d, t) {
-        K.xray(t); gut.draw();
-        const u = eio(seg(lt, 0.1, d - 0.1)), [x, y, a] = gut.at(u);
-        ctx.save(); ctx.globalAlpha = 0.35; for (let i = 1; i < 6; i++) { const q = gut.at(Math.max(0, u - i * 0.012)); ctx.beginPath(); ctx.arc(q[0], q[1], 10 - i, 0, 7); ctx.fillStyle = C.cyan; ctx.fill(); } ctx.restore();
-        K.gum(x, y, 1.25, a);
+        K.desk(t, 1180);
+        penny.draw({ x: 540, y: 2330, s: 1.85, t, pose: 'coin', poseFrom: 'stand', poseK: eio(seg(lt, 0, 0.3)), expression: lt > lk ? 'wink' : 'smug', look: [0, 0.2] });
       } });
-    cue(st, 'whoosh'); cue(st + 0.1, 'slide', { dur: L(7) - st - 0.2, gain: 0.6 });
-  }
-
-  // ── 8 · a few days, and it's out ────────────────────────────────────────
-  {
-    const st = cut(7), out = Wd('out', 7) - st - 0.1, shrink = Math.max(0.6, out - 0.45);
-    add({ id: 'S08', at: st, cam: [540, 760], note: 'stopwatch spins DAY 1-3, gum zips out on "out"',
-      draw(lt) {
-        ctx.fillStyle = C.bg; ctx.fillRect(-300, -300, W + 600, H + 600);
-        const k = eio(seg(lt, shrink, shrink + 0.35));
-        K.stopwatch(lerp(540, 250, k), lerp(720, 560, k), lerp(1, 0.55, k), lt * 14);
-        const day = Math.min(3, 1 + Math.floor(lt / (shrink / 3)));
-        K.pill('DAY ' + day, lerp(540, 250, k), lerp(1130, 820, k), lerp(70, 48, k), C.ink, C.white, lt < 0.25 ? eob(seg(lt, 0, 0.25)) : 1);
-        if (lt > out) { const p = seg(lt, out, out + 0.75), gx = lerp(380, 1300, eio(p)); K.gum(gx, 1010, 2.2, 0, 1.25, 0.85); K.speedLines(gx - 60, 1010, 1 - p * 0.6); }
-      } });
-    cue(st, 'whoosh'); for (let i = 1; i < 3; i++) cue(st + i * shrink / 3, 'tock'); cue(st + out, 'zip');
-  }
-
-  // ── 9 · swallow tons? (gums pile up) ────────────────────────────────────
-  {
-    const st = cut(8), d0 = cut(9) - st;
-    add({ id: 'S09', at: st, cam: [540, 820], note: 'many gums rain into the x-ray stomach',
-      draw(lt, d, t) {
-        K.xray(t);
-        const top = K.stomachTop(560, 780, 3.0);
-        ctx.strokeStyle = C.pink; ctx.lineWidth = 70; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(top[0] + 10, -100); ctx.lineTo(top[0], top[1] + 30); ctx.stroke();
-        K.stomach(560, 780, 3.0);
-        const step = Math.min(0.08, (d0 - 0.6) / 14);
-        for (let i = 0; i < 14; i++) {
-          const p = seg(lt, i * step, i * step + 0.45); if (p <= 0) continue;
-          const tx = 470 + (rnd(i) - 0.5) * 260 + (i > 7 ? 40 : 0), ty = 990 - Math.floor(i / 5) * 55 - rnd(i + 3) * 20;
-          K.gum(lerp(470, tx, eo(p)), lerp(-80, ty, eob(p)), 1.1, rnd(i + 7) * 3 + p);
-        }
-      } });
-    const step = Math.min(0.08, (d0 - 0.6) / 14);
-    cue(st, 'whoosh'); for (let i = 0; i < 14; i += 2) cue(st + i * step + 0.4, 'plop', { gain: 0.5 });
-  }
-
-  // ── 10 · bigger problem: blockage ───────────────────────────────────────
-  {
-    const st = cut(9), warn = Wd('block', 9) - st - 0.1;
-    add({ id: 'S10', at: st, cam: [540, 820], note: 'gum clump blocks the gut, warning pulses',
-      draw(lt, d, t) {
-        K.xray(t); K.gutTube(820, t);
-        for (let i = 0; i < 14; i++) { ctx.beginPath(); ctx.arc(120 + i * 24 + Math.sin(t * 3 + i) * 4, 760 + rnd(i) * 120, 16 + rnd(i + 2) * 10, 0, 7); ctx.fillStyle = C.yellow; ctx.fill(); }
-        const pr = Math.sin(lt * 7) * 0.5 + 0.5;
-        ctx.beginPath(); ctx.arc(560, 820, 190 + pr * 30, 0, 7); ctx.strokeStyle = C.red; ctx.globalAlpha = 0.35 + 0.5 * pr; ctx.lineWidth = 18; ctx.stroke(); ctx.globalAlpha = 1;
-        for (let i = 0; i < 7; i++) { const an = i / 7 * Math.PI * 2; K.gum(560 + Math.cos(an) * 60 + Math.sin(t * 20 + i) * 3, 820 + Math.sin(an) * 50, 1.25, an); }
-        K.gum(560, 820, 1.3, 0.4);
-        K.warning(560, 450, lt > warn ? eob(seg(lt, warn, warn + 0.3)) * (1 + pr * 0.06) : 0);
-      } });
-    cue(st, 'whoosh'); cue(st + warn, 'alarm', { dur: cut(10) - st - warn });
-  }
-
-  // ── 11 · so maybe… spit it out ──────────────────────────────────────────
-  {
-    const st = cut(10), spit = Wd('spit', 10) - st;
-    add({ id: 'S11', at: st, cam: [540, 760], note: 'hero wags his finger at camera',
-      draw(lt) {
-        K.room();
-        const p = eio(seg(lt, 0, 0.5));
-        K.man({ x: 540, y: 1290, s: 2.0, arm: K.armPose(K.ARM.down, K.ARM.point, p), finger: lt > 0.35 ? Math.sin(lt * 11) * 0.35 : 0, mouth: lt > spit ? 'grin' : 'smirk', brow: 0.3, smirk: true });
-      } });
-    cue(st, 'whoosh'); cue(st + spit, 'pop', { gain: 0.6 });
+    cue(st, 'whoosh'); cue(st + lk, 'sparkle', { dur: 0.6, gain: 0.5 });
   }
 
   return { shots: S, cues: CUES };

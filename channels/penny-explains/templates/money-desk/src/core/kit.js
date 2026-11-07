@@ -110,10 +110,12 @@ export function tag(str, x, y, tx, ty, size = 52, sc = 1, bg = P.ink) {
   ctx.save(); ctx.globalAlpha *= clamp(sc); line([[x, y], [tx, ty]], P.ink, 7); circle(tx, ty, 10, P.ink); ctx.restore();
   pill(str, x, y, size, bg, P.white, sc);
 }
-/** small italic-free footnote under a chart ("assumes: …" / "for education, not advice") */
-export function footnote(str, x, y, a = 1, color = P.inkSoft) {
+/** small footnote under a chart ("assumes: …" / "for education, not advice"); \n splits lines; fits 960 px */
+export function footnote(str, x, y, a = 1, color = P.inkSoft, size = 32) {
   if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha *= a; text(str, x, y, 30, color, { weight: 800, spacing: 1 }); ctx.restore();
+  ctx.save(); ctx.globalAlpha *= a;
+  str.split('\n').forEach((l, i) => text(l, x, y + i * size * 1.3, size, color, { weight: 800, spacing: 1, maxW: 960 }));
+  ctx.restore();
 }
 /** a speech bubble for Penny (text centred, up to 2 lines split with \n), tail toward (tx, ty) */
 export function bubble(str, x, y, w, h, tx, ty, sc = 1, size = 56) {
@@ -239,7 +241,8 @@ export function pctBadge(x, y, s, str, color = P.red, sc = 1, rot = -0.12) {
   ctx.restore();
 }
 /** a monthly statement / bill card (w x h), lines: [[label, value, color?]], hi = index of a row to box in red */
-export function statement(x, y, w, { title = 'STATEMENT', rows = [], hi = -1, hiA = 0, p = 1 } = {}) {
+export function statement(x, y, w, { title = 'STATEMENT', rows = [], hi = -1, hiA = 0, hiColor = P.red, p = 1, s = 1 } = {}) {
+  if (s !== 1) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); statement(0, 0, w, { title, rows, hi, hiA, hiColor, p }); ctx.restore(); return; }
   const h = 130 + rows.length * 86 + 30;
   card(x - w / 2, y, w, h, { title, titleFill: P.teal });
   rows.forEach(([l, v, c], i) => {
@@ -248,7 +251,7 @@ export function statement(x, y, w, { title = 'STATEMENT', rows = [], hi = -1, hi
     text(l, x - w / 2 + 40, yy, 40, P.inkSoft, { align: 'left', weight: 800, maxW: w * 0.58 });
     text(v, x + w / 2 - 40, yy, 50, c || P.ink, { align: 'right' });
     ctx.restore();
-    if (i === hi && hiA > 0) { ctx.save(); ctx.globalAlpha *= hiA; rr(x - w / 2 + 18, yy - 40, w - 36, 80, 18); ctx.lineWidth = 9; ctx.strokeStyle = P.red; ctx.stroke(); ctx.restore(); }
+    if (i === hi && hiA > 0) { ctx.save(); ctx.globalAlpha *= hiA; rr(x - w / 2 + 18, yy - 40, w - 36, 80, 18); ctx.lineWidth = 9; ctx.strokeStyle = hiColor; ctx.stroke(); ctx.restore(); }
   });
 }
 
@@ -376,13 +379,13 @@ export function check(x, y, s, a = 1) {
  *   right: {...}, p (0..1: left card, then right card) }. draw() renders each card's content centred at (cx, cy).
  */
 export function beforeAfter(o) {
-  const { x = 40, y = 300, w = 1000, h = 820, left, right, p = 1, vs = 'VS' } = o, cw = (w - 40) / 2;
+  const { x = 40, y = 300, w = 1000, h = 820, left, right, p = 1, vs = 'VS', vsY = y + 46 } = o, cw = (w - 40) / 2;
   [[left, x, 0], [right, x + cw + 40, 1]].forEach(([c, cx, i]) => {
     const k = eob(clamp(p * 2 - i)); if (k <= 0) return;
     card(cx, y, cw, h, { title: c.title, titleFill: c.color || P.teal, sc: k });
     if (k > 0.5) c.draw(cx + cw / 2, y + 92 + (h - 92) / 2, clamp(p * 2 - i));
   });
-  if (p > 0.5) { const k = eob(clamp((p - 0.5) * 4)); ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.scale(k, k); circle(0, 0, 66, P.ink); text(vs, 0, 4, 52, P.white); ctx.restore(); }
+  if (p > 0.5) { const k = eob(clamp((p - 0.5) * 4)); ctx.save(); ctx.translate(x + w / 2, vsY); ctx.scale(k, k); circle(0, 0, 66, P.ink); text(vs, 0, 4, 52, P.white); ctx.restore(); }
 }
 
 // ═════════════════════════ EFFECTS ═════════════════════════

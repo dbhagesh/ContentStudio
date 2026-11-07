@@ -1,97 +1,111 @@
-# Inside Out: flat 2D "What happens if…?" shorts, 9:16
+# Money Desk: Penny Explains finance shorts, 9:16
 
-Curious, slightly shocking, satisfying. A simple flat hero, x-ray cutaways into the body, organs and props as clean
-vector shapes, bold 1-3 word captions with one yellow word, and a cut every 1-3 seconds with the camera always moving.
-Example to study and copy: `example/` = **WHAT IF YOU SWALLOW GUM?** (30 s, 11 shots). Style sheet: `style-sheet.png`.
+Sly, clear, a little smug, always on the viewer's side. Penny the calico cat presents; precise flat charts, ticking
+counters and money objects prove the point; the trap reveal lands in red on its word. Channel: **penny-explains only**.
+Example to study and copy: `example/` = **WHY YOUR CARD WANTS YOU TO PAY THE MINIMUM** (41 s, 15 shots).
+Style sheet: `style-sheet.png` (`studio stylesheet money-desk`). Penny's model sheet:
+`channels/penny-explains/characters/penny/sheet.png`.
 
 ## 1. The look (rules from the sheet: do not break them)
-- **Flat shapes only.** No gradients, textures or realistic lighting. Depth comes from flat darker/lighter tones of the
-  same colour (shirt shade, organ highlight), never from blur or glow.
-- **Palette:** skin `#E8B89A` · organ pink `#E57A8A` · danger red `#D62839` · x-ray cyan `#4FD1E8` · highlight yellow
-  `#FFD43B` · background `#F4F1EA`, plus ink `#1A1A1E` and the derived shades in `lib.js` `C`.
-- **X-ray cyan is only for inside-the-body views** (skeleton, x-ray film background, gut glow). **Red marks danger or the
-  problem** (X, warning, blockage ring, stopwatch hand). **Yellow is the one keyword per caption**, impact bursts and acid.
-- **One visual mode per shot.** X-ray means the whole body is x-ray (arms, neck, legs), only the head stays normal.
-- Characters are minimal and friendly: round head, dot eyes with a highlight, simple tee and pants, expressive brows and
-  mouth. They react on the beat (gulp, shock, smirk, finger wag) and may look at the camera on the twist ending.
-- Mood: curious, slightly shocking, satisfying. Accurate science, no gore, no injury on screen.
+- **Flat shapes, ink outlines, flat offset shadows.** No gradients on objects (the vault's red glow is the one
+  exception, for the trap beat). Depth = a darker tone of the same colour or the flat `P.shadow` offset.
+- **Palette (`K.P`):** paper `#FBF5E9` · ink `#1D1B26` · money green `#1FA463` · coin gold `#F5B83D` · trap red
+  `#E5483B` · data teal `#2A7F9E` · vault navy `#1C2238` · desk `#C98B57`, plus the light/dark shades in `kit.js`.
+- **Colour has one meaning each:** green = money you keep · red = money they take (interest, fees, the trap) ·
+  gold = the one key number (and the caption's highlighted word) · teal = neutral data. Never decorative colour.
+- **Charts are evidence.** Every bar, line point and counter comes from data in `shots.js` (compute it there, as the
+  example's `simulate()` does, and `throw` if it drifts from what the script says). Every chart has axis ticks with
+  units, a value on every bar, and a footnote with the assumptions. Tick labels ≥ 40 px, values ≥ 60 px: they must read
+  on a phone at 25% zoom.
+- **Penny** is drawn only with `cast('penny').draw({...})`. She reacts on the beat (suspicious on the hook, shock on the
+  number, smug on the reveal, wink at the end). Outfit `classic` by default; `banker` for The Math Of…, `fancy` for
+  Rich People Tricks (see the channel BIBLE).
+- Mood: clever, never preachy. Education, never advice: no tickers, products or "you should".
 
 ## 2. Format
-- **1080x1920, 30 fps, 25-45 s.** Lead silence 0.45 s, outro 0.9 s (they're in `script.json`).
-- **Story shape:** hook question (hero + the thing) → x-ray: where it goes → close-up of what happens → the key fact →
-  myth busted (red X) → what really happens → time passes → **twist: "but if you…"** (danger, red) → the hero's punchy
-  last line to camera (loops back to the hook).
-- **One line = one shot = one cut**, and a sentence usually spans 2-3 lines (`"It slides down your throat and lands
-  right in your stomach,"` / `"where strong acid gets to work on it."`). The voice speaks each sentence in one pass, so
-  it sounds natural, and the cuts are found at the pauses inside it. Shots are 1.5-3.5 s; split a line that runs longer. Every cut gets a punch-in + a brief
-  white flash + a whoosh (automatic in the shared player, tuned by `template.json` → `player`; add the whoosh cue yourself).
-- **Narration:** conversational, like explaining to a friend: flowing sentences with connecting words, never a list of
-  caption-like fragments. Kokoro `am_michael` x1.0 (or `am_puck` for playful, `af_heart` for a warm female voice). Calm, curious,
-  matter-of-fact. Numbers spelled as said.
+- **1080x1920, 30 fps, 30-50 s.** Lead 0.4 s, outro 0.9 s. Voice: Penny's (`af_bella` x1.05 for now; see
+  `projects/penny-explains/_voice-bakeoff/README.md`).
+- **Story shape:** hook question with Penny + the object → one concrete example with real numbers → follow the money
+  (one picture per step) → the number that hurts (chart / receipt) → before / after comparison → **the trap reveal**
+  (vault, red, on its word) → the law / the rule → Penny's last line to camera (loops to the hook).
+- **One line = one shot = one cut**, 1.5-3.5 s each. The player adds a gentle punch-in + light flash on each cut
+  (`template.json` → `player`); add the `whoosh` cue yourself.
 
 ## 3. Captions
-`script.json` line: `{ "text": "Stuck for seven years? Total myth.", "caps": "STUCK 7 *YEARS? | TOTAL *MYTH" }`
-- `|` splits the line into caption chunks; `*` marks the ONE yellow word of each chunk. 1-3 words per chunk.
-- A chunk appears when its first word is spoken (matched by spelling, else by word count), pops in (0.2 s overshoot), and
-  stays until the next chunk. Inter Black 150 px, white, ink outline 30 px + drop, centred at y 1400 (`CAP` in captions.js).
-- Caps may differ from the spoken words ("7" for "seven") but should start with the same word as the spoken chunk.
-- Without `caps`, lines are auto-chunked (2-3 words, longest word yellow): fine for drafts, write caps for the final.
+`script.json` line: `{ "text": "Only thirty actually pays down your debt.", "caps": "ONLY *$30 | PAYS DOWN | YOUR *DEBT" }`
+- `|` splits caption chunks, `*` marks the ONE gold word (`#FFC93C`). 1-3 words per chunk. Inter Black 138 px, white,
+  ink stroke 28, centred at y 1430 (zone ≈ 1350-1510).
+- Money as numerals in caps ("$85", "22%"), spoken as words. **Start every chunk after the first with a word that is
+  actually spoken** ("OWE *$3,000", not "*$3,000"): chunks are placed by matching their first word; a numeral-first
+  chunk falls back to word-count placement and can land early or late. Avoid one-letter first words ("A") too.
 
-## 4. Engine map (`example/`)
+## 4. Engine map
 | file | gives you |
 |---|---|
-| `script.json` | title, voice, speed, lead, outro, gap, music (`bed`·`none`·`audio/x.mp3`), sources, lines `{text, caps, gap}` |
-| `src/shots.js` | **the per-video file**: the shot list + sound cues |
-| `src/core/kit.js` | the component zoo (below) |
-| `src/core/lib.js` | `W H FPS`, palette `C`, `clamp lerp seg eo eio eob rnd`, `rr circle ell line fillAll bigText` |
-| `src/core/timing.js` | `L(i)` line start, `Le(i)` line end, `Wd(word, line)` word start (prefix match, throws if missing), `T.dur` |
-| `src/core/captions.js` (shared) | caption chunking + drawing; position/size/colours in `template.json` → `captions` |
-| `src/main.js` (shared player) | boot, camera (punch-in + slow push), cut flash, fades, `window.OP`; tuned by `template.json` → `player` |
-| `studio` CLI | `check` · `cues` · `sheet` · `frames` · `render [--start --end] [--draft]` · `preview` · `build` |
-| `studio mix` (python/studio_audio) | voice + music bed (ducked) + procedural effects → `data/mix.wav` |
-| `data/` | `lines.json`, `words.json` (timing), `narration.wav`, `cues.json`, `mix.wav` |
+| `example/script.json` | title, description, tags, series, voice, speed, lead, outro, gap, music, sources, lines `{text, caps}` |
+| `example/src/shots.js` | the per-video file: data + the shot list + sound cues |
+| `src/core/kit.js` | the component kit (below), `import * as K`; palette `K.P` |
+| `src/core/lib.js` (engine) | `W H`, `clamp lerp seg eo eio eob rnd`, `rr circle ell line fillAll bigText` |
+| `src/core/timing.js` (engine) | `L(i)` line start, `Le(i)` line end, `Wd(word, line)` word start, `T.dur` |
+| `src/core/cast.js` (engine) | `cast('penny')` → `{ draw(o), anchor(o, name), POSES, EXPRESSIONS, OUTFITS, coin }` |
+| `src/sheet.js` | the style-sheet board |
 
-## 5. The component zoo (`kit.js`, `import * as K`)
-**Hero** `K.man({ x, y, s, arm, armL, finger, eyes, mouth, chew, brow, smirk, frown, look, xray, pulse, holding, inside })`
-- origin = chest centre; at `s: 1` he is ~1100 px tall (head top ≈ -480, feet ≈ +620). Close-up: `s: 1.6-2.0`, y 1150-1300.
-- `arm`: `K.ARM.down | mouth | point | wave | hip`, blend with `K.armPose(a, b, t)`. `finger`: angle (rad) shows a raised
-  index finger (wag with `Math.sin(lt * 11) * 0.35`).
-- `eyes`: `'n' | 'wide' | 'closed'` · `mouth`: `'smile' | 'smirk' | 'chew' | 'o' | 'flat' | 'grin'` · `brow` 0..1 raise.
-- `xray: true` turns the whole body into x-ray (skeleton, stomach), head stays normal. `pulse` 0..1 swells the stomach.
-- `holding: (x, y) => K.gum(x, y, 0.55)` draws a prop AT THE HAND (it follows the arm). `inside: [x, y, rot]` = a gum
-  inside the body in local coords; `K.foodAt(u)` walks mouth → throat → stomach (u 0..1).
-**Organs & props** `K.gum(x, y, s, rot, sx, sy)` · `K.stomach(x, y, s, pulse)` + `K.stomachTop(x, y, s)` · `K.heart(x, y, s, beat)`
-· `K.stopwatch(x, y, s, angle)` · `K.calendar(x, y, s, '7', 'YEARS', rot)` · `K.makeGut()` → `{ draw(), at(u) }` serpentine
-intestine · `K.gutTube(y, t)` straight gut close-up.
-**Graphics** `K.pill(text, x, y, size, bg, fg, scale)` · `K.tag(text, x, y, targetX, targetY, size, scale)` · `K.redX(x, y, s, alpha)`
-· `K.arrow(x, y, len, angle, alpha)` · `K.warning(x, y, s)` · `K.chomper(x, y, r, open, flip)` (enzymes) · `K.burst(x, y, s, a)`
-· `K.speedLines(x, y, a)` · `K.shockLines(x, y, r, a)` · `bigText(text, x, y, size, fill, rot, scale)` (e.g. "GULP!").
-**Backgrounds** `K.room()` (A, real world) · `K.xray(t)` (B, x-ray film + scan line) · `K.insideStomach(t, acid)` (C, macro).
-New topic = new components: add them to kit.js in the same look (flat fills, one darker shade, one light highlight, ink
-outlines only on graphics), document them here, and check them full size.
+## 5. The kit (`kit.js`)
+**Numbers** `K.fmtNum(v, d)` → "1,234" · `K.fmtMoney(v, d)` → "$4,433" · `K.tick(a, b, p)` eased count ·
+`K.counter(v, x, y, size, { prefix, suffix, d, color, stroke, align, sc })` · `K.label(str, x, y, size, color, { weight, align, spacing, maxW })`.
+**Backgrounds** `K.paper(t)` graph paper (charts, math) · `K.desk(t, deskY = 1180)` Penny's office (character beats) ·
+`K.vault(t, glow)` dark navy + red glow (the trap) · `K.field(color, stripe, t)` flat colour slam.
+**Cards & labels** `K.card(x, y, w, h, { title, titleFill, fill, sc })` · `K.pill(text, x, y, size, bg, fg, sc)` ·
+`K.tag(text, x, y, tx, ty, size, sc, bg)` · `K.footnote(text, x, y, a, color, size)` (`\n` = 2 lines; assumptions,
+"for education, not advice") · `K.bubble(text, x, y, w, h, tailX, tailY, sc, size)` speech bubble.
+**Money objects** `K.coin(x, y, r, spin, rot)` · `K.coinStack(x, y, n, r)` · `K.bill(x, y, s, rot, '100')` ·
+`K.creditCard(x, y, s, rot, { color, dark, name, digits })` · `K.priceTag(x, y, s, '$4.99', rot, { fill, strike })` ·
+`K.receipt(x, y, s, { title, rows: [[label, amount, color]], total, p, w })` (rows print as p → 1) ·
+`K.calculator(x, y, s, display, pressIndex)` · `K.pctBadge(x, y, s, '22%', color, sc)` ·
+`K.statement(x, y, w, { title, rows, hi, hiA, hiColor, p, s })` (a bill / statement, one row boxed).
+**Charts** `K.barChart({ x, y, w, h, bars: [{ label, value, color, text }], max, ticks, fmt, p, stagger, title })` ·
+`K.lineChart({ x, y, w, h, xMin, xMax, yMin, yMax, series: [{ data, color, width, area }], p, xTicks, yTicks, fmtX, fmtY, xLabel, yLabel, endLabel })` ·
+`K.splitBar({ x, y, w, h, parts: [{ value, color, label }], p })` (where a payment goes).
+**Verdicts** `K.trap(x, y, s, close, bait)` jaw trap, coin bait, `close` 0 → 1 snaps · `K.stamp('TRAP', x, y, s, color, rot, p)` ·
+`K.redX` · `K.check` · `K.beforeAfter({ x, y, w, h, left: { title, color, draw(cx, cy) }, right, p, vsY })`.
+**Effects** `K.arrow(x, y, len, ang, a, color)` · `K.burst(x, y, s, a, color)` · `K.coinRain(t, n)` ·
+`K.coinFlow(ax, ay, bx, by, p, n, r, arc)` money flying between two points · `K.calendar(x, y, s, '15', 'YEARS')`.
+New topic = new components: add them to `kit.js` in this look (flat fill, ink outline 5-6 px, offset shadow),
+document them here, and look at them full size.
 
-## 6. A shot
+## 6. Penny on screen
+- **Full body:** feet at y ≤ 1240, `s` 0.9-1.0 (she is ~1075 px tall at s = 1), so the caption zone stays clear.
+- **Presenter peek** (charts and cards above): `penny.draw({ x: 880, y: 2340, s: 0.74, flip: -1, ... })` puts her head
+  and paws in y ≈ 1600-1900, under the captions. `pose: 'point', hands: { r: [200, -900] }` points up at the chart.
+- **Close-up** for the last line: `s` ≈ 1.85, `y` ≈ 2330 (face around y 760).
+- Blend poses with `poseFrom` + `poseK: eio(seg(lt, a, a + 0.3))`; change expression on the word (`lt > Wd(...) - st`).
+- Use `penny.anchor(o, 'handR')` to attach props or effects to her paw; `prop: 'coin' | 'bill' | 'card'`.
+
+## 7. A shot
 ```js
-const st = cut(5), slam = Wd('myth', 5) - st - 0.05;          // cut just before line 5; the X lands on "myth"
-add({ id: 'S06', at: st, cam: [540, 800], zoom: 0.06, note: 'calendar drops, red X on "myth"',
-  draw(lt, d, t) {                                              // pure function of time: no state between frames
-    ctx.fillStyle = C.bg; ctx.fillRect(-300, -300, W + 600, H + 600);   // fill past the edges (the camera zooms)
-    K.calendar(540, lerp(-400, 780, eob(seg(lt, 0, 0.45))), 1, '7', 'YEARS');
-    if (lt > slam) K.redX(540, 780, lerp(1.9, 1, eo(seg(lt, slam, slam + 0.2))), 1);
+const st = cut(9), mo = Wd('more', 9) - st;                    // cut just before line 9
+add({ id: 'S10', at: st, cam: [540, 700], zoom: 0.1, note: 'bars: borrowed vs interest',
+  draw(lt, d, t) {                                              // pure function of time
+    K.paper();
+    K.barChart({ x: 230, y: 360, w: 760, h: 640, max: 5000, ticks: [0, 2500, 5000], fmt: (v) => K.fmtMoney(v),
+      p: eo(seg(lt, 0, 0.55)), bars: [{ label: 'BORROWED', value: 3000, color: P.teal }, { label: 'INTEREST', value: MIN.interest, color: P.red }] });
+    cast('penny').draw({ x: 880, y: 2340, s: 0.74, flip: -1, t, expression: 'shock' });
   } });
-cue(st, 'whoosh'); cue(st + 0.4, 'thud'); cue(st + slam + 0.1, 'slam');
+cue(st, 'whoosh'); cue(st + mo, 'slam', { gain: 0.6 });
 ```
-`cam` = the point the camera pushes toward; `zoom` = how much it pushes over the shot (0.06 default, 0.3 = strong).
-Keep the hero and key objects between y 250 and 1250 so the caption (y 1250-1550) never covers them.
+Keep everything important between y 250 and 1230; the camera pushes toward `cam`, so keep content ≥ 60 px inside the
+frame edges (a 1060-px-wide card gets cropped).
 
-**Sound cues** `cue(t, type, { gain, dur })`: `whoosh` (every cut) · `slide` (dur, something travelling) · `pop` (a label
-appears) · `plop` (lands in liquid) · `gulp` · `boing` (bounce, comedic beat) · `bubbles` (dur) · `sizzle` (dur, acid) ·
-`sparkle` (dur, dissolving / magic) · `thud` (something lands) · `slam` (the big X / impact) · `tock` (time passing,
-soft) · `zip` (fast exit) · `alarm` (dur, low danger pulse). All soft and rounded by design.
+**Sound cues** `whoosh` (every cut) · `pop` (a label appears) · `ding` (a number lands) · `tock` (a row prints / time
+passes) · `slide` (dur, a bar grows or a counter runs) · `zip` (money leaves) · `stamp` (seal / stamp) · `slam` (the big
+number, the trap) · `boing` (comic beat) · `sparkle` (dur, the wink) · `thud` · `chirp`. Keep them soft.
 
-## 7. QA pitfalls we've hit (check these first)
-- An x-ray body with normal shirt sleeves or skin arms → `xray: true` handles the whole body; never x-ray only part.
-- A prop floating where it will be, before the hand gets there → use `holding`, which follows the hand.
-- A moving object crossing a label or counter (the gum zipping through "DAY 3") → give moving things their own lane.
-- A caption landing a word early → put `caps` chunk boundaries on real spoken words; check `studio check <project>` output.
-- Things hidden under the caption → keep key action above y 1250.
+## 8. QA pitfalls we've hit (check these first)
+- **Chart text too small:** 30 px tick labels vanish on a phone. Kit defaults are now 40 px ticks / 64 px values.
+- **A numeral-first caption chunk** ("*$3,000") lands at the wrong time: start chunks with a spoken word.
+- **Penny in the caption zone:** full body only with feet ≤ y 1240, otherwise use the peek.
+- **A prop arm reaching into the trap / a chart:** give Penny her own lane (peek) when the object is centred.
+- **Effects over the key number** (a burst on "$85.00"): put the burst somewhere else; the number must stay clean.
+- **Wide cards cropped by the camera push:** cards ≤ 960 px wide.
+- **Footnotes running off the card:** `\n` two lines, `maxW` 960.
+- **A seal touching its label** (65% + pill): leave ≥ 40 px between components.

@@ -1,26 +1,35 @@
 {
-  "title": "What If You Swallow Gum?",
-  "voice": "am_michael",
-  "speed": 1.0,
+  "title": "Why Your Card Wants You to Pay the Minimum",
+  "description": "Why does your credit card company love the minimum payment? Penny follows one $85 payment to see where it really goes, and does the math on what 'just the minimum' costs.",
+  "tags": ["credit card", "minimum payment", "credit card interest", "compound interest", "debt", "personal finance", "how money works"],
+  "series": "how-they-make-money",
+  "voice": "af_bella",
+  "speed": 1.05,
   "lead": 0.4,
   "outro": 0.9,
   "gap": 0.28,
   "music": "bed",
   "sources": [
-    "Mayo Clinic, 'Is it true that gum stays in your stomach for seven years if you swallow it?' (gum base is not digested; it passes through, usually within days)",
-    "Milov et al., Pediatrics 1998, 'Chewing gum bezoars of the gastrointestinal tract' (large amounts swallowed often, mostly by children, can cause blockages)"
+    "Federal Reserve Board, G.19 Consumer Credit release: commercial bank interest rate on credit card plans, accounts assessed interest (22.83% in August 2025, 22.30% in November 2025), federalreserve.gov/releases/g19",
+    "CFPB, Regulation Z, 12 CFR 1026.7(b)(12): every card statement must show the minimum payment warning, how long the balance takes to pay off at the minimum, and the total cost (Credit CARD Act of 2009)",
+    "CFPB, 'Consumer Credit Card Market Report' 2023: issuers typically set the minimum payment as a percentage of the balance plus interest and fees, with a dollar floor",
+    "Penny's calculation (shown on screen): $3,000 balance, 22% APR (monthly rate 22%/12), no new purchases; minimum = interest + 1% of the balance, at least $25 → 180 months (15 years), $4,433 interest, $7,433 paid in total. A flat $150 a month → 26 months, $771 interest."
   ],
   "lines": [
-    { "text": "What happens if you swallow your gum?", "caps": "WHAT *HAPPENS | IF YOU *SWALLOW | YOUR *GUM?" },
-    { "text": "Well, it slides down your throat and lands right in your stomach,", "caps": "WELL, IT *SLIDES | DOWN YOUR *THROAT | RIGHT IN YOUR *STOMACH" },
-    { "text": "where strong acid gets to work on it.", "caps": "WHERE STRONG *ACID | GETS TO *WORK" },
-    { "text": "The sugar and flavor dissolve pretty quickly, but the gum base is a different story.", "caps": "SUGAR *DISSOLVES | BUT THE *BASE | IS *DIFFERENT" },
-    { "text": "It's a rubbery polymer, and your body simply can't break it down.", "caps": "RUBBERY *POLYMER | YOUR BODY *CAN'T | BREAK IT *DOWN" },
-    { "text": "So does it stay there for seven years? Nope, that's a total myth.", "caps": "STAY 7 *YEARS? | *NOPE | TOTAL *MYTH" },
-    { "text": "Your gut just keeps pushing it along,", "caps": "YOUR *GUT | KEEPS IT *MOVING" },
-    { "text": "and within a few days, it's out of your system.", "caps": "A FEW *DAYS | IT'S *OUT" },
-    { "text": "But if you swallow a lot of gum all at once,", "caps": "BUT *IF... | SWALLOW A *LOT | ALL AT *ONCE" },
-    { "text": "it can clump together and actually block your gut.", "caps": "IT CAN *CLUMP | AND *BLOCK | YOUR *GUT" },
-    { "text": "So maybe, just spit it out.", "caps": "SO *MAYBE... | SPIT IT *OUT" }
+    { "text": "Why does your credit card want you to pay the minimum?", "caps": "WHY DOES | YOUR *CARD | WANT THE *MINIMUM?" },
+    { "text": "Say you owe three thousand dollars,", "caps": "SAY YOU | OWE *$3,000" },
+    { "text": "at twenty-two percent, about the average US card rate.", "caps": "AT *22% | ABOUT *AVERAGE" },
+    { "text": "Your minimum payment is eighty-five dollars.", "caps": "YOUR *MINIMUM | IS *$85" },
+    { "text": "Easy, right? But watch where it goes.", "caps": "EASY, *RIGHT? | WATCH WHERE | IT *GOES" },
+    { "text": "Fifty-five dollars is just interest.", "caps": "$55 IS | JUST *INTEREST" },
+    { "text": "Only thirty actually pays down your debt.", "caps": "ONLY *$30 | PAYS DOWN | YOUR *DEBT" },
+    { "text": "Keep paying just the minimum, and it takes fifteen years,", "caps": "KEEP *PAYING | THE *MINIMUM | TAKES *15 YEARS" },
+    { "text": "and about four thousand four hundred dollars in interest.", "caps": "ABOUT *$4,400 | IN *INTEREST" },
+    { "text": "That's more than you borrowed!", "caps": "MORE THAN YOU | *BORROWED!" },
+    { "text": "At a flat hundred and fifty every month,", "caps": "FLAT *$150 | EVERY *MONTH" },
+    { "text": "it's gone in just over two years, with under eight hundred in interest.", "caps": "IT'S *GONE | OVER *2 YEARS | UNDER *$800" },
+    { "text": "So the minimum isn't a plan. It's their business model.", "caps": "NOT A *PLAN | IT'S THEIR | BUSINESS *MODEL" },
+    { "text": "And your statement has to show you this math, by law.", "caps": "YOUR *STATEMENT | HAS TO *SHOW | BY *LAW" },
+    { "text": "Go look.", "caps": "GO *LOOK." }
   ]
 }
