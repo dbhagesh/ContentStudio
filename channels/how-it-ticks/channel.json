@@ -4,23 +4,36 @@
   "handle": "@HowItTicks",
   "url": "https://www.youtube.com/@HowItTicks",
   "instagram": null,
-  "about": "How everyday things really work, shown in 3D: machines, gadgets and the body, taken apart.",
+  "about": "How everyday things really work, shown in 3D: machines, gadgets and the body, taken apart with exploded views and cutaways. In 45 seconds you'll finally get how it works.",
   "cast": [],
   "templates": [],
   "defaults": {
-    "template": null,
-    "voice": null,
-    "speed": 1,
+    "template": "mechanism",
+    "voice": "bm_george",
+    "speed": 1.08,
     "music": "bed",
-    "overrides": {}
+    "overrides": {
+      "captions": {
+        "highlight": "#FF9A3C",
+        "stroke": "#0E1013"
+      }
+    }
   },
   "publish": {
     "targets": [
       "youtube",
       "instagram"
     ],
-    "tags": [],
-    "footer": "",
+    "tags": [
+      "how it works",
+      "engineering",
+      "mechanism",
+      "3d animation",
+      "explained",
+      "science",
+      "how things work"
+    ],
+    "footer": "How It Ticks: how everyday things really work, taken apart in 3D. New mechanism every week.",
     "links": [],
     "youtube": {
       "category": "education",
@@ -32,7 +45,19 @@
     "instagram": {
       "shareToFeed": true,
       "thumbOffsetMs": 1500,
-      "hashtags": []
+      "hashtags": [
+        "howitworks",
+        "engineering",
+        "mechanism",
+        "3danimation",
+        "science"
+      ]
     }
+  },
+  "quality": {
+    "lengthS": [
+      30,
+      55
+    ]
   }
 }
