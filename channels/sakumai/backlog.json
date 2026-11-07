@@ -1,1 +1,224 @@
-{ "episodes": [] }
+{
+  "episodes": [
+    {
+      "id": "music-chills",
+      "title": "Why does music give you chills?",
+      "series": "why-body",
+      "hook": "Why does your favorite song give you goosebumps?",
+      "twist": "Your brain starts releasing dopamine in anticipation, seconds before the best part even arrives.",
+      "sources": [
+        "Salimpoor, Benovoy, Larcher, Dagher & Zatorre (2011), 'Anatomically distinct dopamine release during anticipation and experience of peak emotion to music', Nature Neuroscience 14, 257-262, doi:10.1038/nn.2726, https://www.nature.com/articles/nn.2726 (dopamine is released at peak musical pleasure; the caudate is active in the anticipation before the peak, the nucleus accumbens during it; chills were the marker of peak emotion)",
+        "Shwartz et al. (2020), 'Cell types promoting goosebumps form a niche to regulate hair follicle stem cells', Cell 182(3), 578-593, Harvard / Hsu lab, https://pubmed.ncbi.nlm.nih.gov/32679029/ (goosebumps happen when sympathetic nerves make the tiny arrector pili muscle at each hair follicle contract, pulling the hair upright)"
+      ]
+    },
+    {
+      "id": "contagious-yawn",
+      "title": "Why are yawns contagious?",
+      "series": "why-body",
+      "hook": "Why do you yawn just from seeing someone else yawn?",
+      "twist": "How easily you catch a yawn depends on how excitable your brain's movement area is, and trying to hold it in makes the urge stronger.",
+      "sources": [
+        "Brown et al. (2017), 'A neural basis for contagious yawning', Current Biology 27(17), 2713-2717, University of Nottingham, https://eprints.nottingham.ac.uk/44492 (motor-cortex excitability predicts how readily people yawn after seeing others yawn; brain stimulation raised the urge)",
+        "University of Nottingham press release (Aug 2017), 'Yawning: why is it so contagious and why should it matter?', https://www.nottingham.ac.uk/news/pressreleases/2017/august/yawning-why-is-it-so-contagious-and-why-should-it-matter.aspx (contagious yawning is an automatic copying reflex triggered by seeing someone yawn; being told to resist increased the urge)"
+      ]
+    },
+    {
+      "id": "brain-freeze",
+      "title": "Why does ice cream freeze your brain?",
+      "series": "why-body",
+      "hook": "Why does ice cream make your whole head hurt?",
+      "twist": "The pain isn't the cold itself: a brain artery suddenly widens to rush warm blood in, then narrows again as the pain fades.",
+      "sources": [
+        "Serrador et al. (2012), Experimental Biology 2012 abstract, Harvard Medical School / VA; American Physiological Society release, https://www.eurekalert.org/news-releases/816505 (sipping ice water against the palate made the anterior cerebral artery dilate rapidly as the pain began and constrict as it eased; 13 volunteers)",
+        "ScienceDaily (Apr 2012), 'Brain freeze: new insight into headaches', https://sciencedaily.com/releases/2012/04/120422231742.htm (same study: sudden increase in blood flow through the anterior cerebral artery tracked the brain-freeze pain; suggested role keeping the brain warm)"
+      ]
+    },
+    {
+      "id": "cant-tickle-yourself",
+      "title": "Why can't you tickle yourself?",
+      "series": "why-body",
+      "hook": "Try tickling yourself right now. Nothing, right?",
+      "twist": "Your brain predicts your own touch before it happens and turns the feeling down, but add a tiny delay and it starts to tickle again.",
+      "sources": [
+        "Blakemore, Wolpert & Frith (1998), 'Central cancellation of self-produced tickle sensation', Nature Neuroscience 1(7), 635-640, https://link.springer.com/article/10.1038/2870 (self-produced touch is rated less tickly than identical external touch; the cerebellum's prediction cancels the response)",
+        "Blakemore, Frith & Wolpert (1999), 'Spatio-temporal prediction modulates the perception of self-produced stimuli', Journal of Cognitive Neuroscience 11(5), 551-559, https://wolpertlab.neuroscience.columbia.edu/sites/default/files/content/papers/BlaWolFri99.pdf (adding a delay between your movement and the touch makes self-touch feel more ticklish)"
+      ]
+    },
+    {
+      "id": "hiccups",
+      "title": "Why do you get hiccups?",
+      "series": "why-body",
+      "hook": "Why does your body randomly go 'hic'?",
+      "twist": "The 'hic' is your vocal cords snapping shut, and one theory says the whole reflex is a leftover from our ancestors' tadpole-like breathing.",
+      "sources": [
+        "MedlinePlus (U.S. National Library of Medicine), 'Hiccups', https://medlineplus.gov/ency/article/003068.htm (a hiccup is an involuntary movement of the diaphragm followed by quick closing of the vocal cords, which makes the 'hic' sound)",
+        "Straus et al. (2003), 'A phylogenetic hypothesis for the origin of hiccough', BioEssays 25(2), 182-188, doi:10.1002/bies.10224, https://core.ac.uk/download/357378668.pdf (proposes hiccups are a leftover of the gill-ventilation pattern of amphibian tadpoles; a hypothesis, said as 'one theory')"
+      ]
+    },
+    {
+      "id": "earworm",
+      "title": "Why do songs get stuck in your head?",
+      "series": "why-body",
+      "hook": "Why does one song play in your head all day?",
+      "twist": "Earworms tend to be fast, simple tunes with one surprising jump, and chewing gum keeps your 'inner voice' busy so they show up less.",
+      "sources": [
+        "Jakubowski, Finkel, Stewart & Müllensiefen (2016), 'Dissecting an earworm: Melodic features and song popularity predict involuntary musical imagery', Psychology of Aesthetics, Creativity, and the Arts, APA press release https://www.apa.org/news/press/releases/2016/11/earworms (earworms are usually faster, with a common, easy melodic shape plus unusual intervals such as leaps or repeats)",
+        "Beaman, Powell & Rapley (2015), 'Want to block earworms from conscious awareness? B(u)y gum!', Quarterly Journal of Experimental Psychology 68(6), 1049-1057, University of Reading, https://centaur.reading.ac.uk/40114/ (chewing gum reduced unwanted musical thoughts, more than finger tapping did)"
+      ]
+    },
+    {
+      "id": "why-we-cry",
+      "title": "Why do you feel better after crying?",
+      "series": "feelings-explained",
+      "hook": "Why does a good cry make you feel lighter?",
+      "twist": "Right after a cry your mood can dip, but about an hour and a half later people who cried felt better than before they started.",
+      "sources": [
+        "Gračanin, Bylsma & Vingerhoets (2014), 'Is crying a self-soothing behavior?', Frontiers in Psychology 5:502, https://www.frontiersin.org/articles/10.3389/fpsyg.2014.00502/full (review: converging evidence that crying has self-soothing effects, proposed via parasympathetic nervous system activation and oxytocin)",
+        "Gračanin, Vingerhoets, Kardum, Zupčić, Šantek & Šimić (2015), 'Why crying does and sometimes does not seem to alleviate mood: a quasi-experimental study', Motivation and Emotion 39(6), 953-960, https://pmc.ncbi.nlm.nih.gov/articles/PMC4608976 (criers' mood dipped right after a sad film, returned to baseline within 20 min, and was better than before at 90 min)"
+      ]
+    },
+    {
+      "id": "nervous-excited",
+      "title": "Why do you shake when you're nervous?",
+      "series": "feelings-explained",
+      "hook": "Why do your hands shake right before you go on stage?",
+      "twist": "Nerves and excitement feel almost the same in the body, and people who told themselves 'I'm excited' actually did better.",
+      "sources": [
+        "Harvard Health Publishing, 'Understanding the stress response', https://www.health.harvard.edu/staying-healthy/understanding-the-stress-response (in fight-or-flight the adrenal glands pump adrenaline into the blood: the heart beats faster, breathing speeds up, muscles tense)",
+        "Brooks, A. W. (2014), 'Get excited: Reappraising pre-performance anxiety as excitement', Journal of Experimental Psychology: General 143(3), 1144-1158, https://pubmed.ncbi.nlm.nih.gov/24364682/ (anxiety and excitement are both high-arousal states; saying 'I am excited' improved singing, speaking and math performance compared with trying to calm down)"
+      ]
+    },
+    {
+      "id": "laughter-contagious",
+      "title": "Why is laughing so contagious?",
+      "series": "feelings-explained",
+      "hook": "Why do you start laughing just because your friend is?",
+      "twist": "Hearing a laugh makes your brain quietly get your face muscles ready to smile, before you even decide to.",
+      "sources": [
+        "Warren et al. (2006), 'Positive emotions preferentially engage an auditory-motor mirror system', Journal of Neuroscience 26(50), 13067-13075, UCL / Imperial College (hearing laughter activates the premotor cortex that prepares facial movement, more strongly than negative sounds)",
+        "Nature news (12 Dec 2006), 'Laughter really is contagious', doi:10.1038/news061211-7, https://www.nature.com/news/2006/061211/full/news061211-7.html (same study: the premotor response to laughter and cheering was larger, an automatic mirroring that may help social bonding)"
+      ]
+    },
+    {
+      "id": "rejection-hurts",
+      "title": "Why does being left out hurt so much?",
+      "series": "feelings-explained",
+      "hook": "Why does being left out feel like it actually hurts?",
+      "twist": "Your brain uses some of the same alarm areas for being left out as for physical pain, because belonging always mattered for survival.",
+      "sources": [
+        "Eisenberger, Lieberman & Williams (2003), 'Does rejection hurt? An fMRI study of social exclusion', Science 302(5643), 290-292, https://pubmed.ncbi.nlm.nih.gov/14551436/ (being excluded from a ball-tossing game activated the anterior cingulate cortex, a region also involved in physical pain, and activity tracked distress)",
+        "Kross, Berman, Mischel, Smith & Wager (2011), 'Social rejection shares somatosensory representations with physical pain', PNAS 108(15), 6270-6275, https://pubmed.ncbi.nlm.nih.gov/21444827/ (recalling a recent rejection activated regions that also responded to physical pain; the overlap is debated, so we say 'some of the same areas')"
+      ]
+    },
+    {
+      "id": "why-hugs",
+      "title": "Why do hugs feel so good?",
+      "series": "feelings-explained",
+      "hook": "Why does one good hug make everything feel lighter?",
+      "twist": "Your skin has special nerves tuned to slow, gentle touch, and people who got more hugs got less sick when stressed.",
+      "sources": [
+        "Löken, Wessberg, Morrison, McGlone & Olausson (2009), 'Coding of pleasant touch by unmyelinated afferents in humans', Nature Neuroscience 12, 547-548, https://pubmed.ncbi.nlm.nih.gov/19363489/ (C-tactile nerve fibres respond best to slow, gentle stroking, and their firing tracks how pleasant the touch feels)",
+        "Cohen, Janicki-Deverts, Turner & Doyle (2015), 'Does hugging provide stress-buffering social support?', Psychological Science 26(2), 135-147, Carnegie Mellon, https://www.cmu.edu/news/stories/archives/2014/december/december17_hugsprotect.html (more frequent hugs were linked to less severe cold symptoms in people exposed to a cold virus, and accounted for a third of social support's protective effect)"
+      ]
+    },
+    {
+      "id": "crush-reward",
+      "title": "What a crush does to your brain",
+      "series": "crush-brain",
+      "hook": "When you like someone, your brain lights up like you won a prize.",
+      "twist": "Scientists found a crush works less like an emotion and more like a motivation, the same reward system that makes you want things.",
+      "sources": [
+        "Aron, Fisher, Mashek, Strong, Li & Brown (2005), 'Reward, motivation, and emotion systems associated with early-stage intense romantic love', Journal of Neurophysiology 94(1), 327-337, https://pubmed.ncbi.nlm.nih.gov/15928068/ (looking at the beloved activated the dopamine-rich ventral tegmental area and caudate; the authors describe early love as a motivation system)",
+        "Fisher, Aron & Brown (2005), 'Romantic love: An fMRI study of a neural mechanism for mate choice', Journal of Comparative Neurology 493(1), 58-62, https://pubmed.ncbi.nlm.nih.gov/16255001/ (early-stage romantic love activates reward and motivation pathways, especially the VTA and caudate)"
+      ]
+    },
+    {
+      "id": "crush-on-your-mind",
+      "title": "Why can't you stop thinking about your crush?",
+      "series": "crush-brain",
+      "hook": "Why does your crush live in your head rent-free?",
+      "twist": "In early love, one study found a serotonin marker in the blood at levels like those in people with obsessive thoughts, so a crush on repeat is your brain chemistry, not you being weird.",
+      "sources": [
+        "Marazziti, Akiskal, Rossi & Cassano (1999), 'Alteration of the platelet serotonin transporter in romantic love', Psychological Medicine 29(3), 741-745, https://pubmed.ncbi.nlm.nih.gov/10405096/ (20 people who had fallen in love within 6 months had platelet serotonin transporter density similar to OCD patients and lower than controls)",
+        "Fisher, Aron & Brown (2006), 'Romantic love: a mammalian brain system for mate choice', Philosophical Transactions of the Royal Society B 361(1476), 2173-2186, https://pmc.ncbi.nlm.nih.gov/articles/PMC1764845/ (the most characteristic trait of romantic love: the lover thinks obsessively about the beloved, 'intrusive thinking')"
+      ]
+    },
+    {
+      "id": "pupils-crush",
+      "title": "Your eyes give your crush away",
+      "series": "crush-brain",
+      "hook": "Your eyes do something you can't control when you see someone you like.",
+      "twist": "Your pupils widen when you look at something that interests or excites you, and you can't stop them, because the nervous system does it on its own.",
+      "sources": [
+        "Hess & Polt (1960), 'Pupil size as related to interest value of visual stimuli', Science 132(3423), 349-350, doi:10.1126/science.132.3423.349 (pupils enlarge when people view emotionally toned or interesting pictures)",
+        "de Winter, Petermeijer, Kooijman & Dodou (2021), 'Replicating five pupillometry studies of Eckhard Hess', International Journal of Psychophysiology, TU Delft, https://research.tudelft.nl/en/publications/a4c89e29-c26e-4e94-b2ac-53d86e6f1969 (modern replication confirmed pupils dilate to arousing stimuli; Hess's mimicry and gender claims did not replicate, so we only say 'interest')"
+      ]
+    },
+    {
+      "id": "holding-hands",
+      "title": "What holding hands does to two brains",
+      "series": "crush-brain",
+      "hook": "When two people hold hands, their brains do something wild.",
+      "twist": "Their brain waves start to sync up, and in one study the more in sync they were, the less pain the other person felt.",
+      "sources": [
+        "Goldstein, Weissman-Fogel, Dumas & Shamay-Tsoory (2018), 'Brain-to-brain coupling during handholding is associated with pain reduction', PNAS (Feb 2018), https://www.pasteur.fr/en/node/7654 (Institut Pasteur summary: 22 couples; brain-wave coupling rose most when they held hands during pain, and greater coupling went with less pain)",
+        "ScienceDaily / University of Colorado Boulder (1 Mar 2018), 'Holding hands can sync brainwaves, ease pain, study shows', https://sciencedaily.com/releases/2018/03/180301094822.htm (same study: hand-holding increased brain-wave coupling; the more empathic the partner, the more in sync and the less pain)"
+      ]
+    },
+    {
+      "id": "tongue-tied",
+      "title": "Why do you forget words around your crush?",
+      "series": "crush-brain",
+      "hook": "Why does your brain go blank the second your crush says hi?",
+      "twist": "A rush of stress chemicals briefly turns down your brain's planning area, so going blank means you care, not that you're awkward.",
+      "sources": [
+        "Arnsten, A. F. T. (2009), 'Stress signalling pathways that impair prefrontal cortex structure and function', Nature Reviews Neuroscience 10(6), 410-422, https://pmc.ncbi.nlm.nih.gov/articles/PMC2907136/ (even mild acute stress rapidly impairs prefrontal cognitive abilities via high norepinephrine and dopamine release)",
+        "Arnsten, A. F. T. (2015), 'Stress weakens prefrontal networks: molecular insults to higher cognition', Nature Neuroscience 18(10), 1376-1385, https://pmc.ncbi.nlm.nih.gov/articles/PMC4816215/ (acute stress quickly takes the prefrontal cortex 'offline', shifting control to more reflexive brain circuits; the effect is reversible)"
+      ]
+    },
+    {
+      "id": "dream-paralysis",
+      "title": "Why can't you move in your dreams?",
+      "series": "night-mode",
+      "hook": "Every night, your body switches off your muscles. On purpose.",
+      "twist": "During dream sleep your brain blocks the signals to your muscles, so you can run in a dream without running into your wall.",
+      "sources": [
+        "Brooks & Peever (2012), 'Identification of the transmitter and receptor mechanisms responsible for REM sleep paralysis', Journal of Neuroscience 32(29), 9785-9795, https://pmc.ncbi.nlm.nih.gov/articles/PMC6621291 (REM sleep paralysis is produced by GABA and glycine inhibition of motor neurons)",
+        "Society for Neuroscience (18 Jul 2012), 'Study identifies how muscles are paralyzed during sleep', https://www.sfn.org/publications/latest-news/2012/07/18/study-identifies-how-muscles-are-paralyzed-during-sleep (during REM sleep, when most dreaming happens, the muscles are paralysed, which keeps us from acting out our dreams)"
+      ]
+    },
+    {
+      "id": "teens-sleep-late",
+      "title": "Why can't teens fall asleep early?",
+      "series": "night-mode",
+      "hook": "Why are you wide awake at midnight but a zombie at seven?",
+      "twist": "It isn't laziness: in the teen years your body clock shifts later and your sleep hormone melatonin arrives later at night.",
+      "sources": [
+        "Carskadon, M. A. (2011), 'Sleep in adolescents: the perfect storm', Pediatric Clinics of North America 58(3), 637-647, doi:10.1016/j.pcl.2011.03.003 (the circadian system shifts later during adolescence, including later melatonin secretion; teen sleep loss is not lower need)",
+        "Crowley, Wolfson, Tarokh & Carskadon (2018), 'An update on adolescent sleep: New evidence informing the perfect storm model', Journal of Adolescence 67, 55-65, https://pubmed.ncbi.nlm.nih.gov/29908393/ (review confirming the later circadian phase and melatonin timing in adolescents)"
+      ]
+    },
+    {
+      "id": "brain-cleans-at-night",
+      "title": "Your brain cleans itself while you sleep",
+      "series": "night-mode",
+      "hook": "While you sleep, your brain does the dishes.",
+      "twist": "In sleeping mice, the spaces between brain cells opened up by about sixty percent so fluid could wash waste away much faster.",
+      "sources": [
+        "Xie et al. (2013), 'Sleep drives metabolite clearance from the adult brain', Science 342(6156), 373-377, https://pubmed.ncbi.nlm.nih.gov/24136970/ (in mice, sleep increased the space between brain cells by about 60%, speeding the clearance of waste such as beta-amyloid)",
+        "National Institutes of Health news release (17 Oct 2013), 'Brain may flush out toxins during sleep', https://www.nih.gov/news-events/news-releases/brain-may-flush-out-toxins-during-sleep (NIH-funded study: sleep clears the brain of damaging molecules; findings in mice)"
+      ]
+    },
+    {
+      "id": "sleep-saves-memories",
+      "title": "Why sleep helps you remember",
+      "series": "night-mode",
+      "hook": "You studied all night, but your brain does the real saving after you fall asleep.",
+      "twist": "While you sleep, your brain replays what you learned and moves it into longer-term storage, so sleep is part of studying.",
+      "sources": [
+        "Diekelmann & Born (2010), 'The memory function of sleep', Nature Reviews Neuroscience 11(2), 114-126, doi:10.1038/nrn2762 (sleep optimises the consolidation of newly learned information, through reactivation of the activity patterns from learning)",
+        "Stickgold & Walker (2007), 'Sleep-dependent memory consolidation and reconsolidation', Sleep Medicine 8(4), 331-343, https://pmc.ncbi.nlm.nih.gov/articles/PMC2680680 (many steps of memory consolidation occur preferentially during sleep, stabilising new memories)"
+      ]
+    }
+  ]
+}

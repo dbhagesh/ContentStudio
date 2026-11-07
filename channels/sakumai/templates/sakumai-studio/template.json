@@ -1,0 +1,15 @@
+{
+  "id": "sakumai-studio",
+  "title": "Sakumai Studio",
+  "description": "Cute pastel anime explainer hosted by Sakumai: classroom, bedroom, night-sky and inside-the-body sets, a kawaii body-cutaway kit (heart, brain, lungs, stomach, nerves, vessels, skin) with hormones as cute particles, heart-iris transitions, bold 1-3 word captions with one yellow word.",
+  "useFor": ["Sakumai: feelings and the body explained (blushing, crushes, nerves, sleep, crying, chills)"],
+  "format": { "aspect": "9:16", "width": 1080, "height": 1920, "length": "30-40 s" },
+  "fonts": [
+    { "family": "Inter", "weight": 900, "file": "fonts/Inter-Black.otf" },
+    { "family": "Inter", "weight": 800, "file": "fonts/Inter-ExtraBold.otf" }
+  ],
+  "player": { "renderer": "2d", "punch": 0.09, "punchDur": 0.3, "flash": 0.35, "flashDur": 0.1, "fadeIn": 0.2, "fadeOut": 0.4, "zoom": 0.05, "background": "#2A1A3A" },
+  "captions": { "y": 1420, "size": 140, "maxW": 920, "fill": "#FFFFFF", "highlight": "#FFD43B", "stroke": "#2A1A3A", "strokeWidth": 28, "shadowOffset": 9, "popFrom": 0.6, "popDur": 0.22 },
+  "sheet": { "canvases": [] },
+  "defaults": { "voice": "af_heart", "music": "bed", "youtube": { "category": "27" } }
+}

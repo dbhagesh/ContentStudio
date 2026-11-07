@@ -6,7 +6,7 @@
   "module": "character.js",
   "description": "The Sakumai channel's mascot: a cute pink-haired anime schoolgirl who explains how feelings and the body work.",
   "channels": ["sakumai"],
-  "voice": { "id": "af_heart", "speed": 1.0, "note": "provisional: confirm against the channel's existing videos" },
+  "voice": { "id": "af_heart", "speed": 1.0, "note": "picked by the 2026-11-07 bake-off (projects/sakumai/_voice-bakeoff/README.md); the owner confirms the final voice" },
   "palette": {
     "hair": "#F7A9CB", "hairLight": "#FCC9DE", "skin": "#FFE7DA", "iris": "#9A7BE6", "bow": "#E2384A",
     "cardigan": "#F9E5AC", "collar": "#2E3D7A", "skirt": "#34468A", "shoes": "#77462C", "line": "#7A4258"
