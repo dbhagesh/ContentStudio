@@ -1,3 +1,32 @@
 {
-  "series": []
+  "series": [
+    {
+      "id": "strange-but-true",
+      "name": "Strange But True",
+      "format": "One real, documented event so odd it sounds invented (a dancing plague, a flood of molasses, a war lost to birds). Date stamp → the ordinary day → the strange thing, step by step → the number that proves it happened → the human detail or consequence nobody expects → the Archivist stamps it TRUE.",
+      "hookFormula": "In <year>, <ordinary place/people> <did something impossible-sounding>. (state the absurd fact flat, no question)",
+      "example": "In nineteen nineteen, a wave of molasses swept through the streets of Boston."
+    },
+    {
+      "id": "unsolved",
+      "name": "Unsolved",
+      "format": "An open case with no accepted answer. What was found → the timeline on the evidence board → the clue that breaks every simple explanation → the leading theories, fairly ('one theory says…') → why none of them fits → stamp UNSOLVED, the Archivist leaves the file open and asks the viewer.",
+      "hookFormula": "<Something was found / someone vanished>, and <the one detail that makes no sense>.",
+      "example": "A ship was found sailing itself across the Atlantic, with a meal still on the table."
+    },
+    {
+      "id": "weird-laws",
+      "name": "Weird Laws",
+      "format": "A real law (or a famous fake one) with the story of why it exists. The law, typed and stamped → the strange wording → the real reason or incident behind it → is it still in force? → the twist (it's sensible, it's still used, or it never existed). Statute text or an official source is always one of the two sources.",
+      "hookFormula": "In <place>, it is <still> illegal to <oddly specific act>. Here's why.",
+      "example": "In Britain it's a crime to handle a salmon in suspicious circumstances, and that's the actual wording."
+    },
+    {
+      "id": "lost-and-found",
+      "name": "Lost & Found",
+      "format": "Something lost for decades or centuries, then found by accident or obsession. What was lost and why it mattered → the years of searching or forgetting → the unlikely finder or place → the moment of discovery (map X, polaroid) → what it changed → stamp FOUND.",
+      "hookFormula": "For <N> years, <famous thing> was lost, until <unlikely finder> found it <in the unlikeliest place>.",
+      "example": "For five hundred years, a king was missing, until they found him under a car park."
+    }
+  ]
 }
