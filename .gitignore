@@ -1,5 +1,5 @@
 # local env + models (rebuilt by `studio setup`)
-.studio/
+.studio
 # your videos (each is its own folder; commit them separately if you want)
 projects/*
 !projects/.gitkeep
@@ -12,3 +12,8 @@ __pycache__/
 templates/*/example/review/
 templates/*/example/renders/
 templates/*/example/data/*.wav
+
+# cloned tools (Hyperframes, VoiceStudio): local only
+third_party/
+# agent worktrees (parallel channel work)
+.claude/worktrees/

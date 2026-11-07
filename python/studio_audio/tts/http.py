@@ -3,6 +3,8 @@
 Used for higher-quality local engines running as their own app (e.g. VoiceStudio, Kokoro-FastAPI, Chatterbox
 servers). Settings per speaker: {"tts": "http", "url": "http://127.0.0.1:8880", "model": "...", "voice": "..."};
 an API key, if the server wants one, comes from the environment variable named by "key_env" (never from files).
+Any other settings (e.g. VoiceStudio's "description" for voice design, "seed" so a character sounds the same every
+time, "instruct", "language") are sent along in the request body.
 """
 import io
 import json
@@ -27,7 +29,8 @@ def wav_to_float(data: bytes) -> tuple[np.ndarray, int]:
 class HttpSpeechProvider:
     name = 'http'
 
-    def __init__(self, url='http://127.0.0.1:8880', model='tts-1', key_env=None, default_voice='default', timeout=300, opener=None):
+    def __init__(self, url='http://127.0.0.1:8880', model='tts-1', key_env=None, default_voice='default', timeout=600, opener=None, **extra):
+        self.extra = extra
         self.url = url.rstrip('/')
         self.model = model
         self.key_env = key_env
@@ -42,7 +45,7 @@ class HttpSpeechProvider:
         pass
 
     def synthesize(self, text, voice, speed):
-        body = json.dumps({'model': self.model, 'input': text, 'voice': voice or self.default_voice,
+        body = json.dumps({**self.extra, 'model': self.model, 'input': text, 'voice': voice or self.default_voice,
                            'speed': speed, 'response_format': 'wav'}).encode()
         headers = {'Content-Type': 'application/json'}
         key = os.environ.get(self.key_env) if self.key_env else None

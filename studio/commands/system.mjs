@@ -41,13 +41,27 @@ function checks(cfg) {
   ];
 }
 
+/** optional tools: shown, never counted as problems */
+async function optional(cfg) {
+  const vsUrl = process.env.VOICESTUDIO_URL || 'http://127.0.0.1:3900';
+  let vs = null;
+  try { const r = await fetch(`${vsUrl}/health`, { signal: AbortSignal.timeout(1500) }); if (r.ok) vs = await r.json(); } catch { /* not running */ }
+  const hf = path.join(cfg.root, 'third_party/hyperframes/packages/cli/bin/hyperframes.mjs');
+  const hfBuilt = fs.existsSync(hf) && fs.existsSync(path.join(cfg.root, 'third_party/hyperframes/packages/cli/dist'));
+  return [
+    ['voicestudio', !!vs, vs ? `${vsUrl} (v${vs.version}, ${vs.device})` : 'not running (optional): cd third_party/VoiceStudio && bun run dev:api   (or open the app: bun run dev)'],
+    ['hyperframes', hfBuilt, hfBuilt ? path.relative(cfg.root, hf) : 'not built (optional): cd third_party/hyperframes && bun install && bun run build'],
+  ];
+}
+
 export const commands = [
   {
     name: 'doctor', group: 'system', summary: 'check that everything the studio needs is installed',
     usage: 'doctor',
-    run({ cfg }) {
+    async run({ cfg }) {
       let bad = 0;
       for (const [name, pass, info, fix] of checks(cfg)) { if (!pass) bad++; console.log(`${pass ? '✓' : '✗'} ${name.padEnd(12)} ${pass ? info : fix}`); }
+      for (const [name, pass, info] of await optional(cfg)) console.log(`${pass ? '✓' : '·'} ${name.padEnd(12)} ${info}`);
       console.log(bad ? `${bad} problem(s)` : 'All set');
       return bad ? 1 : 0;
     },
@@ -55,7 +69,7 @@ export const commands = [
   {
     name: 'setup', group: 'system', summary: 'one-time: Python env + free local voice/Whisper models (~0.9 GB) inside .studio/',
     usage: 'setup',
-    run({ cfg }) {
+    async run({ cfg }) {
       fs.mkdirSync(cfg.studioHome, { recursive: true });
       let py = venvPython(cfg);
       if (!py) {
@@ -73,7 +87,7 @@ export const commands = [
       const env = audioEnv(cfg);
       run(['-m', 'studio_audio', 'voice', '--download'], 'voice model (Kokoro, ~340 MB, once) ...', env);
       run(['-c', `from studio_audio.align import load_whisper; load_whisper()`], `Whisper ${cfg.voice.whisperModel} (~0.5 GB, once) ...`, env);
-      return commands.find((c) => c.name === 'doctor').run({ cfg });
+      return await commands.find((c) => c.name === 'doctor').run({ cfg });
     },
   },
 ];

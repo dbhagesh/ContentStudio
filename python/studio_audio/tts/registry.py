@@ -34,10 +34,16 @@ def _http(**opts):
 
 
 def _voicestudio(**opts):
-    """VoiceStudio's local backend (default port 3900); key from OMNIVOICE_API_KEY when it is set."""
+    """VoiceStudio's local backend (default port 3900); key from OMNIVOICE_API_KEY when it is set.
+    The model defaults to "mlx-audio" (VoxCPM2 / Qwen3-TTS, Apache-2.0), never the generic "tts-1" alias: that maps
+    to VoiceStudio's active engine, which can be OmniVoice, licensed for non-commercial use only."""
     import os
     from .http import HttpSpeechProvider
     url = opts.pop('url', None) or os.environ.get('VOICESTUDIO_URL') or 'http://127.0.0.1:3900'
+    if opts.get('model') in (None, 'tts-1', 'tts-1-hd', 'gpt-4o-mini-tts', 'omnivoice'):
+        if opts.get('model') == 'omnivoice':
+            raise SystemExit('voicestudio: OmniVoice is licensed CC-BY-NC (non-commercial); monetized channels need a commercial-use model')
+        opts['model'] = 'mlx-audio'
     return HttpSpeechProvider(url=url, key_env=opts.pop('key_env', 'OMNIVOICE_API_KEY'), **opts)
 
 

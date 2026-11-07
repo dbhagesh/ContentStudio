@@ -91,6 +91,14 @@ class NarrateTest(unittest.TestCase):
         self.assertEqual(seen['auth'], 'Bearer k123')
         self.assertEqual(sr, 22050); self.assertAlmostEqual(x.max(), 8000 / 32767, places=4)
         self.assertIn('voicestudio', names()); self.assertIn('http', names())
+        p = HttpSpeechProvider(url='http://x', model='m', opener=opener, description='warm young voice', seed=7)
+        p.synthesize('hi', 'v', 1.0)
+        self.assertEqual((seen['body']['description'], seen['body']['seed']), ('warm young voice', 7))
+        vs = get_provider('voicestudio')
+        self.assertEqual((vs.url, vs.model, vs.key_env), ('http://127.0.0.1:3900', 'mlx-audio', 'OMNIVOICE_API_KEY'))
+        self.assertEqual(get_provider('voicestudio', model='tts-1').model, 'mlx-audio')
+        with self.assertRaises(SystemExit):
+            get_provider('voicestudio', model='omnivoice')
 
     def test_registry(self):
         self.assertIn('kokoro', names())

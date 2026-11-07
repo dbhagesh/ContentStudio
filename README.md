@@ -67,6 +67,30 @@ Characters are permanent, reusable cast members with stable IDs: shared ones in 
   was made with an older version.
 - `studio characters`, `studio channels` and `studio character-sheet <id>` list, validate and render them.
 
+## Optional tools (`third_party/`, git-ignored, local to this folder)
+
+Cloned from GitHub and built here; `studio doctor` shows whether they're ready.
+
+**VoiceStudio** (AGPL-3.0, used only through its local API) gives higher-quality voices and voice design.
+- **Start the backend:** `cd third_party/VoiceStudio && bun run dev:api` (headless, `http://127.0.0.1:3900`), or open
+  the app with `bun run dev`.
+- **Installed models (both Apache-2.0):** VoxCPM2 8-bit (active, 48 kHz, voice design and cloning) and Qwen3-TTS
+  VoiceDesign. They run through the `mlx-audio` engine on the Apple GPU.
+- **Licence warning:** don't use VoiceStudio's default engine **OmniVoice**. It is CC-BY-NC (non-commercial) and
+  monetized channels can't use it. The studio's `voicestudio` provider always asks for `mlx-audio` and refuses
+  `omnivoice`.
+- **Giving a character a designed voice** (in `character.json`, or in a channel's `voices`):
+  `"voice": { "engine": "voicestudio", "id": "default", "description": "young female, warm, bright, playful", "seed": 7 }`.
+  The seed keeps the voice identical in every video.
+- **Telemetry:** analytics consent is asked by the app on first launch; leave it off if you prefer.
+
+**Hyperframes** (HeyGen, Apache-2.0) is HTML-to-video rendering with a catalog of transitions, charts and captions.
+- **CLI:** `node third_party/hyperframes/packages/cli/bin/hyperframes.mjs` (`init`, `catalog`, `add`, `render`, `doctor`).
+- **Telemetry:** disabled (`hyperframes telemetry status`).
+- It renders separately from the studio's engine for now; integrating it as a second renderer is a planned step.
+
+Tools installed for these: `bun` and `uv` (Homebrew).
+
 ## Commands (`studio help <command>` for details)
 
 | group | commands |
