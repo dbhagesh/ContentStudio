@@ -1,0 +1,73 @@
+{
+  "id": "mechanism",
+  "title": "Mechanism 3D",
+  "description": "How It Ticks' product-visualisation look: machined parts on a graphite studio cyclorama, exploded views that fly apart and reassemble, hatched cross-section cutaways, x-ray ghosting, meshing involute gears, live springs, pistons, cams, flow arrows and leader-line part labels.",
+  "useFor": [
+    "how a machine, gadget or body part works, taken apart in 3D (How It Ticks)"
+  ],
+  "format": {
+    "aspect": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "length": "35-50 s"
+  },
+  "fonts": [
+    {
+      "family": "Inter",
+      "weight": 900,
+      "file": "fonts/Inter-Black.otf"
+    },
+    {
+      "family": "Inter",
+      "weight": 800,
+      "file": "fonts/Inter-ExtraBold.otf"
+    }
+  ],
+  "player": {
+    "renderer": "3d",
+    "fadeIn": 0.15,
+    "fadeOut": 0.4
+  },
+  "captions": {
+    "y": 1500,
+    "size": 112,
+    "maxW": 940,
+    "letterSpacing": -1,
+    "highlight": "#FF9A3C",
+    "stroke": "#0E1013",
+    "strokeWidth": 22,
+    "shadowOffset": 6
+  },
+  "engine3d": {
+    "toneMapping": "neutral",
+    "far": 200,
+    "grade": {
+      "vignette": 0.3,
+      "grain": 0.012,
+      "warm": 0.0,
+      "sat": 1.04
+    }
+  },
+  "sheet": {
+    "canvases": [
+      [
+        "gl",
+        1080,
+        1920
+      ],
+      [
+        "gl2",
+        1280,
+        860
+      ]
+    ]
+  },
+  "defaults": {
+    "voice": "bm_george",
+    "speed": 1.08,
+    "music": "workshop",
+    "youtube": {
+      "category": "27"
+    }
+  }
+}

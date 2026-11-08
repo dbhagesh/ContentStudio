@@ -1,3 +1,238 @@
 {
-  "episodes": []
+  "episodes": [
+    {
+      "id": "pin-tumbler-lock",
+      "title": "How Your Key Actually Opens a Lock",
+      "series": "how-it-works",
+      "hook": "Your house key is a password.",
+      "twist": "The same pin trick was used in ancient Egyptian wooden locks about 4,000 years ago; Linus Yale Jr. made it small and metal.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Lock (security)': the Egyptian pin-tumbler lock, possibly 4,000 years old; Yale cylinder pins raised to the proper heights by the key's serrations, usually five. https://www.britannica.com/technology/lock-security",
+        "Encyclopaedia Britannica, 'Linus Yale': his cylinder lock is based on the ancient Egyptian pin tumbler; the key's serrations raise the pins to exactly the right height so the cylinder turns. https://www.britannica.com/biography/Linus-Yale",
+        "US Patent 8,646,299 B2 (background): the lock opens when the gaps between key pins and driver pins are on the shear line, and stays closed while driver pins extend across it. https://patents.google.com/patent/US8646299B2/en"
+      ],
+      "notes": "PILOT. Mechanism modelled in templates/mechanism/src/core/lock.js."
+    },
+    {
+      "id": "zipper",
+      "title": "The Tiny Wedge Inside Every Zipper",
+      "series": "tiny-machines",
+      "hook": "Every zipper is two rows of hooks and one tiny wedge.",
+      "twist": "The slider never touches the teeth on purpose: its Y-shaped channel forces them together at an angle so each hook drops into the next one's hollow.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Zipper': interlocking teeth joined and separated by a slider; Gideon Sundback's 1913-1917 'hookless fastener'. https://www.britannica.com/technology/zipper",
+        "YKK Group, 'Zipper parts and structure' (manufacturer technical reference: elements, slider, the Y-channel). https://www.ykkfastening.com/products/zipper/"
+      ],
+      "notes": "Model: two element rows, slider as cutaway Y-channel; elements rotate as they pass the wedge."
+    },
+    {
+      "id": "microwave-oven",
+      "title": "Your Microwave Does NOT Cook From the Inside",
+      "series": "how-it-works",
+      "hook": "A microwave doesn't heat food. It shakes it.",
+      "twist": "It doesn't cook from the inside out: microwaves heat the outer few centimetres and conduction carries the heat in, which is why the middle stays cold.",
+      "sources": [
+        "US FDA, 'Microwave Oven Radiation' (magnetron, metal box reflects microwaves, absorbed by water in food). https://www.fda.gov/radiation-emitting-products/resources-you-radiation-emitting-products/microwave-oven-radiation",
+        "Health Physics Society, 'Microwave Ovens': thick foods are cooked in the outer layers by microwaves and inside mainly by conduction. https://hps.org/hpspublications/articles/microwaveovens.html"
+      ],
+      "notes": "Visual: magnetron, waveguide, standing waves (hot spots), water molecules flipping with the field (2.45 GHz)."
+    },
+    {
+      "id": "toilet-siphon",
+      "title": "Why a Toilet Flushes All at Once",
+      "series": "how-it-works",
+      "hook": "A toilet flush is a trick with a bent pipe.",
+      "twist": "The bowl isn't pushed empty: dumping the tank fills the S-shaped trapway, and the siphon then pulls the bowl empty until air breaks it with a gurgle.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Siphon': liquid flows up and over a bend when the outlet is lower than the surface, once the tube is full. https://www.britannica.com/technology/siphon",
+        "Explain that Stuff (Chris Woodford), 'How do toilets work?': tank, flush valve, siphon trapway, the gurgle when air enters. https://www.explainthatstuff.com/toilets.html"
+      ],
+      "notes": "Visual: water cutaway with flow arrows (water), the gurgle as the siphon breaks."
+    },
+    {
+      "id": "escalator-steps",
+      "title": "Where Do Escalator Steps Go?",
+      "series": "how-it-works",
+      "hook": "Every escalator step goes on a secret trip underneath you.",
+      "twist": "Each step has two pairs of wheels running on two separate tracks; where the tracks spread apart the step stays level, and where they meet it flattens into the floor.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Escalator': steps on a continuous chain loop, flattening at the landings. https://www.britannica.com/technology/escalator",
+        "Explain that Stuff, 'Escalators': step chain, drive sprocket, two tracks per step that keep the tread level. https://www.explainthatstuff.com/escalators.html"
+      ],
+      "notes": "Verify track geometry against a manufacturer diagram (Otis/KONE) before scripting."
+    },
+    {
+      "id": "watch-escapement",
+      "title": "The Part That Makes a Watch Tick",
+      "series": "tiny-machines",
+      "hook": "This tiny part inside a watch ticks about 691,000 times a day.",
+      "twist": "The tick isn't the clock running; it's the escapement stopping it: the gear train is held still and released one tooth at a time.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Escapement': the device that releases a clock's or watch's gear train in steps, giving the balance its impulses. https://www.britannica.com/technology/escapement",
+        "Encyclopaedia Britannica, 'Watch': mainspring, gear train, balance wheel and hairspring, lever escapement. https://www.britannica.com/technology/watch"
+      ],
+      "notes": "691,200 = 28,800 beats per hour (a common 4 Hz movement) x 24. Say \"about\" and name the beat rate."
+    },
+    {
+      "id": "jet-engine",
+      "title": "How a Jet Engine Really Pushes a Plane",
+      "series": "how-it-works",
+      "hook": "Most of a jet engine's push doesn't come from the fire.",
+      "twist": "In a big airliner engine most of the thrust comes from the giant fan blowing air around the core, not from the hot jet out the back.",
+      "sources": [
+        "NASA Glenn Research Center, 'Turbofan Engine': thrust comes from both the core and the fan; high-bypass engines. https://www.grc.nasa.gov/www/k-12/airplane/aturbf.html",
+        "Rolls-Royce, 'How a jet engine works' (suck, squeeze, bang, blow; bypass air). https://www.rolls-royce.com/media/our-stories/discover/2017/how-a-jet-engine-works.aspx"
+      ],
+      "notes": "Do not quote a percentage unless the source used gives one for that engine."
+    },
+    {
+      "id": "bike-freewheel",
+      "title": "Why Your Bike Clicks When You Coast",
+      "series": "tiny-machines",
+      "hook": "That ticking when you stop pedalling is a one-way door.",
+      "twist": "Spring-loaded pawls catch on ramped teeth one way and skip over them the other: the click is each pawl snapping back.",
+      "sources": [
+        "Sheldon Brown, 'Glossary: Freewheel / Freehub / Pawl' (bicycle mechanic reference). https://www.sheldonbrown.com/gloss_f.html",
+        "Encyclopaedia Britannica, 'Ratchet': pawl and toothed wheel allowing motion in one direction only. https://www.britannica.com/technology/ratchet"
+      ]
+    },
+    {
+      "id": "car-differential",
+      "title": "Why Car Wheels Can Spin at Different Speeds",
+      "series": "how-it-works",
+      "hook": "In every turn, your car's wheels disagree.",
+      "twist": "The outer wheel travels farther; a differential's little spider gears let one wheel speed up exactly as much as the other slows down.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Differential': gear arrangement that lets wheels on the same axle turn at different speeds. https://www.britannica.com/technology/differential",
+        "Explain that Stuff, 'Differentials': ring gear, pinion, spider gears, the average-speed rule. https://www.explainthatstuff.com/differential.html"
+      ],
+      "notes": "Gear kit: bevel gears needed (new kit component)."
+    },
+    {
+      "id": "elevator-safety-brake",
+      "title": "What Happens If an Elevator Cable Snaps?",
+      "series": "why-it-doesnt-fail",
+      "hook": "What happens if an elevator's cable snaps?",
+      "twist": "In 1854 Elisha Otis had the only rope holding his platform cut in front of a crowd: a spring snapped out into toothed rails and the platform dropped only a few inches.",
+      "sources": [
+        "ASME, 'Elisha Graves Otis' (the 1854 Crystal Palace demonstration of the safety hoist). https://www.asme.org/engineering-topics/articles/elevators/elisha-graves-otis",
+        "Encyclopaedia Britannica, 'Elevator': safety devices that grip the guide rails if the car overspeeds. https://www.britannica.com/technology/elevator-vertical-transport"
+      ],
+      "notes": "Modern cars hang from several ropes and use overspeed governors; check a manufacturer source before claiming numbers."
+    },
+    {
+      "id": "four-stroke-engine",
+      "title": "Suck, Squeeze, Bang, Blow: Inside a Car Engine",
+      "series": "how-it-works",
+      "hook": "Your car engine sets off thousands of small explosions every minute.",
+      "twist": "The camshaft turns exactly half as fast as the crankshaft, because each valve opens once every two turns.",
+      "sources": [
+        "US Department of Energy, Alternative Fuels Data Center, 'How Do Gasoline Cars Work?'. https://afdc.energy.gov/vehicles/how-do-gasoline-cars-work",
+        "Encyclopaedia Britannica, 'Gasoline engine': the four-stroke (Otto) cycle, valves driven by the camshaft at half crankshaft speed. https://www.britannica.com/technology/gasoline-engine"
+      ],
+      "notes": "Kit: piston(), cam(), gear 2:1 timing drive. At 2,000 rpm a 4-cylinder fires 4,000 times a minute."
+    },
+    {
+      "id": "ballpoint-pen",
+      "title": "The Tiny Ball That Makes Your Pen Work",
+      "series": "tiny-machines",
+      "hook": "Your pen writes with a tiny steel ball, not its tip.",
+      "twist": "The ball is a valve as well as a roller: it seals the ink in when you stop and lets a thin film out only while it rolls.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Ballpoint pen': a ball bearing in a socket transfers quick-drying ink; László Bíró's 1938 design. https://www.britannica.com/technology/ballpoint-pen",
+        "Explain that Stuff, 'Ballpoint pens' (ball, socket, ink reservoir, capillary feed). https://www.explainthatstuff.com/howballpointpenswork.html"
+      ]
+    },
+    {
+      "id": "smoke-detector",
+      "title": "The Radioactive Part Inside Your Smoke Alarm",
+      "series": "whats-inside",
+      "hook": "There may be something radioactive on your ceiling right now.",
+      "twist": "Ionization alarms hold a tiny americium-241 source (about a microcurie or less); smoke particles soak up the ions and the current drops, which sets off the alarm.",
+      "sources": [
+        "US Nuclear Regulatory Commission, 'Smoke Detectors' backgrounder: most use americium-241, one microcurie or less. https://www.nrc.gov/reading-rm/doc-collections/fact-sheets/smoke-detectors.html",
+        "NFPA, 'Ionization vs. photoelectric smoke alarms' (how both types detect smoke). https://www.nfpa.org/education-and-research/home-fire-safety/smoke-alarms"
+      ],
+      "notes": "Calm tone; say it is safe in normal use (NRC). No scare framing."
+    },
+    {
+      "id": "fridge-heat-pump",
+      "title": "Your Fridge Doesn't Make Cold",
+      "series": "how-it-works",
+      "hook": "Your fridge doesn't make cold. It moves heat.",
+      "twist": "The coils on the back are warm because that's where the heat from your food ends up: the fridge is a heat pump pointed at your kitchen.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Refrigeration': the vapour-compression cycle (compressor, condenser, expansion valve, evaporator). https://www.britannica.com/technology/refrigeration",
+        "US Department of Energy, 'Heat Pump Systems': moving heat from a cool space to a warm one with the same cycle. https://www.energy.gov/energysaver/heat-pump-systems"
+      ]
+    },
+    {
+      "id": "quartz-watch",
+      "title": "Why Quartz Watches Vibrate 32,768 Times a Second",
+      "series": "tiny-machines",
+      "hook": "Inside a cheap watch, a tiny crystal fork hums 32,768 times a second.",
+      "twist": "32,768 is two to the fifteenth power: halve it fifteen times and you get exactly one tick per second.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Quartz clock': piezoelectric quartz resonator driving the timekeeping. https://www.britannica.com/technology/quartz-clock",
+        "Micro Crystal, 32.768 kHz tuning-fork crystal datasheet (manufacturer technical document). https://www.microcrystal.com/en/products/32768-khz-crystals/"
+      ]
+    },
+    {
+      "id": "car-airbag",
+      "title": "An Airbag Fills Faster Than You Can Blink",
+      "series": "why-it-doesnt-fail",
+      "hook": "An airbag fills faster than you can blink.",
+      "twist": "It's a controlled chemical burst, not compressed air, and it starts deflating through vents almost immediately, so you sink into it instead of bouncing off.",
+      "sources": [
+        "US NHTSA, 'Air Bags' (deployment, sensors, safety for children). https://www.nhtsa.gov/vehicle-safety/air-bags",
+        "Encyclopaedia Britannica, 'Airbag': crash sensor, gas generator, inflation in a few hundredths of a second. https://www.britannica.com/technology/airbag"
+      ]
+    },
+    {
+      "id": "heart-valves",
+      "title": "The Four One-Way Doors in Your Heart",
+      "series": "how-it-works",
+      "hook": "Your heart has four one-way doors, and you can hear them shut.",
+      "twist": "The \"lub-dub\" of a heartbeat isn't the muscle squeezing: it's the valves snapping closed.",
+      "sources": [
+        "US NHLBI, 'How the Heart Works' (chambers, four valves, one-way flow). https://www.nhlbi.nih.gov/health/heart",
+        "Cleveland Clinic, 'Heart Valves' (heart sounds are made by valves closing). https://my.clevelandclinic.org/health/body/17067-heart-valves"
+      ],
+      "notes": "Body topic: no gore, clean anatomical 3D, flow arrows in blood red/blue."
+    },
+    {
+      "id": "ear-ossicles",
+      "title": "The Smallest Bones in Your Body Are a Lever",
+      "series": "tiny-machines",
+      "hook": "The smallest bone in your body is shaped like a stirrup.",
+      "twist": "The three ear bones work as a lever and a funnel that concentrate sound, so tiny air vibrations can move the fluid in your inner ear.",
+      "sources": [
+        "US NIDCD, 'How Do We Hear?' (eardrum, malleus, incus, stapes, cochlea). https://www.nidcd.nih.gov/health/how-do-we-hear",
+        "Encyclopaedia Britannica, 'Ear: transmission of sound by the middle ear'. https://www.britannica.com/science/ear"
+      ]
+    },
+    {
+      "id": "hard-drive-head",
+      "title": "A Hard Drive Head Flies Thinner Than a Virus",
+      "series": "tiny-machines",
+      "hook": "Inside a hard drive, a head flies over a spinning disk on a cushion of air.",
+      "twist": "The gap is only a few nanometres; a speck of dust would be like a boulder, which is why drives are sealed.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Hard disk': read/write heads float on an air bearing over the platters. https://www.britannica.com/technology/hard-disk",
+        "Western Digital / HGST, 'Fly height and head-disk interface' technical brief (verify exact nm at script time). https://documents.westerndigital.com/"
+      ],
+      "notes": "Check fly-height numbers against a current manufacturer document before scripting."
+    },
+    {
+      "id": "disc-brakes",
+      "title": "How Your Foot Stops a Two-Ton Car",
+      "series": "why-it-doesnt-fail",
+      "hook": "Your foot can stop a two-ton car because of a liquid that refuses to squeeze.",
+      "twist": "Brake fluid passes the push from a small piston to bigger ones, multiplying the force, and the car stops by turning motion into heat in the discs.",
+      "sources": [
+        "Encyclopaedia Britannica, 'Brake': hydraulic brakes, disc and caliper. https://www.britannica.com/technology/brake",
+        "Encyclopaedia Britannica, 'Pascal's principle': pressure in a confined fluid is transmitted equally; force scales with piston area. https://www.britannica.com/science/Pascals-principle"
+      ]
+    }
+  ]
 }
