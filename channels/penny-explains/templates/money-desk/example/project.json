@@ -1,0 +1,7 @@
+{
+  "template": "money-desk",
+  "channel": "penny-explains",
+  "title": "Money Desk example",
+  "cast": { "penny": "1.0.0" },
+  "overrides": {}
+}

@@ -1,0 +1,97 @@
+{
+ "duration": 41.134,
+ "voice": "af_bella",
+ "speed": 1.05,
+ "lines": [
+  {
+   "i": 0,
+   "text": "Why does your credit card want you to pay the minimum?",
+   "start": 0.4,
+   "end": 2.945
+  },
+  {
+   "i": 1,
+   "text": "Say you owe three thousand dollars,",
+   "start": 3.224,
+   "end": 5.045
+  },
+  {
+   "i": 2,
+   "text": "at twenty-two percent, about the average US card rate.",
+   "start": 5.394,
+   "end": 8.692
+  },
+  {
+   "i": 3,
+   "text": "Your minimum payment is eighty-five dollars.",
+   "start": 8.972,
+   "end": 11.462
+  },
+  {
+   "i": 4,
+   "text": "Easy, right? But watch where it goes.",
+   "start": 11.742,
+   "end": 13.767
+  },
+  {
+   "i": 5,
+   "text": "Fifty-five dollars is just interest.",
+   "start": 14.047,
+   "end": 16.136
+  },
+  {
+   "i": 6,
+   "text": "Only thirty actually pays down your debt.",
+   "start": 16.416,
+   "end": 18.568
+  },
+  {
+   "i": 7,
+   "text": "Keep paying just the minimum, and it takes fifteen years,",
+   "start": 18.848,
+   "end": 21.998
+  },
+  {
+   "i": 8,
+   "text": "and about four thousand four hundred dollars in interest.",
+   "start": 22.328,
+   "end": 24.891
+  },
+  {
+   "i": 9,
+   "text": "That's more than you borrowed!",
+   "start": 25.171,
+   "end": 26.331
+  },
+  {
+   "i": 10,
+   "text": "At a flat hundred and fifty every month,",
+   "start": 26.611,
+   "end": 28.501
+  },
+  {
+   "i": 11,
+   "text": "it's gone in just over two years, with under eight hundred in interest.",
+   "start": 29.001,
+   "end": 32.778
+  },
+  {
+   "i": 12,
+   "text": "So the minimum isn't a plan. It's their business model.",
+   "start": 33.058,
+   "end": 36.043
+  },
+  {
+   "i": 13,
+   "text": "And your statement has to show you this math, by law.",
+   "start": 36.323,
+   "end": 39.119
+  },
+  {
+   "i": 14,
+   "text": "Go look.",
+   "start": 39.399,
+   "end": 39.954
+  }
+ ]
+}
