@@ -1,0 +1,86 @@
+{
+  "id": "akari",
+  "name": "Akari Hino",
+  "version": "1.0.0",
+  "kind": "canvas2d",
+  "module": "character.js",
+  "description": "Ink & Ember's lead: a 16-year-old Ember whose heart burns red. White flame-shaped ponytail, spiky bangs, a long ragged scarf.",
+  "channels": [
+    "ink-and-ember"
+  ],
+  "voice": {
+    "id": "af_bella",
+    "speed": 1.05,
+    "note": "bake-off pick: bright, young, fierce (projects/ink-and-ember/_voice-bakeoff)"
+  },
+  "palette": {
+    "ink": "#111014",
+    "paper": "#FBFAF6",
+    "accent": "#FF4A1C",
+    "hairColour": "#FF5A1F",
+    "scarf": "#E3261B",
+    "iris": "#FF7A1A",
+    "skin": "#F7D6BE"
+  },
+  "expressions": [
+    "neutral",
+    "determined",
+    "smirk",
+    "grin",
+    "rage",
+    "shock",
+    "tears",
+    "sweat",
+    "cold",
+    "sad",
+    "shout",
+    "soft"
+  ],
+  "poses": [
+    "stand",
+    "guard",
+    "point",
+    "reach",
+    "lunge",
+    "punch",
+    "leap",
+    "crouch",
+    "clutch",
+    "cross",
+    "wield",
+    "kneel"
+  ],
+  "outfits": [
+    "street",
+    "runaway"
+  ],
+  "modes": [
+    "mono",
+    "accent",
+    "full"
+  ],
+  "anchors": [
+    "top",
+    "head",
+    "face",
+    "eyes",
+    "mouth",
+    "neck",
+    "chest",
+    "heart",
+    "hips",
+    "handL",
+    "handR",
+    "knees",
+    "feet",
+    "bubble"
+  ],
+  "references": [],
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-11-07",
+      "note": "Created in code for Ink & Ember: manga ink style, 12 expressions, 12 poses, colour modes."
+    }
+  ]
+}

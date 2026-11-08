@@ -4,26 +4,26 @@
   "handle": "@InkAndEmber",
   "url": "https://www.youtube.com/@InkAndEmber",
   "instagram": null,
-  "about": "Original serialized manga micro-dramas in black-and-white ink with ember-red colour bursts.",
-  "cast": [],
+  "about": "Original serialized manga micro-dramas in black-and-white ink with ember-red colour bursts. A city where colour is a crime, and the kids whose hearts catch fire.",
+  "cast": ["akari", "ren", "dai", "sumi"],
   "templates": [],
   "defaults": {
-    "template": null,
-    "voice": null,
-    "speed": 1,
-    "music": "bed",
-    "overrides": {}
+    "template": "manga-panels",
+    "voice": "bm_fable",
+    "speed": 1.0,
+    "music": "ember",
+    "overrides": {
+      "captions": { "y": 1470, "size": 112 }
+    }
   },
+  "quality": { "minSources": 0, "lengthS": [42, 62], "hookMaxS": 3.2, "lineMaxS": 4.2 },
   "publish": {
-    "targets": [
-      "youtube",
-      "instagram"
-    ],
-    "tags": [],
-    "footer": "",
+    "targets": ["youtube", "instagram"],
+    "tags": ["manga", "anime", "original manga", "webtoon", "shorts", "ink and ember", "manga story"],
+    "footer": "Ink & Ember: an original manga, one part at a time. New part every few days. Follow so you don't miss the next one.",
     "links": [],
     "youtube": {
-      "category": "education",
+      "category": "entertainment",
       "privacy": "private",
       "madeForKids": false,
       "syntheticMedia": false,
@@ -32,7 +32,7 @@
     "instagram": {
       "shareToFeed": true,
       "thumbOffsetMs": 1500,
-      "hashtags": []
+      "hashtags": ["manga", "anime", "originalmanga", "webtoon", "mangaart"]
     }
   }
 }

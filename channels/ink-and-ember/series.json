@@ -1,3 +1,28 @@
 {
-  "series": []
+  "series": [
+    {
+      "id": "arc1-spark",
+      "name": "Arc 1: Spark",
+      "logline": "In a city where colour is a crime, a girl who has spent her life feeling nothing ignites in public, and the Inkguard's youngest hunter is sent to put her out.",
+      "episodes": 5,
+      "format": "5 parts of 45-60 s, manga-panels. Cold open on the peak image, 'Part N' card by ~4 s, one colour moment, cliffhanger, 'Part N+1 →' end card. Payoff in Part 5: Akari burns on purpose and colour floods the market.",
+      "hookFormula": "The forbidden fact, or the broken rule"
+    },
+    {
+      "id": "arc2-blue-fire",
+      "name": "Arc 2: Blue Fire",
+      "logline": "The hunter has been hiding a flame of his own. To save him, Akari walks into the Inkguard's tower, where the grey is not paint but erased memories.",
+      "episodes": 4,
+      "format": "4 parts of 45-60 s, manga-panels. Two-colour moments (red and blue) allowed in Part 3. Payoff in Part 4: Dai, with no powers, brings Akari back.",
+      "hookFormula": "The betrayal reveal, or the impossible stake"
+    },
+    {
+      "id": "arc3-ashfall",
+      "name": "Arc 3: Ashfall",
+      "logline": "A hundred years ago one girl painted the sky black to end a war of fire. She is Sumi, and the only way to bring back the sun is to burn the Hush from the inside.",
+      "episodes": 5,
+      "format": "5 parts of 45-60 s, manga-panels. Every cast colour appears by the finale; Part 5 ends in full colour: the first sunrise in a hundred years.",
+      "hookFormula": "The confession, or the countdown"
+    }
+  ]
 }
