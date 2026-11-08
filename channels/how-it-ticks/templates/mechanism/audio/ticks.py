@@ -1,4 +1,4 @@
-"""How It Ticks: the channel's own sounds (every video of the channel gets them).
+"""How It Ticks sounds, shipped with the mechanism template (so every video of the channel and the example get them).
 
   click     a small metal click: a pin dropping into place, a tooth engaging, a latch (soft, short)
   clunk     a heavy metal stop: something jammed, a bolt hitting its end

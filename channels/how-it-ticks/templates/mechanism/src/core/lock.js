@@ -6,7 +6,7 @@
 // The key's top edge is a real profile: every pin's tip rides on it as the key slides (pinHeight), so the right key
 // lifts every key pin's top exactly to the shear line, and a wrong cut leaves a pin across it.
 import * as THREE from 'three';
-import { MAT, CAP, PAL, shadowed, cutaway, sectionFace, xrayable, xray, plane } from './kit.js';
+import { MAT, CAP, PAL, shadowed, cutaway, sectionFace, xrayable, xray, plane, glowPart } from './kit.js';
 import { spring } from './parts.js';
 import { clamp, lerp } from './lib.js';
 
@@ -140,7 +140,7 @@ export function pinTumbler({ cuts = CORRECT } = {}) {
 
   // sections: the bodies are cut in every section view; pins, springs and key only in end-on slices (side views keep them whole)
   const bodyCuts = [cutaway(housing, CAP.steel, { caps: false }), cutaway(plug, CAP.brass, { caps: false })];
-  const pinCuts = [...keyPins.map((m) => cutaway(m, CAP.brass)), ...drivers.map((m) => cutaway(m, CAP.steel)), ...springs.map((m) => cutaway(m, CAP.dark)), cutaway(keyG, CAP.steel)];
+  const pinCuts = [...keyPins.map((m) => cutaway(m, CAP.brass)), ...drivers.map((m) => cutaway(m, CAP.pin)), ...springs.map((m) => cutaway(m, CAP.dark)), cutaway(keyG, CAP.key)];
   setCuts(cuts);
   xrayable(housing); xrayable(plug);
   const parts = { housing, plug, rotor, key: keyG, keyPins, drivers, springs, shear, ring };
@@ -152,9 +152,11 @@ export function pinTumbler({ cuts = CORRECT } = {}) {
     /**
      * pose everything. keyX: key tip x (FULL = all the way in, ≥ 1.5 = out of the lock; null = no key) · cuts · turn (rad, plug)
      * · cut: 'none' │ 'side' (section through the pins, seen from +z) │ 'slice' (end-on section through chamber `slice`)
-     * · xray 0..1 (housing + plug to glass) · explode 0..1 · shearGlow 0..1
+     * · xray 0..1 (housing + plug to glass) · explode 0..1 · shearGlow 0..1 · shearGrow 0..1 (the line draws in from the face)
+     * · open 0..1 (the front half lifts off like a lid, revealing the side section) · only: 'key' (just the key)
+     * · glow: { drivers: [k…], keyPins: [k…], color } lights pins up (e.g. the one that blocks)
      */
-    pose({ keyX = null, cuts: cs = CORRECT, turn = 0, cut = 'none', slice = 2, xray: xk = 0, explode: ek = 0, shearGlow = 0, keyVisible = keyX != null } = {}) {
+    pose({ keyX = null, cuts: cs = CORRECT, turn = 0, cut = 'none', slice = 2, xray: xk = 0, explode: ek = 0, shearGlow = 0, shearGrow = 1, open = 0, only = null, glow = {}, keyVisible = keyX != null } = {}) {
       setCuts(cs); keyG.visible = keyVisible; keyG.position.x = keyX ?? 4;
       // exploded view: the plug (with its key pins) slides out the back; drivers and springs lift out of the housing
       rotor.position.set(-5.2 * stag(ek, 0), 0, 0); rotor.rotation.x = turn;
@@ -166,7 +168,17 @@ export function pinTumbler({ cuts = CORRECT } = {}) {
       });
       const planes = cut === 'side' ? [plane([0, 0, -1], 0.002)] : cut === 'slice' ? [plane([-1, 0, 0], -X[slice])] : null;
       bodyCuts.forEach((c) => c.set(planes)); pinCuts.forEach((c) => c.set(cut === 'slice' ? planes : null));
-      hSide.visible = pSide.visible = cut === 'side';
+      hSide.visible = pSide.visible = cut === 'side' || open > 0;
+      // the lid: the front halves of shell and plug slide toward the camera, then lift out of frame
+      const lift = (o) => o.position.set(0, 10 * smooth(clamp((open - 0.3) / 0.7)), 2.6 * smooth(clamp(open / 0.45)));
+      lift(housing.userData.halves.front); lift(plug.userData.halves.front);
+      shear.scale.x = Math.max(0.001, shearGrow); shear.position.x = -LEN * shearGrow / 2;
+      if (cut !== 'side' && open > 0.6) { shear.visible = shearGlow > 0; }
+      const bodies = only !== 'key';
+      housing.visible = plug.visible = bodies; [...keyPins, ...drivers, ...springs].forEach((m) => { m.visible = bodies; });
+      if (!bodies) { hSide.visible = pSide.visible = shear.visible = ring.visible = false; hSlice.forEach((f) => { f.visible = false; }); pSlice.forEach((f) => { f.visible = false; }); }
+      drivers.forEach((m, i) => glowPart(m, (Array.isArray(glow.drivers) ? glow.drivers[i] : glow.drivers) || 0, glow.color || PAL.accent));
+      keyPins.forEach((m, i) => glowPart(m, (Array.isArray(glow.keyPins) ? glow.keyPins[i] : glow.keyPins) || 0, glow.color || PAL.accent));
       hSlice.forEach((f, i) => { f.visible = cut === 'slice' && i === slice; }); pSlice.forEach((f, i) => { f.visible = cut === 'slice' && i === slice; });
       xray(housing, xk); xray(plug, xk * 0.85);
       shear.visible = cut === 'side' && shearGlow > 0; shear.material.opacity = clamp(shearGlow);
@@ -177,17 +189,38 @@ export function pinTumbler({ cuts = CORRECT } = {}) {
   return L.pose();
 }
 
-/** the ancient Egyptian pin lock (for the history beat): a wooden bolt held by pins that drop from a staple above */
+/** a painted wood-grain texture (seeded, so it's identical every frame) */
+function grain(base = '#B08A62') {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 128; const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0, 0, 512, 128);
+  for (let i = 0; i < 70; i++) { const y = (i * 37.3) % 128, a = 0.05 + ((i * 13) % 7) / 70; g.strokeStyle = `rgba(60,32,12,${a})`; g.lineWidth = 1 + (i % 3); g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= 512; x += 32) g.lineTo(x, y + Math.sin(x / 60 + i) * 3); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+/**
+ * the ancient Egyptian pin lock (Britannica, "Lock"): a wooden bolt slides through a staple; wooden pins drop from the
+ * staple into holes in the bolt and hold it. A wooden key with pegs, pushed into the bolt's hollow and lifted, raises
+ * the pins clear, and the bolt slides open. .set(insert 0..1, lift 0..1, slide 0..1) · .parts { bolt, staple, pins, key }
+ */
 export function egyptianLock() {
-  const g = new THREE.Group(), wood = MAT.wood(), dark = MAT.wood(); dark.color.set('#7A5230');
-  const bolt = shadowed(new THREE.Mesh(new THREE.BoxGeometry(5, 0.7, 0.8), wood)); g.add(bolt);
-  const staple = shadowed(new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.6, 1.3), dark)); staple.position.set(0.4, 0.75, 0); g.add(staple);
-  const pins = [-0.2, 0.4, 1.0].map((x) => { const p = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 1.0, 20), MAT.wood())); p.position.set(x, 0.4, 0); g.add(p); return p; });
-  const key = new THREE.Group(), kb = shadowed(new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.22, 0.36), wood)); key.add(kb);
-  [-0.2, 0.4, 1.0].forEach((x) => { const peg = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.3, 14), dark)); peg.position.set(x - 0.4 + 1.6 - 1.6, 0.22, 0); key.add(peg); });
-  g.add(key);
+  const g = new THREE.Group(), tex = grain(), wood = new THREE.MeshPhysicalMaterial({ color: '#C9A47E', map: tex, roughness: 0.7 });
+  const dark = new THREE.MeshPhysicalMaterial({ color: '#A58462', map: tex, roughness: 0.75 }), pinM = new THREE.MeshPhysicalMaterial({ color: '#E8CFA8', map: tex, roughness: 0.6 });
+  const PX = [-0.5, 0.1, 0.7];                                                   // pin positions along the bolt
+  const bolt = new THREE.Group(), bb = shadowed(new THREE.Mesh(new THREE.BoxGeometry(6, 0.8, 0.9), wood)); bolt.add(bb);
+  const staple = new THREE.Group(), sTop = shadowed(new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.3, 1.5), dark)); sTop.position.y = 1.05; staple.add(sTop);
+  for (const x of [-1.1, 1.1]) { const leg = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.1, 1.5), dark)); leg.position.set(x, -0.15, 0); staple.add(leg); }
+  const pins = PX.map((x) => { const p = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 1.1, 24), pinM)); p.position.set(x, 0.4, 0); g.add(p); return p; });
+  const key = new THREE.Group(), kb = shadowed(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.2, 0.3), pinM)); kb.position.x = 1.6; key.add(kb);
+  const handle = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.6, 0.34), pinM)); handle.position.set(3.65, -0.7, 0); key.add(handle);
+  PX.forEach((x) => { const peg = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.06, 16), pinM)); peg.position.set(x, 0.13, 0); key.add(peg); });
+  g.add(bolt, staple, key);
+  xrayable(bolt, '#FFC98A'); xrayable(staple, '#FFC98A');
   g.parts = { bolt, staple, pins, key };
-  /** lift 0..1 raises the key (and the pins) · slide moves the bolt open */
-  g.set = (lift = 0, slide = 0) => { key.position.set(0.4, -0.15 + lift * 0.5, 0); pins.forEach((p) => { p.position.y = 0.4 + lift * 0.5; }); bolt.position.x = -slide * 1.4; return g; };
-  return g.set();
+  g.set = (insert = 1, lift = 0, slide = 0, ghost = 0) => {
+    key.position.set(4 * (1 - insert), -0.3 + lift * 0.56, 0);   // bar sits in the bolt's hollow; pegs touch the pins
+    pins.forEach((p) => { p.position.y = 0.4 + lift * 0.56; });                 // pin bottoms (-0.15) rise just above the bolt (0.4)
+    bolt.position.x = -1.6 * slide; key.position.x -= 1.6 * slide;
+    xray(bolt, ghost); xray(staple, ghost * 0.8);
+    return g;
+  };
+  return g.set(0);
 }

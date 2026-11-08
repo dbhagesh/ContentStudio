@@ -11,7 +11,7 @@
     "template": "mechanism",
     "voice": "bm_george",
     "speed": 1.08,
-    "music": "bed",
+    "music": "workshop",
     "overrides": {
       "captions": {
         "highlight": "#FF9A3C",

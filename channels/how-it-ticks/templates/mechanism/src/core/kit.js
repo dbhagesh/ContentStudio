@@ -87,7 +87,7 @@ export function capMaterial(col = '#E9DFC8', line = '#8A7A5C', side = THREE.Back
 }
 /** an explicit section face (for bodies built from several pieces, where back-face caps would show the seams) */
 export function sectionFace(geo, [col, line] = CAP.steel) { const m = new THREE.Mesh(geo, capMaterial(col, line, THREE.DoubleSide)); m.userData.noCut = true; m.userData.ghost = true; return m; }
-export const CAP = { brass: ['#F0D9A8', '#A8823F'], steel: ['#DCE2E8', '#7D8894'], dark: ['#9AA2AC', '#4E5660'], plastic: ['#9CC3F2', '#2F64B0'], red: ['#F6B0A8', '#B8332B'] };
+export const CAP = { brass: ['#F0D9A8', '#A8823F'], steel: ['#DCE2E8', '#7D8894'], pin: ['#8D97A3', '#454D57'], key: ['#B4BDC7', '#5E6873'], dark: ['#6E7782', '#3A4048'], plastic: ['#9CC3F2', '#2F64B0'], red: ['#F6B0A8', '#B8332B'], wood: ['#E2C49A', '#8A6038'] };
 /**
  * make every mesh under root cuttable: each gets a hatched back-face twin that fills the cut. Parts must be closed,
  * single-piece solids (a body glued from several pieces shows its seams: give it sectionFace()s and caps: false).
@@ -142,6 +142,16 @@ export function xray(root, k) {
     m.castShadow = k < 0.5;
     g.visible = k > 0; g.material.uniforms.uS.value = k;
   }
+}
+
+/** light a part up (emissive) in a colour, k 0..1; call with 0 to switch it off. Skips caps and ghosts. */
+export function glowPart(obj, k, color = PAL.accent) {
+  obj.traverse((m) => {
+    if (!m.isMesh || m.userData.cap || m.userData.ghost || !m.material.emissive) return;
+    const mt = m.material; mt.userData.base ??= mt.color.clone();
+    mt.color.copy(mt.userData.base).lerp(new THREE.Color(color), k * 0.75);   // tint (metal reflects its own colour)
+    mt.emissive.set(color); mt.emissiveIntensity = k * 0.45;
+  });
 }
 
 // ── exploded views ──────────────────────────────────────────────────────
