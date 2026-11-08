@@ -1,0 +1,86 @@
+{
+  "id": "dai",
+  "name": "Dai Okabe",
+  "version": "1.0.0",
+  "kind": "canvas2d",
+  "module": "character.js",
+  "description": "Ink & Ember's best friend: the lantern-maker's son, big, loud and kind, with no powers. Round head, spiky crew-cut in grey tone, welding goggles on his forehead, a plaster on his nose, a work apron.",
+  "channels": [
+    "ink-and-ember"
+  ],
+  "voice": {
+    "id": "am_puck",
+    "speed": 1.05,
+    "note": "bake-off pick: lively, warm, US"
+  },
+  "palette": {
+    "ink": "#111014",
+    "paper": "#FBFAF6",
+    "accent": "#FFC21A",
+    "hairColour": "#3B2A1E",
+    "apron": "#8A5A33",
+    "goggles": "#FFC21A",
+    "skin": "#E3B28E"
+  },
+  "expressions": [
+    "neutral",
+    "determined",
+    "smirk",
+    "grin",
+    "rage",
+    "shock",
+    "tears",
+    "sweat",
+    "cold",
+    "sad",
+    "shout",
+    "soft"
+  ],
+  "poses": [
+    "stand",
+    "guard",
+    "point",
+    "reach",
+    "lunge",
+    "punch",
+    "leap",
+    "crouch",
+    "clutch",
+    "cross",
+    "wield",
+    "kneel"
+  ],
+  "outfits": [
+    "work",
+    "street"
+  ],
+  "modes": [
+    "mono",
+    "accent",
+    "full"
+  ],
+  "anchors": [
+    "top",
+    "head",
+    "face",
+    "eyes",
+    "mouth",
+    "neck",
+    "chest",
+    "heart",
+    "hips",
+    "handL",
+    "handR",
+    "knees",
+    "feet",
+    "bubble"
+  ],
+  "references": [],
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-11-07",
+      "note": "Created in code for Ink & Ember: manga ink style, 12 expressions, 12 poses, colour modes."
+    }
+  ]
+}
