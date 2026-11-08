@@ -45,3 +45,21 @@ export function reencodeAudio(src, out, { bitrate = '128k', sampleRate = 48000 }
   if (r.status) throw new Error(`ffmpeg failed: ${r.stderr}`);
   return out;
 }
+
+/**
+ * Does the file carry C2PA content credentials (provenance metadata platforms read, e.g. YouTube's "made with AI"
+ * label)? Scans for the C2PA/JUMBF box labels. Studio renders carry none: nothing in the pipeline writes them.
+ */
+export function contentCredentials(file) {
+  const fd = fs.openSync(file, 'r'), buf = Buffer.alloc(1 << 20), marks = [Buffer.from('c2pa'), Buffer.from('jumb')];
+  try {
+    let pos = 0, tail = Buffer.alloc(0);
+    for (;;) {
+      const n = fs.readSync(fd, buf, 0, buf.length, pos);
+      if (!n) return false;
+      const chunk = Buffer.concat([tail, buf.subarray(0, n)]);
+      if (marks.some((m) => chunk.includes(m))) return true;
+      tail = chunk.subarray(Math.max(0, chunk.length - 8)); pos += n;
+    }
+  } finally { fs.closeSync(fd); }
+}

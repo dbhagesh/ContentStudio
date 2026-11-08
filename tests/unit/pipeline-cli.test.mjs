@@ -26,7 +26,7 @@ test('runPipeline runs custom steps in order and collects results', async () => 
 
 test('commands are discovered from studio/commands, each documented, no duplicates', async () => {
   const cmds = await loadCommands();
-  for (const n of ['templates', 'new', 'list', 'voice', 'words', 'estimate', 'mix', 'check', 'cues', 'sheet', 'frames', 'render', 'preview', 'stylesheet', 'build', 'selftest', 'doctor', 'setup', 'host', 'share', 'accounts', 'connect', 'disconnect', 'publish', 'characters', 'channels', 'character-sheet', 'channel-new', 'backlog', 'backlog-add', 'lint']) assert.ok(cmds.has(n), n);
+  for (const n of ['templates', 'new', 'list', 'voice', 'words', 'estimate', 'mix', 'check', 'cues', 'sheet', 'frames', 'render', 'preview', 'stylesheet', 'build', 'selftest', 'doctor', 'setup', 'host', 'share', 'accounts', 'connect', 'disconnect', 'publish', 'characters', 'channels', 'character-sheet', 'channel-new', 'backlog', 'backlog-add', 'lint', 'workspace-init']) assert.ok(cmds.has(n), n);
   for (const c of cmds.values()) { assert.ok(c.summary, c.name); assert.ok(c.usage.startsWith(c.name), c.name); assert.equal(typeof c.run, 'function'); }
 });
 

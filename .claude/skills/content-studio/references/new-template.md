@@ -1,7 +1,8 @@
 # Adding a new video type (template)
 
-A template built for one channel goes in `channels/<channel>/templates/<id>/` (only that channel can use it); a
-template meant for many channels goes in `templates/` (or any folder in `studio.config.json` → `templatesDirs`), and a
+A template built for one channel goes in the workspace at `channels/<channel>/templates/<id>/` (only that channel can use it); a
+template shared by several of your channels goes in the workspace's `templates/`; a generic style that belongs to
+the studio itself (no channel-specific content) goes in the studio's `templates/` (or any folder in `studio.config.json` → `templatesDirs`), and a
 channel lists it in channel.json "templates". Template ids are unique across both. Drop it in and
 `studio templates` picks it up; nothing else is registered anywhere. The studio serves every page from three layers,
 first hit wins:

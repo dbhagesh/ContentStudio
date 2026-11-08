@@ -1,6 +1,6 @@
 // Projects: one video each. A channel's videos live in config.projectsDir/<channel>/<name>/ (so channels never mix);
 // a video without a channel in config.projectsDir/<name>/.
-//   project.json  { "template": "inside-out", "channel": "sakumai", "cast": { "sakumai": "1.0.0" },
+//   project.json  { "template": "inside-out", "channel": "<id>", "cast": { "<character>": "1.0.0" },
 //                   "title": "...", "created": "...", "overrides": { "captions": {...}, ... }, "publish": {...} }
 //   script.json   the narration (lines + caption chunks), sources, voice, music
 //   src/shots.js  the shot list (the only code that changes per video)

@@ -29,6 +29,7 @@ function checks(cfg) {
   const chErrs = [...listCharacters(cfg).flatMap((c) => validateCharacter(c).map((e) => `${c.id}: ${e}`)), ...duplicateCharacters(cfg).map((id) => `character id "${id}" is defined twice`)];
   const chanErrs = listChannels(cfg).flatMap((c) => validateChannel(c, cfg).map((e) => `${c.id}: ${e}`));
   return [
+    ['workspace', fs.existsSync(cfg.channelsDir), cfg.workspace, `no workspace at ${cfg.workspace}: run  studio workspace-init  (or set "workspace" in studio.config.local.json / $STUDIO_WORKSPACE)`],
     ['node', node >= 22, `v${process.versions.node}`, 'need Node.js 22+ (brew install node)'],
     ['ffmpeg', ok('ffmpeg', ['-version']) && ok('ffprobe', ['-version']), 'ffmpeg + ffprobe', 'brew install ffmpeg'],
     ['chrome', !!findChrome(cfg.render.chrome), findChrome(cfg.render.chrome) || '', 'install Google Chrome, or set render.chrome in studio.config.local.json'],
@@ -54,7 +55,41 @@ async function optional(cfg) {
   ];
 }
 
+const WORKSPACE_README = `# Studio workspace
+
+Your channels and videos, kept outside the studio code (the studio repo reads this folder through its "workspace"
+setting). Keep it in its own private git repo or a synced folder.
+
+- channels/<id>/    one folder per channel: channel.json, BIBLE.md, series.json, backlog.json, and its own
+                    templates/, characters/ and audio/ (studio channel-new <id> --name "...")
+- characters/<id>/  characters shared by several of your channels
+- templates/<id>/   templates shared by several of your channels
+- projects/<channel>/<episode>/   the videos (big generated files: data/*.wav, renders/, review/)
+`;
+
+const WORKSPACE_GITIGNORE = `# generated per video (rebuilt by studio build)
+projects/*/*/data/*.wav
+projects/*/*/renders/
+projects/*/*/review/
+projects/*/_voice-bakeoff/
+.DS_Store
+`;
+
 export const commands = [
+  {
+    name: 'workspace-init', group: 'system', summary: 'create the workspace folder for your channels and videos (outside the studio code)',
+    usage: 'workspace-init [path]   (default: the configured workspace)',
+    run({ positionals: [where], cfg }) {
+      const ws = where ? path.resolve(where) : cfg.workspace;
+      for (const d of ['channels', 'characters', 'templates', 'projects']) fs.mkdirSync(path.join(ws, d), { recursive: true });
+      for (const [f, body] of [['README.md', WORKSPACE_README], ['.gitignore', WORKSPACE_GITIGNORE]]) {
+        if (!fs.existsSync(path.join(ws, f))) fs.writeFileSync(path.join(ws, f), body);
+      }
+      const hint = ws === cfg.workspace ? '' : `\nPoint the studio at it: studio.config.local.json → { "workspace": "${ws}" } (or $STUDIO_WORKSPACE)`;
+      console.log(`${ws}${hint}`);
+      return 0;
+    },
+  },
   {
     name: 'doctor', group: 'system', summary: 'check that everything the studio needs is installed',
     usage: 'doctor',

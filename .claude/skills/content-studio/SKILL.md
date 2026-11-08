@@ -15,6 +15,10 @@ Run everything from the ContentStudio folder as `node bin/studio.mjs <command>` 
 engine or the CLI, not for an ordinary video).
 
 ## Channels first (never mix them)
+The studio is generic code; **all channel content lives in the workspace**, a separate folder outside the studio
+(`studio doctor` prints its path; set by "workspace" in studio.config.local.json or $STUDIO_WORKSPACE). Paths below
+like `channels/` and `projects/` are inside the workspace. Never put channel content in the studio folder.
+
 The studio runs many channels. **Every video belongs to exactly one channel**, and each channel is a self-contained
 folder: `channels/<id>/` holds `channel.json`, `BIBLE.md`, `series.json`, `backlog.json`, and its own `templates/`,
 `characters/` and `audio/`. Its videos live in `projects/<id>/`. `studio channels` lists them.

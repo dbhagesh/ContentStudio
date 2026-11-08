@@ -27,6 +27,11 @@ Required only for **realistic** content a viewer could mistake for real footage 
 Clearly stylised animation (all our templates, including 3D cartoons) doesn't need it, so `syntheticMedia: false`
 is right. Set it to `true` if a video ever shows a realistic depiction of a real person or a realistic fake event.
 An AI voice narrating a cartoon doesn't require disclosure.
+YouTube also labels a video automatically when the file carries **C2PA content credentials (2.1+)** saying the whole
+video was made with AI. Nothing in the studio pipeline writes C2PA data, and `studio publish` prints what each file
+carries ("AI labelling: content credentials …"). If a file ever shows credentials, they came from an outside tool;
+tell the user instead of stripping them. Honest disclosure is a policy requirement, and the studio never hides a
+label that the rules require.
 
 ## Audience: made for kids?
 Every channel here is `madeForKids: false`. Our audiences are 13+, and "made for kids" turns off comments,
@@ -34,21 +39,22 @@ personalized ads and notifications, which cuts revenue sharply. Don't write for 
 characters or nursery themes. COPPA decides this by content, not by the setting.
 
 ## Category, language, metadata
-- Category per channel: education (Sakumai, How It Ticks, Penny Explains), entertainment (The Strange File,
-  Ink & Ember). Language: `en`.
+- Category and language: set per channel in `channel.json` → `publish.youtube` (education for explainers, entertainment
+  for stories and mysteries).
 - Title ≤ 55 characters reads best on phones. The description's first line is the hook in words, then sources, then
   the channel footer and links. Use 3-5 hashtags, and `#shorts` is added automatically.
 - `publish.links`: affiliate, merch or newsletter links are added to every description. Disclose affiliate links
   ("affiliate link") in the description; FTC and YouTube both require it.
 
-## Per channel: where the money comes from
-| channel | ads (RPM) | other income |
+## Where the money comes from, by niche
+Each channel's BIBLE.md ("Monetization notes") records its own plan. Typical patterns:
+| niche | ads (RPM) | other income |
 |---|---|---|
-| Sakumai | medium | stickers and merch of the character, a Patreon art pack |
-| The Strange File | medium-high | long-form compilations (higher RPM), sponsorships |
-| Penny Explains | **highest** (finance) | sponsorships from finance apps (disclosed), a newsletter. **Never give personal financial advice** |
-| How It Ticks | high (education) | long-form explainers, education sponsors |
-| Ink & Ember | low-medium | memberships for early episodes, a webtoon or comic edition of the arcs |
+| finance / money | **highest** | disclosed sponsorships, newsletter. **Never give personal financial advice** |
+| education / how things work / science | high | long-form explainers, education sponsors |
+| history / mysteries / true stories | medium-high | long-form compilations (higher RPM), sponsorships |
+| cute character / lifestyle explainers | medium | character merch and stickers, art packs |
+| serialized fiction (manga, stories) | low-medium | memberships for early episodes, comic editions |
 
 ## Instagram
 Reels earn mostly through brand deals, subscriptions and occasional invite-only bonuses, not a revenue share. Treat

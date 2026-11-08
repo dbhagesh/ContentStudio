@@ -1,7 +1,7 @@
 // The cast: permanent characters from the library (characters/<id>/), loaded before the shots are built.
 //   import { cast } from './core/cast.js';
-//   const sakumai = cast('sakumai');
-//   sakumai.draw({ x: 540, y: 1500, s: 1, pose: 'wave', expression: 'happy', t });
+//   const host = cast('<character id>');
+//   host.draw({ x: 540, y: 1500, s: 1, pose: 'wave', expression: 'happy', t });
 // A character module exports default { id, version, draw(opts), poses, expressions, outfits, ... }.
 // Only characters listed in the project's cast (or its channel's) can be used, so every appearance is on record.
 const REG = new Map();

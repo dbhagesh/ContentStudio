@@ -1,8 +1,5 @@
 # local env + models (rebuilt by `studio setup`)
 .studio
-# your videos (each is its own folder; commit them separately if you want)
-projects/*
-!projects/.gitkeep
 # per-machine overrides
 studio.config.local.json
 node_modules/

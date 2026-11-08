@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { readSecret, writeSecret, secretFile, redact } from '../../studio/publish/secrets.mjs';
 import { request, scrub } from '../../studio/publish/http.mjs';
-import { probe, checkSpecs } from '../../studio/publish/media.mjs';
+import { probe, checkSpecs, contentCredentials } from '../../studio/publish/media.mjs';
 import { postMetadata, captionText } from '../../studio/publish/metadata.mjs';
 import { loadExporters } from '../../studio/publish/exporters/index.mjs';
 import youtube, { parseClientSecret, startLoopback } from '../../studio/publish/exporters/youtube.mjs';
@@ -18,7 +18,7 @@ import { loadTemplate } from '../../studio/lib/templates.mjs';
 import { testConfig, tmpDir } from './helpers.mjs';
 
 const cfg = { ...testConfig(), studioHome: tmpDir('studio-home-') };
-const channel = loadChannel('sakumai', cfg);
+const channel = loadChannel('demo', cfg);
 
 /** a 4 s 720x1280 H.264 + AAC 192k MP4, like a studio render */
 function makeVideo(dir, seconds = 4, size = '720x1280') {
@@ -47,12 +47,12 @@ function fakeFetch(routes) {
 const ctxFor = (extra = {}) => ({ cfg, channel, log: () => {}, ...extra });
 
 test('secrets: owner-only files, scoped paths, redaction', () => {
-  const f = writeSecret(cfg, 'channels/sakumai/demo', { token: 'abcdefghijklmnop' });
-  assert.equal(f, secretFile(cfg, 'channels/sakumai/demo'));
+  const f = writeSecret(cfg, 'channels/demo/demo', { token: 'abcdefghijklmnop' });
+  assert.equal(f, secretFile(cfg, 'channels/demo/demo'));
   assert.equal(fs.statSync(f).mode & 0o777, 0o600);
   assert.equal(fs.statSync(path.dirname(f)).mode & 0o777, 0o700);
-  assert.deepEqual(readSecret(cfg, 'channels/sakumai/demo'), { token: 'abcdefghijklmnop' });
-  assert.equal(readSecret(cfg, 'channels/sakumai/none'), null);
+  assert.deepEqual(readSecret(cfg, 'channels/demo/demo'), { token: 'abcdefghijklmnop' });
+  assert.equal(readSecret(cfg, 'channels/demo/none'), null);
   assert.throws(() => secretFile(cfg, '../etc/passwd'), /bad secret scope/);
   assert.equal(redact('abcdefghijklmnop'), 'abcd…mnop');
 });
@@ -127,11 +127,11 @@ test('youtube: connect (PKCE sign-in, account check) then resumable upload', asy
   fs.writeFileSync(cs, JSON.stringify({ installed: { client_id: 'cid', client_secret: 'csecret' } }));
   const routes = (handle) => [
     ['POST', /oauth2\.googleapis\.com\/token/, (u, o) => (String(o.body).includes('grant_type=authorization_code') ? { json: { access_token: 'AT', refresh_token: 'RT', scope: 's' } } : { json: { access_token: 'AT2' } })],
-    ['GET', /youtube\/v3\/channels/, () => ({ json: { items: [{ id: 'UC1', snippet: { title: 'Sakumai', customUrl: handle } }] } })],
+    ['GET', /youtube\/v3\/channels/, () => ({ json: { items: [{ id: 'UC1', snippet: { title: 'Demo', customUrl: handle } }] } })],
   ];
   const signIn = (url) => { const u = new URL(url); fetch(`${u.searchParams.get('redirect_uri')}/?code=C&state=${u.searchParams.get('state')}`); };
-  await assert.rejects(youtube.connect(ctxFor({ fetch: fakeFetch(routes('@someoneelse')), open: signIn }), { clientSecret: cs }), /signed in as Sakumai \(@someoneelse\)/);
-  const f = fakeFetch(routes('@sakumaishorts'));
+  await assert.rejects(youtube.connect(ctxFor({ fetch: fakeFetch(routes('@someoneelse')), open: signIn }), { clientSecret: cs }), /signed in as Demo \(@someoneelse\)/);
+  const f = fakeFetch(routes('@demoshorts'));
   let authUrl;
   const acc = await youtube.connect(ctxFor({ fetch: f, open: (u) => { authUrl = new URL(u); signIn(u); } }), { clientSecret: cs });
   assert.equal(acc.id, 'UC1');
@@ -139,7 +139,7 @@ test('youtube: connect (PKCE sign-in, account check) then resumable upload', asy
   assert.equal(authUrl.searchParams.get('access_type'), 'offline');
   assert.match(authUrl.searchParams.get('scope'), /youtube\.upload/);
   assert.match(String(f.calls[0].opts.body), /code_verifier=/);
-  assert.equal(readSecret(cfg, 'channels/sakumai/youtube').refresh_token, 'RT');
+  assert.equal(readSecret(cfg, 'channels/demo/youtube').refresh_token, 'RT');
   assert.equal(youtube.status(ctxFor()).connected, true);
 
   const up = fakeFetch([
@@ -160,24 +160,24 @@ test('youtube: connect (PKCE sign-in, account check) then resumable upload', asy
 test('instagram: connect checks the account type and handle', async () => {
   const me = (json) => fakeFetch([['GET', /graph\.instagram\.com\/v[\d.]+\/me\?/, () => ({ json })]]);
   await assert.rejects(instagram.connect(ctxFor({ fetch: me({ user_id: '1', username: 'x', account_type: 'PERSONAL' }) }), { token: 'T' }), /professional/);
-  const ch2 = { ...channel, manifest: { ...channel.manifest, instagram: '@sakumai.anime' } };
+  const ch2 = { ...channel, manifest: { ...channel.manifest, instagram: '@demo.channel' } };
   await assert.rejects(instagram.connect({ cfg, channel: ch2, log: () => {}, fetch: me({ user_id: '1', username: 'other', account_type: 'BUSINESS' }) }, { token: 'T' }), /token is for @other/);
-  const acc = await instagram.connect(ctxFor({ fetch: me({ user_id: '1789', username: 'sakumai.anime', account_type: 'MEDIA_CREATOR' }) }), { token: 'IGTOKEN' });
+  const acc = await instagram.connect(ctxFor({ fetch: me({ user_id: '1789', username: 'demo.channel', account_type: 'MEDIA_CREATOR' }) }), { token: 'IGTOKEN' });
   assert.equal(acc.id, '1789');
-  assert.equal(readSecret(cfg, 'channels/sakumai/instagram').access_token, 'IGTOKEN');
-  assert.match(instagram.status(ctxFor()).detail, /@sakumai\.anime .*valid (59|60) more days/);
+  assert.equal(readSecret(cfg, 'channels/demo/instagram').access_token, 'IGTOKEN');
+  assert.match(instagram.status(ctxFor()).detail, /@demo\.channel .*valid (59|60) more days/);
 });
 
 test('instagram: token refresh after a week', async () => {
-  const s = readSecret(cfg, 'channels/sakumai/instagram');
-  writeSecret(cfg, 'channels/sakumai/instagram', { ...s, refreshed_at: new Date(Date.now() - 8 * 86400e3).toISOString() });
+  const s = readSecret(cfg, 'channels/demo/instagram');
+  writeSecret(cfg, 'channels/demo/instagram', { ...s, refreshed_at: new Date(Date.now() - 8 * 86400e3).toISOString() });
   const f = fakeFetch([['GET', /refresh_access_token\?grant_type=ig_refresh_token/, () => ({ json: { access_token: 'IGTOKEN2', expires_in: 5184000 } })]]);
   const acc = await igAccount(ctxFor({ fetch: f }));
   assert.equal(acc.access_token, 'IGTOKEN2');
-  assert.equal(readSecret(cfg, 'channels/sakumai/instagram').access_token, 'IGTOKEN2');
-  writeSecret(cfg, 'channels/sakumai/instagram', { ...acc, expires_at: new Date(Date.now() - 1000).toISOString() });
+  assert.equal(readSecret(cfg, 'channels/demo/instagram').access_token, 'IGTOKEN2');
+  writeSecret(cfg, 'channels/demo/instagram', { ...acc, expires_at: new Date(Date.now() - 1000).toISOString() });
   await assert.rejects(igAccount(ctxFor({ fetch: f })), /expired/);
-  writeSecret(cfg, 'channels/sakumai/instagram', acc);
+  writeSecret(cfg, 'channels/demo/instagram', acc);
 });
 
 test('instagram: plan (caption rules, audio re-encode) and the Reel publishing flow', async () => {
@@ -219,4 +219,12 @@ test('publish bookkeeping: history guards double posts; stale renders are caught
   assert.deepEqual(staleInputs(loadProject(dir, cfg), render).sort(), ['script.json', 'src/shots.js']);
   fs.utimesSync(render, new Date(), new Date(Date.now() + 60_000));
   assert.deepEqual(staleInputs(loadProject(dir, cfg), render), []);
+});
+
+test('content credentials: studio renders carry none; a C2PA box is detected', () => {
+  const dir = tmpDir(), v = makeVideo(dir);
+  assert.equal(contentCredentials(v), false);
+  const tagged = path.join(dir, 'tagged.mp4');
+  fs.writeFileSync(tagged, Buffer.concat([fs.readFileSync(v), Buffer.from('....jumbc2pa.manifest')]));
+  assert.equal(contentCredentials(tagged), true);
 });

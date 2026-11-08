@@ -1,5 +1,10 @@
 // Configuration, in layers (later wins):
 //   studio:  DEFAULTS < studio.config.json < studio.config.local.json (git-ignored, per machine) < environment
+// The studio is generic code. Everything about your channels lives in a separate WORKSPACE folder outside the repo
+// ("workspace", default ../ContentStudio-workspace, or $STUDIO_WORKSPACE): channels/ (each with its own templates,
+// characters, bible), characters/ and templates/ shared by your channels, and projects/ (the videos). Relative
+// projectsDir / channelsDir / charactersDir are inside the workspace; workspace templates/ is searched after the
+// studio's own templatesDirs.
 //   runtime: ENGINE_DEFAULTS < template.json < channel.json defaults.overrides < project.json "overrides"
 //            (what the browser engine sees), plus the cast: the characters the video may draw
 import fs from 'node:fs';
@@ -7,6 +12,7 @@ import path from 'node:path';
 import { ROOT, resolveFrom } from './paths.mjs';
 
 export const DEFAULTS = {
+  workspace: '../ContentStudio-workspace',
   projectsDir: 'projects',
   studioHome: '.studio',
   templatesDirs: ['templates'],
@@ -49,6 +55,7 @@ function envLayer(env) {
     render: { fps: num(env.FPS), chrome: env.CHROME || undefined, softwareGL: env.SOFTWARE_GL ? env.SOFTWARE_GL !== '0' : undefined, quality: env.QS || undefined },
     voice: { whisperModel: env.STUDIO_WHISPER_MODEL || undefined },
     studioHome: env.STUDIO_HOME || undefined,
+    workspace: env.STUDIO_WORKSPACE || undefined,
   };
 }
 
@@ -56,12 +63,13 @@ function envLayer(env) {
 export function loadStudioConfig({ root = ROOT, env = process.env } = {}) {
   const cfg = deepMerge(DEFAULTS, readJson(path.join(root, 'studio.config.json'), {}), readJson(path.join(root, 'studio.config.local.json'), {}), envLayer(env));
   cfg.root = root;
-  cfg.projectsDir = resolveFrom(root, cfg.projectsDir);
+  cfg.workspace = resolveFrom(root, cfg.workspace);
+  cfg.projectsDir = resolveFrom(cfg.workspace, cfg.projectsDir);
+  cfg.charactersDir = resolveFrom(cfg.workspace, cfg.charactersDir);
+  cfg.channelsDir = resolveFrom(cfg.workspace, cfg.channelsDir);
   cfg.studioHome = resolveFrom(root, cfg.studioHome);
-  cfg.templatesDirs = cfg.templatesDirs.map((d) => resolveFrom(root, d));
+  cfg.templatesDirs = [...cfg.templatesDirs.map((d) => resolveFrom(root, d)), path.join(cfg.workspace, 'templates')];
   cfg.audioPlugins = cfg.audioPlugins.map((d) => resolveFrom(root, d));
-  cfg.charactersDir = resolveFrom(root, cfg.charactersDir);
-  cfg.channelsDir = resolveFrom(root, cfg.channelsDir);
   return cfg;
 }
 

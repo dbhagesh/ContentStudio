@@ -10,6 +10,7 @@ import { readJson } from '../lib/config.mjs';
 import { HOSTS, hostFile } from '../publish/hosts.mjs';
 import { loadExporters, getExporter } from '../publish/exporters/index.mjs';
 import { deleteSecret } from '../publish/secrets.mjs';
+import { contentCredentials } from '../publish/media.mjs';
 
 const list = (s) => (s ? s.split(',').map((x) => x.trim()).filter(Boolean) : []);
 const openUrl = (u) => spawnSync(process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer' : 'xdg-open', [u], { stdio: 'ignore' });
@@ -110,6 +111,8 @@ export const commands = [
       if (stale.length) throw new Error(`the render is older than ${stale.join(', ')}: rebuild (studio build ${p.ref || p.name} --from check) before publishing`);
       const targets = list(values.to).length ? list(values.to) : p.channel.manifest.publish?.targets || [];
       if (!targets.length) throw new Error('where to? --to youtube,instagram');
+      const synthetic = !!p.channel.manifest.publish?.youtube?.syntheticMedia, c2pa = contentCredentials(file);
+      console.log(`AI labelling: content credentials (C2PA) ${c2pa ? 'PRESENT in the file: platforms may label it' : 'none in the file'} · altered/synthetic disclosure ${synthetic ? 'ON' : 'off'} (channel.json publish.youtube.syntheticMedia)`);
       const plans = [];
       let blocked = 0;
       for (const id of targets) {

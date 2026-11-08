@@ -1,0 +1,25 @@
+{
+  "id": "demo",
+  "name": "Demo Channel",
+  "handle": "@DemoShorts",
+  "url": "https://www.youtube.com/@DemoShorts",
+  "instagram": null,
+  "about": "Test fixture channel for the studio's own tests.",
+  "cast": ["mascot"],
+  "templates": ["inside-out"],
+  "defaults": {
+    "template": "inside-out",
+    "voice": "af_heart",
+    "speed": 1.0,
+    "music": "bed",
+    "overrides": { "captions": { "stroke": "#1F3A5F", "highlight": "#FFD43B" } }
+  },
+  "publish": {
+    "targets": ["youtube", "instagram"],
+    "tags": ["demo", "shorts"],
+    "footer": "Demo footer line",
+    "links": [],
+    "youtube": { "category": "education", "privacy": "private", "madeForKids": false, "syntheticMedia": false, "language": "en" },
+    "instagram": { "shareToFeed": true, "thumbOffsetMs": 1500, "hashtags": ["demo"] }
+  }
+}

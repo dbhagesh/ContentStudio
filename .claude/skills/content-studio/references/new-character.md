@@ -1,12 +1,13 @@
 # Adding a permanent character
 
-A channel's own characters live in `channels/<channel>/characters/<id>/` (the default for a new character: only that
+A channel's own characters live in the workspace at `channels/<channel>/characters/<id>/` (the default for a new character: only that
 channel can cast them); shared ones in `characters/<id>/`. Either way they are served read-only at `/characters/<id>/` to every video, so a character
-looks identical in every Short and on every channel that casts them. Use `channels/sakumai/characters/sakumai/` as the reference
+looks identical in every Short and on every channel that casts them. Use the most complete character in the workspace (`studio characters`) as the reference for style and richness, and
+`tests/fixtures/workspace/channels/demo/characters/mascot/` (in the studio) for the minimal contract. Use either as the reference
 implementation.
 
 ## The ID
-Lowercase letters, digits and dashes, starting with a letter (`sakumai`, `kenji`, `professor-owl`). It is permanent:
+Lowercase letters, digits and dashes, starting with a letter (`kenji`, `professor-owl`, `the-narrator`). It is permanent:
 every project that cast the character refers to it, so never rename or reuse an ID. Ask the user for the name if it
 isn't obvious.
 

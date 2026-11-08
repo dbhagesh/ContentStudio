@@ -20,12 +20,25 @@ test('studio config layers: defaults < studio.config.json < local < env, with ab
   writeJson(path.join(root, 'studio.config.json'), { projectsDir: 'videos', render: { fps: 25 } });
   writeJson(path.join(root, 'studio.config.local.json'), { render: { crf: 20 } });
   const cfg = loadStudioConfig({ root, env: { FPS: '24', CHROME: '/x/chrome' } });
-  assert.equal(cfg.projectsDir, path.join(root, 'videos'));
+  assert.equal(cfg.workspace, path.resolve(root, '../ContentStudio-workspace'));
+  assert.equal(cfg.projectsDir, path.join(cfg.workspace, 'videos'), 'content paths are inside the workspace');
+  assert.equal(cfg.channelsDir, path.join(cfg.workspace, 'channels'));
+  assert.deepEqual(cfg.templatesDirs, [path.join(root, 'templates'), path.join(cfg.workspace, 'templates')]);
   assert.equal(cfg.render.fps, 24);
   assert.equal(cfg.render.crf, 20);
   assert.equal(cfg.render.chrome, '/x/chrome');
   assert.equal(cfg.render.preset, DEFAULTS.render.preset);
   assert.equal(cfg.studioHome, path.join(root, '.studio'));
+});
+
+test('the workspace comes from the config or $STUDIO_WORKSPACE, never from the studio folder', () => {
+  const root = tmpDir(), ws = tmpDir();
+  writeJson(path.join(root, 'studio.config.local.json'), { workspace: '/elsewhere' });
+  assert.equal(loadStudioConfig({ root, env: {} }).workspace, '/elsewhere');
+  const cfg = loadStudioConfig({ root, env: { STUDIO_WORKSPACE: ws } });
+  assert.equal(cfg.workspace, ws);
+  assert.equal(cfg.projectsDir, path.join(ws, 'projects'));
+  assert.equal(cfg.charactersDir, path.join(ws, 'characters'));
 });
 
 test('studio config works with no config files at all', () => {

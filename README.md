@@ -13,17 +13,34 @@ templates, layered configuration, a command-line tool and tests.
 node bin/studio.mjs doctor                      # what's installed ("All set")
 node bin/studio.mjs setup                       # once: Python env + free voice/Whisper models, all inside .studio/
 node bin/studio.mjs channels                    # the channels (each one a self-contained folder)
-node bin/studio.mjs backlog --channel sakumai    # its episode ideas and where each one is
-node bin/studio.mjs new --channel sakumai --from-backlog why-blush
-#   …write projects/sakumai/why-blush/script.json and src/shots.js…
-node bin/studio.mjs build sakumai/why-blush     # voice → timing → lint → check → cues → mix → review sheet → MP4
-open projects/sakumai/why-blush/renders/why-blush.mp4
+node bin/studio.mjs backlog --channel <id>       # its episode ideas and where each one is
+node bin/studio.mjs new --channel <id> --from-backlog <episode>
+#   …write <workspace>/projects/<id>/<episode>/script.json and src/shots.js…
+node bin/studio.mjs build <id>/<episode>        # voice → timing → lint → check → cues → mix → review sheet → MP4
 ```
 
 With Claude Code in this folder, just ask ("make a Deep Dive short about cracking your knuckles"). The project skill
 `.claude/skills/content-studio/` (local to this folder only) runs the whole workflow, including QA and publishing.
 
 Needs: Node.js 22+, ffmpeg, Google Chrome, Python 3.10+ (for the env). `npm link` makes `studio` a global command.
+
+## Studio and workspace
+
+The studio (this repo) is generic code: engine, CLI, shared template styles, the workflow skill and tests. Nothing in
+it names a real channel; behaviour comes from configuration and templates. **Your channels live in a separate
+workspace folder** that the studio reads:
+
+- **Default location:** `../ContentStudio-workspace`, next to the studio.
+- **Override:** set `"workspace": "/path"` in `studio.config.local.json`, or `STUDIO_WORKSPACE`.
+- **Create one:** `studio workspace-init`. `studio doctor` shows the path in use.
+- **Another computer:** clone the studio, copy or clone the workspace next to it, then run `studio setup`.
+
+```
+<workspace>/
+  channels/<id>/     every channel (below)
+  characters/<id>/   characters shared by several channels      templates/<id>/   templates shared by several channels
+  projects/<channel>/<episode>/   the videos
+```
 
 ## Channels (the unit the studio scales by)
 
@@ -56,12 +73,12 @@ Characters are permanent, reusable cast members with stable IDs: shared ones in 
         drawing code) · CHARACTER.md (the bible) · sheet.png (model sheet, rendered from the code) · refs/
 ```
 
-- `studio new <name> --channel sakumai` makes a video with the channel's template, voice and look, and pins its
+- `studio new <name> --channel <id>` makes a video with the channel's template, voice and look, and pins its
   cast versions in `project.json`.
 - **Voices:** a script line's `"speaker"` speaks in that character's voice (character.json `voice` < channel.json
   `voices` < script.json `speakers`). Engines: `kokoro` (built in), `voicestudio` and `http` (any local server with
   the OpenAI-compatible speech API).
-- Shots draw a character with `cast('sakumai').draw({ x, y, s, pose, expression, outfit, xray, t, talk })`.
+- Shots draw a character with `cast('<id>').draw({ x, y, s, pose, expression, outfit, xray, t, talk })`.
 - Characters are served read-only from the library, so a project can't change how they look.
 - Improving a character means editing it in the library and bumping its version. `studio check` notes when a project
   was made with an older version.
@@ -122,12 +139,9 @@ engine/                     the browser runtime shared by every template
   src/core/                 lib (math, primitives) · timing · captions (configurable) · config · random (seeded) ·
                             board (style sheets) · engine (three.js film look, configurable) · human · sdf
   fonts/  vendor/three/     stored once
-channels/<id>/              one folder per channel: channel.json · BIBLE.md · series · backlog · its own templates/ characters/ audio/
-characters/<id>/            shared permanent cast members (character.js, CHARACTER.md, sheet.png)
-templates/<id>/             shared video types: template.json · STYLE.md · style-sheet.png · src/ (its kit) · example/
+templates/<id>/             generic video styles: template.json · STYLE.md · style-sheet.png · src/ (its kit) · example/
 python/studio_audio/        voice (TTS provider registry, Kokoro) · align (Whisper) · estimate · mix (effect/music registries, plugins)
-projects/<channel>/<name>/  your videos: project.json · script.json · src/shots.js · data/ · renders/ · review/
-tests/                      unit/ (fast) · render/ (headless Chrome) · python/tests (audio)
+tests/                      unit/ (fast) · render/ (headless Chrome) · fixtures/workspace (a demo channel) · python/tests (audio)
 .studio/                    venv + models (git-ignored, rebuilt by `studio setup`)
 .claude/skills/content-studio/   the workflow skill (local to this folder)
 ```
@@ -155,7 +169,7 @@ render`); `build` runs all or a slice of them. `lint` is the quality gate (`stud
 video with no description, tags or sources, over-long captions, or phrasing that repeats the channel's other videos.
 
 **Plug-ins.**
-- Channels: a folder in `channels/` (`studio channel-new`).
+- Channels: a folder in the workspace's `channels/` (`studio channel-new`).
 - Templates: a folder in any `templatesDirs` entry, or in a channel's `templates/`.
 - Commands: a file in `studio/commands/`.
 - Sound effects and music: `@effect` / `@track` in a `.py` file in `templates/<id>/audio/` or `projects/<name>/audio/`.
@@ -184,8 +198,8 @@ Working from a git worktree (parallel work): link the one shared env first, `ln 
   - One (deep-dive) was random scatter that differed between the original's own runs too; renders are now seeded.
   - One is a fix: stick-story's first caption used to render in a fallback serif because a font loaded too late.
 - **Audio output unchanged:** the mixer output is sample-identical to the original `mix.py`.
-- **Paths moved:** models and the Python env live in `.studio/` here, not `~/.faceless-shorts`. Projects live in
-  `projects/`, not `~/faceless-shorts`.
+- **Paths moved:** models and the Python env live in `.studio/` here, not `~/.faceless-shorts`. Videos live in the
+  workspace's `projects/`, not `~/faceless-shorts`.
 
 ## Licenses
 Original code, stories, drawings and sounds are free to use in your videos. Inter: SIL Open Font License 1.1.

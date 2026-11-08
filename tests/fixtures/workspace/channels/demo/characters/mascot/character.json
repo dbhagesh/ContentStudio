@@ -1,0 +1,16 @@
+{
+  "id": "mascot",
+  "name": "Mascot",
+  "version": "1.0.0",
+  "kind": "canvas2d",
+  "module": "character.js",
+  "description": "A simple test character for the studio's own tests (not a real channel's cast).",
+  "voice": { "id": "af_heart", "speed": 1.0 },
+  "palette": { "body": "#7FC8F8", "line": "#1F3A5F", "eye": "#1F3A5F", "cheek": "#F7A9CB", "xray": "#24305E" },
+  "expressions": ["neutral", "smile", "happy", "surprised", "serious", "love"],
+  "poses": ["stand", "wave", "cheer", "point"],
+  "outfits": ["plain", "scarf"],
+  "modes": ["xray"],
+  "anchors": ["top", "head", "face", "heart", "belly", "feet"],
+  "changelog": [{ "version": "1.0.0", "date": "2026-11-08", "note": "Test fixture." }]
+}

@@ -1,7 +1,7 @@
 // A render session = the overlay server for one project + headless Chrome on one of its pages.
 //   await withSession(project, cfg, async (s) => modes.check(s))                       the film
 //   await withSession(project, cfg, fn, { page: 'sheet' })                             the template style sheet
-//   await withSession(stage, cfg, fn, { page: 'character', query: 'id=sakumai' })      a character model sheet
+//   await withSession(stage, cfg, fn, { page: 'character', query: 'id=<character>' })      a character model sheet
 import { startServer, projectRoutes } from './server.mjs';
 import { openPage, READY } from './chrome.mjs';
 

@@ -1,7 +1,7 @@
 // Channels: a brand, and the unit the studio scales by. Each channel is one self-contained folder:
 //   channels/<id>/channel.json   {
 //     id, name, handle, url, instagram, about,
-//     cast: ["sakumai", ...]            the characters that appear on this channel
+//     cast: ["<character id>", ...]     the characters that appear on this channel
 //     templates: ["inside-out", ...]    shared templates it may use; [] = only its own templates/; no key = any
 //     defaults: { template, voice, speed, music, overrides: { captions, player, ... } }
 //     publish:  { targets, tags, footer, links, youtube: {...}, instagram: {...} }

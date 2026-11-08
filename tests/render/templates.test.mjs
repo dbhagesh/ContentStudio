@@ -52,18 +52,18 @@ test('full pipeline (estimated timing): cues → mix → sheet → MP4 with soun
 test('character model sheet renders every expression / pose / outfit without errors', async () => {
   const { characterStage } = await import('../../studio/commands/cast.mjs');
   const { loadCharacter } = await import('../../studio/lib/characters.mjs');
-  const c = loadCharacter('sakumai', cfg), out = path.join(cfg.projectsDir, 'sheet.png');
-  await withSession(characterStage(c, cfg), cfg, async (s) => { await modes.stylesheet(s, out); assert.deepEqual(s.logs, []); }, { page: 'character', query: 'id=sakumai' });
-  assert.ok(fs.statSync(out).size > 200_000);
+  const c = loadCharacter('mascot', cfg), out = path.join(cfg.projectsDir, 'sheet.png');
+  await withSession(characterStage(c, cfg), cfg, async (s) => { await modes.stylesheet(s, out); assert.deepEqual(s.logs, []); }, { page: 'character', query: 'id=mascot' });
+  assert.ok(fs.statSync(out).size > 50_000);
 });
 
 test('a channel video draws its cast, and the character renders deterministically', async () => {
   const { loadChannel } = await import('../../studio/lib/channels.mjs');
-  const ch = loadChannel('sakumai', cfg);
+  const ch = loadChannel('demo', cfg);
   const dir = createProject({ template: listTemplates(cfg).find((x) => x.id === ch.manifest.defaults.template), name: 'cast-video', cfg, channel: ch });
   fs.writeFileSync(path.join(dir, 'src/shots.js'), `import { cast } from './core/cast.js';
 export function buildShots() {
-  const s = cast('sakumai');
+  const s = cast('mascot');
   return { shots: [{ id: 'S1', at: 0, draw(lt, d, t) { s.draw({ x: 540, y: 1700, s: 1.2, t, pose: 'wave', expression: 'love' }); } }], cues: [] };
 }
 `);

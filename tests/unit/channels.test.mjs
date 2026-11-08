@@ -19,8 +19,8 @@ function world() {
     fs.cpSync(loadTemplate('inside-out', real).dir, t, { recursive: true });
     writeJson(path.join(t, 'template.json'), { ...loadTemplate('inside-out', real).manifest, id: `${ch}-style` });
     const c = path.join(cfg.channelsDir, ch, 'characters', `${ch}-hero`);
-    fs.cpSync(loadCharacter('sakumai', real).dir, c, { recursive: true });
-    writeJson(path.join(c, 'character.json'), { ...loadCharacter('sakumai', real).manifest, id: `${ch}-hero`, channels: [] });
+    fs.cpSync(loadCharacter('mascot', real).dir, c, { recursive: true });
+    writeJson(path.join(c, 'character.json'), { ...loadCharacter('mascot', real).manifest, id: `${ch}-hero`, channels: [] });
     const f = path.join(cfg.channelsDir, ch, 'channel.json'), m = JSON.parse(fs.readFileSync(f, 'utf8'));
     writeJson(f, { ...m, cast: [`${ch}-hero`], defaults: { ...m.defaults, template: `${ch}-style` } });
   }
@@ -93,7 +93,7 @@ test('only the video\'s own cast is served under /characters/', () => {
   const p = loadProject(dir, cfg);
   assert.equal(p.overlay.resolve('/characters/alpha-hero/character.js'), path.join(cfg.channelsDir, 'alpha/characters/alpha-hero/character.js'));
   assert.equal(p.overlay.resolve('/characters/beta-hero/character.js'), null);
-  assert.equal(p.overlay.resolve('/characters/sakumai/character.js'), null);
+  assert.equal(p.overlay.resolve('/characters/someone-else/character.js'), null);
   assert.deepEqual(p.runtime.cast.map((c) => c.id), ['alpha-hero']);
 });
 
