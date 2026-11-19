@@ -6,7 +6,10 @@ import path from 'node:path';
 
 async function postForm(url, fields) {
   const form = new FormData();
-  for (const [k, v] of Object.entries(fields)) form.append(k, v.file ? await fs.openAsBlob(v.file) : v, v.file ? path.basename(v.file) : undefined);
+  for (const [k, v] of Object.entries(fields)) {
+    if (v.file) form.append(k, await fs.openAsBlob(v.file), path.basename(v.file));
+    else form.append(k, v); // a third argument is only allowed with a Blob (Node 22 throws otherwise)
+  }
   const r = await fetch(url, { method: 'POST', body: form });
   const text = (await r.text()).trim();
   if (!r.ok) throw new Error(`${url}: HTTP ${r.status} ${text.slice(0, 200)}`);

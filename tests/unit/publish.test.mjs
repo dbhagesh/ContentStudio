@@ -208,6 +208,35 @@ test('instagram: plan (caption rules, audio re-encode) and the Reel publishing f
   await assert.rejects(instagram.publish({ ...ctx, fetch: full }, plan), /limit reached/);
 });
 
+test('instagram: a Facebook Page token posts through graph.facebook.com and is never refreshed', async () => {
+  const saved = readSecret(cfg, 'channels/demo/instagram');
+  const ch2 = { ...channel, manifest: { ...channel.manifest, instagram: '@demo.channel' } };
+  const page = (ig) => fakeFetch([
+    ['GET', /graph\.facebook\.com\/v[\d.]+\/me\?fields=id,name,instagram_business_account/, () => ({ json: { id: 'P1', name: 'Demo', ...(ig ? { instagram_business_account: ig } : {}) } })],
+    ['GET', /graph\.facebook\.com\/v[\d.]+\/debug_token/, () => ({ json: { data: { expires_at: 0 } } })],
+  ]);
+  await assert.rejects(instagram.connect(ctxFor({ fetch: page(null) }), { token: 'EAAPAGE' }), /no linked Instagram/);
+  await assert.rejects(instagram.connect({ cfg, channel: ch2, log: () => {}, fetch: page({ id: '42', username: 'other' }) }, { token: 'EAAPAGE' }), /token is for @other/);
+  const acc = await instagram.connect({ cfg, channel: ch2, log: () => {}, fetch: page({ id: '42', username: 'demo.channel' }) }, { token: 'EAAPAGE' });
+  assert.equal(acc.id, '42');
+  const s = readSecret(cfg, 'channels/demo/instagram');
+  assert.equal(s.api, 'facebook');
+  assert.equal(s.expires_at, null);
+  writeSecret(cfg, 'channels/demo/instagram', { ...s, connected_at: new Date(Date.now() - 30 * 86400e3).toISOString() });
+  assert.equal((await igAccount(ctxFor({ fetch: fakeFetch([]) }))).access_token, 'EAAPAGE', 'no refresh call');
+  const plan = instagram.plan(ctxFor({ script: { title: 'Why Do You Blush?', tags: ['blush'] }, project: {}, file: VIDEO }));
+  const f = fakeFetch([
+    ['GET', /graph\.facebook\.com\/v[\d.]+\/42\/content_publishing_limit/, () => ({ json: { data: [{ quota_usage: 0, config: { quota_total: 100 } }] } })],
+    ['POST', /graph\.facebook\.com\/v[\d.]+\/42\/media$/, () => ({ json: { id: 'C2' } })],
+    ['GET', /graph\.facebook\.com\/v[\d.]+\/C2\?fields=status_code/, () => ({ json: { status_code: 'FINISHED' } })],
+    ['POST', /graph\.facebook\.com\/v[\d.]+\/42\/media_publish$/, () => ({ json: { id: 'M2' } })],
+    ['GET', /graph\.facebook\.com\/v[\d.]+\/M2\?fields=permalink/, () => ({ json: { permalink: 'https://www.instagram.com/reel/fb/' } })],
+  ]);
+  const r = await instagram.publish(ctxFor({ fetch: f, host: async () => ({ url: 'https://host.example/v.mp4' }) }), plan, { pollMs: 1 });
+  assert.equal(r.url, 'https://www.instagram.com/reel/fb/');
+  writeSecret(cfg, 'channels/demo/instagram', saved);
+});
+
 test('publish bookkeeping: history guards double posts; stale renders are caught', () => {
   const dir = createProject({ template: loadTemplate(channel.manifest.defaults.template, cfg), name: 'pub', cfg, channel });
   recordPublish(dir, { to: 'youtube', id: 'V', url: 'u', at: 'now' });

@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { selectSteps, runPipeline, STEPS } from '../../studio/lib/pipeline.mjs';
+import { selectSteps, runPipeline, STEPS, stepsFor, hasPlate } from '../../studio/lib/pipeline.mjs';
 import { loadCommands } from '../../studio/cli.mjs';
 import { ROOT } from '../../studio/lib/paths.mjs';
 
@@ -16,6 +18,19 @@ test('pipeline order and slicing', () => {
   assert.throws(() => selectSteps({ from: 'nope' }), /unknown step "nope"/);
 });
 
+test('the Blender plate step is added only for projects with blender/scene.py', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'plate-'));
+  try {
+    assert.equal(stepsFor({ dir }), STEPS);
+    assert.ok(!hasPlate({ dir }));
+    fs.mkdirSync(path.join(dir, 'blender'));
+    fs.writeFileSync(path.join(dir, 'blender/scene.py'), '');
+    assert.deepEqual(names(stepsFor({ dir })), ['timing', 'plate', 'lint', 'check', 'cues', 'mix', 'sheet', 'render']);
+    assert.deepEqual(names(selectSteps({ from: 'plate' }, stepsFor({ dir }))), ['plate', 'lint', 'check', 'cues', 'mix', 'sheet', 'render']);
+    assert.throws(() => selectSteps({ only: ['plate'] }), /unknown step "plate"/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('runPipeline runs custom steps in order and collects results', async () => {
   const seen = [];
   const steps = [{ name: 'a', describe: '', run: () => (seen.push('a'), 1) }, { name: 'b', describe: '', run: async ({ opts }) => (seen.push('b'), opts.x) }];
@@ -26,7 +41,7 @@ test('runPipeline runs custom steps in order and collects results', async () => 
 
 test('commands are discovered from studio/commands, each documented, no duplicates', async () => {
   const cmds = await loadCommands();
-  for (const n of ['templates', 'new', 'list', 'voice', 'words', 'estimate', 'mix', 'check', 'cues', 'sheet', 'frames', 'render', 'preview', 'stylesheet', 'build', 'selftest', 'doctor', 'setup', 'host', 'share', 'accounts', 'connect', 'disconnect', 'publish', 'characters', 'channels', 'character-sheet', 'channel-new', 'backlog', 'backlog-add', 'lint', 'workspace-init']) assert.ok(cmds.has(n), n);
+  for (const n of ['templates', 'new', 'list', 'voice', 'words', 'estimate', 'mix', 'check', 'cues', 'sheet', 'frames', 'render', 'preview', 'stylesheet', 'build', 'selftest', 'doctor', 'setup', 'host', 'share', 'accounts', 'connect', 'disconnect', 'publish', 'characters', 'channels', 'character-sheet', 'channel-new', 'backlog', 'backlog-add', 'lint', 'workspace-init', 'brief', 'plan', 'status', 'avatar']) assert.ok(cmds.has(n), n);
   for (const c of cmds.values()) { assert.ok(c.summary, c.name); assert.ok(c.usage.startsWith(c.name), c.name); assert.equal(typeof c.run, 'function'); }
 });
 

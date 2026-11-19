@@ -19,7 +19,7 @@ export const DEFAULTS = {
   charactersDir: 'characters',
   channelsDir: 'channels',
   audioPlugins: [],
-  render: { fps: 30, chrome: null, softwareGL: false, quality: '', crf: 18, preset: 'veryfast', draftCrf: 28, draftPreset: 'ultrafast', bootTimeoutS: 120 },
+  render: { fps: 30, chrome: null, blender: null, softwareGL: false, quality: '', crf: 18, preset: 'veryfast', draftCrf: 28, draftPreset: 'ultrafast', bootTimeoutS: 120 },
   voice: { tts: 'kokoro', voice: 'am_michael', speed: 1.0, whisperModel: 'small.en' },
   review: { sheetStep: 0.5, sheetCols: 10 },
   publish: { host: 'litterbox', expiry: '1h' },
@@ -52,7 +52,7 @@ export function readJson(file, fallback) {
 function envLayer(env) {
   const num = (v) => (v == null || v === '' ? undefined : +v);
   return {
-    render: { fps: num(env.FPS), chrome: env.CHROME || undefined, softwareGL: env.SOFTWARE_GL ? env.SOFTWARE_GL !== '0' : undefined, quality: env.QS || undefined },
+    render: { fps: num(env.FPS), chrome: env.CHROME || undefined, blender: env.BLENDER || undefined, softwareGL: env.SOFTWARE_GL ? env.SOFTWARE_GL !== '0' : undefined, quality: env.QS || undefined },
     voice: { whisperModel: env.STUDIO_WHISPER_MODEL || undefined },
     studioHome: env.STUDIO_HOME || undefined,
     workspace: env.STUDIO_WORKSPACE || undefined,

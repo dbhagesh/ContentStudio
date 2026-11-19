@@ -29,9 +29,10 @@ export function drawSheet(c, version) {
     label(name, x + cw / 2, y + ch - 10, 18);
   });
   // poses
-  const ps = Object.keys(c.POSES || {}), pw = 284, ph = 392;
+  // up to 12 poses: 2 rows of 6; up to 14: 2 rows of 7 narrower cards (the outfit row starts at y 1410)
+  const ps = Object.keys(c.POSES || {}), pc = ps.length > 12 ? 7 : 6, pw = pc === 7 ? 239 : 284, ph = 392;
   ps.forEach((name, i) => {
-    const x = 630 + (i % 6) * (pw + 10), y = 600 + Math.floor(i / 6) * (ph + 10);
+    const x = 630 + (i % pc) * (pw + 10), y = 600 + Math.floor(i / pc) * (ph + 10);
     card(x, y, pw, ph);
     clipped(x, y, pw, ph - 28, () => c.draw({ x: x + pw / 2, y: y + ph - 40, s: 0.36, pose: name, expression: 'smile', t: 0.9, blink: false }));
     label(name, x + pw / 2, y + ph - 8, 18);

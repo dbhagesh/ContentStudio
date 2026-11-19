@@ -45,6 +45,34 @@ class NarrateTest(unittest.TestCase):
         sr, w = wavfile.read(P / 'data/narration.wav'); self.assertEqual(sr, 24000); self.assertEqual(w.dtype, np.int16)
         self.assertEqual(len(json.loads((P / 'data/lines.json').read_text())['lines']), 4)
 
+    def test_pitch_raises_the_voice_at_the_same_pace(self):
+        class Spy(FakeTTS):
+            speeds = []
+
+            def synthesize(self, text, voice, speed):
+                self.speeds.append(speed); return super().synthesize(text, voice, speed)
+
+        tts = Spy()
+        base, sr, _ = build_narration({**SCRIPT}, FakeTTS(), log=lambda s: None)
+        up, sr2, _ = build_narration({**SCRIPT, 'speed': 1.0, 'pitch': 12}, tts, log=lambda s: None)
+        self.assertEqual(sr, sr2)
+        self.assertTrue(all(abs(v - 0.5) < 1e-9 for v in tts.speeds))     # asked for half speed: resampling doubles it back
+        # the fake ignores speed, so resampling alone halves the audio; a real voice is slowed first and keeps its length
+        self.assertLess(len(up), len(base) * 0.7)
+
+    def test_lowcut_thins_the_bass(self):
+        class Two(FakeTTS):          # a 150 Hz hum under a 2 kHz tone
+            def synthesize(self, text, voice, speed):
+                t = np.arange(int(0.25 * len(text.split()) * self.sr)) / self.sr
+                return 0.4 * np.sin(2 * np.pi * 150 * t) + 0.4 * np.sin(2 * np.pi * 2000 * t), self.sr
+
+        def bass_share(y, sr):
+            f = np.fft.rfftfreq(len(y), 1 / sr); m = np.abs(np.fft.rfft(y)) ** 2
+            return m[f < 300].sum() / m.sum()
+        plain, sr, _ = build_narration({**SCRIPT}, Two(), log=lambda s: None)
+        thin, _, _ = build_narration({**SCRIPT, 'lowcut': 600}, Two(), log=lambda s: None)
+        self.assertLess(bass_share(thin, sr), bass_share(plain, sr) * 0.2)
+
     def test_speakers_get_their_own_voice_and_sentences(self):
         script = {**SCRIPT, 'lines': [
             {'text': 'Who took my lunch,'}, {'text': 'he asked.', 'speaker': 'kai'},

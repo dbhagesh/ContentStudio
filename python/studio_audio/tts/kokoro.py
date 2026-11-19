@@ -48,6 +48,12 @@ class KokoroProvider:
         return self._model
 
     def synthesize(self, text, voice, speed):
-        lang = 'en-gb' if voice.startswith('b') else 'en-us'
-        samples, sr = self._load().create(text, voice=voice, speed=speed, lang=lang)
+        model = self._load()
+        names = voice.split('+')                       # "a+b" blends voices equally; "a:0.7+b:0.3" weights them
+        lang = 'en-gb' if names[0].startswith('b') else 'en-us'
+        if len(names) > 1:
+            parts = [(n.split(':')[0], float(n.split(':')[1]) if ':' in n else 1.0) for n in names]
+            tot = sum(w for _, w in parts)
+            voice = sum(model.get_voice_style(n) * (w / tot) for n, w in parts)
+        samples, sr = model.create(text, voice=voice, speed=speed, lang=lang)
         return np.asarray(samples, dtype=np.float64), sr

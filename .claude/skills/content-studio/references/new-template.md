@@ -32,6 +32,8 @@ working. To change a shared engine file for one template, put a file with the sa
      "captions": { "y": 1400, "size": 150, "maxW": 900, "font": "Inter", "weight": 900, "letterSpacing": -2,
                    "fill": "#FFFFFF", "highlight": "#FFD43B", "stroke": "#1A1A1E", "strokeWidth": 30, "shadowOffset": 10 },
      "engine3d": { "toneMapping": "aces | neutral", "far": 120, "grade": { "vignette": 0.35, "grain": 0.02, "warm": 0.03, "sat": 1 } },
+     // optional, 3D only: "player": { …, "motionBlur": 4, "shutter": 0.017 } (sub-frames averaged inside each shot),
+     // and "render": { "quality": "res=2&aa=8", "crf": 14, "preset": "slow", "jpeg": 0.97 } for a heavier final MP4
      "sheet": { "canvases": [["gl", 1080, 1920]] },
      "defaults": { "voice": "am_michael", "music": "bed", "youtubeCategory": "27" }
    }

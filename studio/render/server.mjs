@@ -2,7 +2,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import { indexHtml, sheetHtml, characterHtml } from '../lib/pages.mjs';
+import { indexHtml, sheetHtml, characterHtml, avatarHtml } from '../lib/pages.mjs';
 
 export const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.otf': 'font/otf',
@@ -17,6 +17,7 @@ export function projectRoutes(project) {
     '/index.html': () => ['text/html', indexHtml(rc)],
     '/sheet.html': () => ['text/html', sheetHtml(rc)],
     '/character.html': () => ['text/html', characterHtml(rc)],
+    '/avatar.html': () => ['text/html', avatarHtml(rc)],
     '/studio/config.json': () => ['application/json', JSON.stringify(rc)],
   };
 }

@@ -13,9 +13,13 @@ templates, layered configuration, a command-line tool and tests.
 node bin/studio.mjs doctor                      # what's installed ("All set")
 node bin/studio.mjs setup                       # once: Python env + free voice/Whisper models, all inside .studio/
 node bin/studio.mjs channels                    # the channels (each one a self-contained folder)
+node bin/studio.mjs status                      # every video: which stages are done, and the next command
 node bin/studio.mjs backlog --channel <id>       # its episode ideas and where each one is
+node bin/studio.mjs brief --channel <id> --episode <episode>   # what to know, and the files to read in order
 node bin/studio.mjs new --channel <id> --from-backlog <episode>
-#   …write <workspace>/projects/<id>/<episode>/script.json and src/shots.js…
+#   …write <workspace>/projects/<id>/<episode>/script.json…
+node bin/studio.mjs plan <id>/<episode>         # the plan screen: cuts, captions, shots, timing, script rules
+#   …write src/shots.js…
 node bin/studio.mjs build <id>/<episode>        # voice → timing → lint → check → cues → mix → review sheet → MP4
 ```
 
@@ -52,6 +56,8 @@ channels/<id>/
   channel.json     name, handle, cast, shared templates it may use, defaults (template, voice, music, caption look),
                    voices (per speaker), quality (lint thresholds), publish (targets, tags, footer, links, per platform)
   BIBLE.md         audience, promise, tone, hook formulas, series, look, do / don't, titles, monetization
+  BRIEF.md         a ≤ 400-word digest of the bible for routine episodes (studio brief --compact)
+  brand/           avatar.png, its profile picture (studio avatar; channel.json "brand.avatar")
   series.json      recurring formats        backlog.json   episode ideas (status is read from what exists)
   templates/<t>/   templates only this channel uses
   characters/<c>/  characters only this channel uses
@@ -108,16 +114,38 @@ Cloned from GitHub and built here; `studio doctor` shows whether they're ready.
 
 Tools installed for these: `bun` and `uv` (Homebrew).
 
+**Blender plates (optional, opt-in per project).** For film-quality 3D (real rigged models, HDRI light, ocean, cloth,
+depth of field, motion blur), a project can carry `blender/scene.py`. Only such projects get an extra `plate` step after
+`timing`: Blender renders the film frames (`plate/frames/*.jpg` + `plate/plate.json`, timed to the narration), and the
+template's `src/shots.js` draws them under the captions with `plateFilm()` from `engine/src/core/plate.js`. Every other
+project runs exactly the usual steps.
+- **Install:** `brew install --cask blender` (or set `render.blender` / `$BLENDER` to the binary).
+- **Studio side:** `blender/boot.py` (entry, puts the template's and project's `blender/` folders on `sys.path`) and
+  `blender/studio3d.py` (timing, actors with blended clips, paths, camera cuts/moves/shake, HDRI + sun, ocean, cloth
+  baking, `render_plate`). Everything that moves is a pure function of film time.
+- **More motion and sets:** `retarget()` bakes clips from an animation library rig (shared T-pose) onto a model's rig;
+  `group()` + `stages()` build several sets (locations) in one scene and show one at a time, with `world_hdris()`
+  switching the sky; `split_mesh()` cuts a part off a model to hinge it (a lid); `Spray` throws bits (sand, water).
+- **2D actors in 3D sets (2.5D):** `s3.Anchor(name, height, shadow=r, proxy=True)` marks where a drawn character's
+  feet stand (keyed like the camera); `render_plate` projects it every frame into plate.json `actors` (film px, px per
+  metre, depth, depth-of-field blur; maths in `blender/projection.py`), and the template draws the character there with
+  `actorAt(name, t)` from `plate.js`. `cam.focus(t, point)` keys a rack focus. Optional soft contact shadow and an
+  invisible stand-in that casts the character's shadow into the set.
+- **Look-dev:** run `boot.py` with `"stills": [t, …]` and `"draft": true` to render only a few times at half size;
+  add `"view": [[x, y, z], [look x, y, z], lens]` to look from a free camera instead of the film's.
+- **Assets:** downloaded models stay in the channel's workspace folder with their licences in `assets/SOURCES.md`.
+
 ## Commands (`studio help <command>` for details)
 
 | group | commands |
 |---|---|
 | projects | `templates [--validate]` · `new <name> --channel <id>` · `new --channel <id> --from-backlog <ep>` · `new <template> <name>` · `list [--channel <id>]` |
-| channel | `backlog --channel <id>` · `backlog-add --channel <id> --id … --title …` · `lint <project>` |
-| cast | `channels [--validate]` · `channel-new <id> --name "…"` · `characters [--validate]` · `character-sheet <id>` |
+| workflow | `status [--channel <id>] [--all]` · `brief --channel <id> [--episode <ep>] [--compact]` · `brief <project>` · `plan <project>` |
+| channel | `backlog --channel <id>` · `backlog-add --channel <id> --id … --title …` · `lint <project> [--no-picture]` |
+| cast | `channels [--validate]` · `channel-new <id> --name "…"` · `characters [--validate]` · `character-sheet <id>` · `avatar --channel <id>` |
 | audio | `voice` · `words [--audio file]` · `estimate` · `mix` · `voices` · `effects` |
 | render | `check` · `cues` · `sheet` · `frames <times>` · `render [--draft]` · `preview` · `stylesheet <template>` |
-| pipeline | `build [--timing voice\|estimate\|audio:<file>\|keep] [--from step] [--only a,b] [--skip a,b]` · `selftest` |
+| pipeline | `build [--timing voice\|estimate\|audio:<file>\|keep] [--from step] [--only a,b] [--skip a,b] [--verbose]` · `selftest` |
 | publish | `accounts` · `connect <youtube\|instagram> --channel <id>` · `disconnect` · `publish <project> --to youtube,instagram [--yes]` · `share` · `host` |
 | system | `doctor` · `setup` |
 
@@ -130,14 +158,15 @@ template's own example.
 bin/studio.mjs              CLI entry
 studio/                     Node orchestrator (no npm dependencies)
   cli.mjs                   loads every studio/commands/*.mjs: a new command is a new file
-  commands/                 project · audio · render · pipeline · publish · system
-  lib/                      config (layers) · templates (registry + validation) · project · overlay · pages · pipeline · python
-  render/                   server (overlay + generated pages) · chrome (DevTools protocol) · modes (check/cues/sheet/frames/video) · session
+  commands/                 project · channel · workflow (brief/plan/status) · cast · audio · render · pipeline · publish · system
+  lib/                      config (layers) · templates (registry + validation) · project · overlay · pages · pipeline · lint · workflow · python
+  render/                   server (overlay + generated pages) · chrome (DevTools protocol) · modes (check/cues/sheet/frames/video/textLayout) · session
   publish/                  exporters/ (youtube, instagram: one file per platform) · secrets · metadata · media (spec checks) · http · hosts
 engine/                     the browser runtime shared by every template
   src/main.js               the player: boots any template from its config, 2D or 3D
   src/core/                 lib (math, primitives) · timing · captions (configurable) · config · random (seeded) ·
-                            board (style sheets) · engine (three.js film look, configurable) · human · sdf
+                            board (style sheets) · engine (three.js film look, configurable) · human · sdf ·
+                            avatar (channel profile pictures)
   fonts/  vendor/three/     stored once
 templates/<id>/             generic video styles: template.json · STYLE.md · style-sheet.png · src/ (its kit) · example/
 python/studio_audio/        voice (TTS provider registry, Kokoro) · align (Whisper) · estimate · mix (effect/music registries, plugins)
@@ -158,15 +187,19 @@ path. Existing relative imports (`./core/lib.js`, `three`) work unchanged.
   (`FPS`, `CHROME`, `SOFTWARE_GL`, `QS`, `STUDIO_HOME`, `STUDIO_WHISPER_MODEL`).
 - Runtime (what the browser engine sees): engine defaults < `template.json` < channel `defaults.overrides` <
   `project.json` → `overrides`.
-  Keys: `player` (renderer, camera punch/push/flash, fades, seed), `captions` (position, size, colours, stroke),
-  `engine3d` (tone mapping, far plane, grade), `fonts`, `sheet`.
+  Keys: `player` (renderer, camera punch/push/flash, fades, seed; 3D: optional `motionBlur` sub-frames and `shutter`
+  seconds), `captions` (position, size, colours, stroke), `engine3d` (tone mapping, far plane, grade), `fonts`, `sheet`.
+- Final render (opt-in per template): `template.json` → `render` { `quality` (e.g. `res=2&aa=8`: supersampled 3D),
+  `crf`, `preset`, `jpeg` (frame capture quality) } overrides the studio render settings for the MP4 only (not drafts).
 
 **Generated pages.** `index.html` and `sheet.html` are generated from the config (fonts → `@font-face`, 3D → WebGL
 canvas + import map), so templates carry no boilerplate.
 
 **Pipeline as data.** `studio/lib/pipeline.mjs` holds the steps (`timing → lint → check → cues → mix → sheet →
 render`); `build` runs all or a slice of them. `lint` is the quality gate (`studio/lib/lint.mjs`): it blocks a channel
-video with no description, tags or sources, over-long captions, or phrasing that repeats the channel's other videos.
+video with no description, tags or sources, over-long captions, or phrasing that repeats the channel's other videos,
+and (drawing every frame in headless Chrome) text cut off by the frame edge or lying over the captions or other text.
+The engine marks what it is drawing (`OP.layer`: shot or caption) so lint can tell captions from the shot's own text.
 
 **Plug-ins.**
 - Channels: a folder in the workspace's `channels/` (`studio channel-new`).

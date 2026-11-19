@@ -47,6 +47,25 @@ catch (e) { window.SHEET_ERROR = String(e && e.stack || e); console.error(e); }
 `;
 }
 
+/** a channel profile picture (engine/src/core/avatar.js; rc.avatar) */
+export function avatarHtml(rc) {
+  const n = rc.avatar?.size || 800;
+  return `<!doctype html>
+<html><head><meta charset="utf-8"><title>Profile picture</title>
+<style>
+${fontFaces(rc.fonts)}
+html, body { margin: 0; background: #111; } canvas { display: block; max-width: 100vw; height: auto; }
+</style></head>
+<body><canvas id="cv" width="${n}" height="${n}"></canvas>
+<script type="module">
+import { loadConfig, loadFonts } from './src/core/config.js';
+import { loadCast } from './src/core/cast.js';
+try { const cfg = await loadConfig(); await loadFonts(40); await loadCast(cfg.cast); await import('./src/core/avatar.js'); }
+catch (e) { window.SHEET_ERROR = String(e && e.stack || e); console.error(e); }
+</script></body></html>
+`;
+}
+
 /** the style-sheet page (1920x1080 board drawn by the template's src/sheet.js; it sets window.SHEET_READY) */
 export function sheetHtml(rc) {
   const canvases = rc.sheet?.canvases || [], uses3d = canvases.length > 0 || rc.player?.renderer === '3d';

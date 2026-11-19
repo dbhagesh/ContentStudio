@@ -6,6 +6,9 @@
 //   POST /<ig-user-id>/media (media_type=REELS) → poll status_code until FINISHED → POST /<ig-user-id>/media_publish
 // Limits: a professional (Business or Creator) account; 100 API posts per 24 h (checked first); captions ≤ 2200
 // characters and ≤ 30 hashtags; Reels 3 s-15 min, ≤ 300 MB, H.264/HEVC, 23-60 fps, AAC ≤ 48 kHz at 128 kbps.
+// Opt-in: a Facebook Page access token ("EAA…", Facebook Login) for a Page linked to the Instagram business account
+// works too. The same calls then go to graph.facebook.com; the account is stored with api: 'facebook' and its
+// token is not refreshed here (a Page token from a long-lived user token does not expire).
 import fs from 'node:fs';
 import path from 'node:path';
 import { request } from '../http.mjs';
@@ -19,7 +22,10 @@ const AUDIO_BITRATE = 128_000;
 const DAY = 86_400_000;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const base = (ctx) => `https://graph.instagram.com/${ctx.cfg.publish?.instagram?.apiVersion || 'v27.0'}`;
+const base = (ctx, acc) => acc?.api === 'facebook'
+  ? `https://graph.facebook.com/${ctx.cfg.publish?.instagram?.facebookApiVersion || 'v21.0'}`
+  : `https://graph.instagram.com/${ctx.cfg.publish?.instagram?.apiVersion || 'v27.0'}`;
+const isFacebookToken = (token) => /^EAA/.test(token);
 const scope = (ctx) => `channels/${ctx.channel.id}/instagram`;
 const normUser = (u) => String(u || '').trim().toLowerCase().replace(/^@/, '');
 
@@ -28,7 +34,7 @@ export async function account(ctx, { now = Date.now() } = {}) {
   let acc = readSecret(ctx.cfg, scope(ctx));
   if (!acc?.access_token) throw new Error(`Instagram is not connected for channel "${ctx.channel.id}": studio connect instagram --channel ${ctx.channel.id} --token-file <file>`);
   if (acc.expires_at && Date.parse(acc.expires_at) <= now) throw new Error(`the Instagram token for "${ctx.channel.id}" expired on ${acc.expires_at}: generate a new one and connect again`);
-  if (now - Date.parse(acc.refreshed_at || acc.connected_at || 0) > 7 * DAY) {
+  if (acc.api !== 'facebook' && now - Date.parse(acc.refreshed_at || acc.connected_at || 0) > 7 * DAY) {
     try {
       const { data } = await request(ctx.fetch, `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${encodeURIComponent(acc.access_token)}`);
       acc = { ...acc, access_token: data.access_token, refreshed_at: new Date(now).toISOString(), expires_at: new Date(now + (data.expires_in || 60 * 86400) * 1000).toISOString() };
@@ -37,6 +43,23 @@ export async function account(ctx, { now = Date.now() } = {}) {
     } catch (e) { ctx.log?.(`note: Instagram token refresh failed (${e.message}); using the current token`); }
   }
   return acc;
+}
+
+/** connect with a Facebook Page token: the Page's linked Instagram business account is the one posted to */
+async function connectPage(ctx, token, anyAccount) {
+  const api = base(ctx, { api: 'facebook' }), auth = `access_token=${encodeURIComponent(token)}`;
+  const { data: page } = await request(ctx.fetch, `${api}/me?fields=id,name,instagram_business_account{id,username}&${auth}`);
+  const ig = page?.instagram_business_account;
+  if (!ig?.id) throw new Error(`the token is for "${page?.name || '?'}", which has no linked Instagram business account (use a Page access token, or an Instagram Login token)`);
+  const want = ctx.channel.manifest.instagram && normUser(ctx.channel.manifest.instagram);
+  if (want && normUser(ig.username) !== want && !anyAccount) throw new Error(`token is for @${ig.username}, but channel "${ctx.channel.id}" is @${want} (pass --any-account to use it anyway)`);
+  let expires = null;
+  try { expires = (await request(ctx.fetch, `${api}/debug_token?input_token=${encodeURIComponent(token)}&${auth}`)).data?.data?.expires_at || null; } catch { /* unknown expiry */ }
+  const now = new Date();
+  const acc = { api: 'facebook', access_token: token, page_id: String(page.id), user_id: String(ig.id), username: ig.username, account_type: 'BUSINESS', connected_at: now.toISOString(), expires_at: expires ? new Date(expires * 1000).toISOString() : null };
+  writeSecret(ctx.cfg, scope(ctx), acc);
+  if (expires && expires * 1000 - now.getTime() < 7 * DAY) ctx.log?.(`note: this token expires ${acc.expires_at}; a Page token from a long-lived user token does not`);
+  return { id: acc.user_id, title: `@${ig.username}`, handle: `@${ig.username}` };
 }
 
 export default {
@@ -54,12 +77,14 @@ export default {
   status(ctx) {
     const acc = readSecret(ctx.cfg, scope(ctx));
     if (!acc?.access_token) return { connected: false, detail: 'no token yet' };
-    const days = acc.expires_at ? Math.round((Date.parse(acc.expires_at) - Date.now()) / DAY) : null;
-    return { connected: days == null || days > 0, detail: `@${acc.username} (${acc.account_type || '?'})${days != null ? `, token ${days > 0 ? `valid ${days} more days` : 'EXPIRED'}` : ''}`, since: acc.connected_at };
+    const left = acc.expires_at ? Date.parse(acc.expires_at) - Date.now() : null, days = left != null ? Math.round(left / DAY) : null;
+    const valid = left == null ? '' : left <= 0 ? ', token EXPIRED' : days > 0 ? `, token valid ${days} more days` : `, token valid ${Math.max(1, Math.round(left / 60_000))} more minutes`;
+    return { connected: left == null || left > 0, detail: `@${acc.username} (${acc.account_type || '?'})${valid}`, since: acc.connected_at };
   },
 
   async connect(ctx, { token, anyAccount = false } = {}) {
     if (!token) throw new Error('give the access token: --token-file <file> (or the STUDIO_INSTAGRAM_TOKEN environment variable)');
+    if (isFacebookToken(token)) return connectPage(ctx, token, anyAccount);
     const { data: me } = await request(ctx.fetch, `${base(ctx)}/me?fields=user_id,username,account_type&access_token=${encodeURIComponent(token)}`);
     if (!me?.user_id) throw new Error('the token works but returned no Instagram user id');
     if (me.account_type && !['BUSINESS', 'MEDIA_CREATOR'].includes(me.account_type)) throw new Error(`@${me.username} is a ${me.account_type} account; publishing needs a professional (Business or Creator) account`);
@@ -88,7 +113,7 @@ export default {
   },
 
   async publish(ctx, plan, { pollMs = 10_000, timeoutMs = 600_000 } = {}) {
-    const acc = await account(ctx), api = base(ctx), auth = `access_token=${encodeURIComponent(acc.access_token)}`;
+    const acc = await account(ctx), api = base(ctx, acc), auth = `access_token=${encodeURIComponent(acc.access_token)}`;
     const { data: lim } = await request(ctx.fetch, `${api}/${acc.user_id}/content_publishing_limit?fields=quota_usage,config&${auth}`);
     const used = lim?.data?.[0]?.quota_usage, total = lim?.data?.[0]?.config?.quota_total;
     if (used != null && total != null && used >= total) throw new Error(`Instagram publishing limit reached (${used}/${total} posts in 24 h)`);

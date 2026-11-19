@@ -3,10 +3,13 @@
 //     id, name, handle, url, instagram, about,
 //     cast: ["<character id>", ...]     the characters that appear on this channel
 //     templates: ["inside-out", ...]    shared templates it may use; [] = only its own templates/; no key = any
-//     defaults: { template, voice, speed, music, overrides: { captions, player, ... } }
+//     defaults: { template, voice, speed, pitch (semitones), lowcut + lowpass (Hz), music, overrides: { captions, player, ... } }
 //     publish:  { targets, tags, footer, links, youtube: {...}, instagram: {...} }
+//     brand:    { avatar: {...} }           its profile picture, drawn from code (studio avatar; engine/src/core/avatar.js)
 //   }
 //   channels/<id>/BIBLE.md       who it's for, its promise, tone, hook formulas, series, do / don't
+//   channels/<id>/BRIEF.md       a ≤ 400-word digest of the bible for routine episodes (studio brief --compact)
+//   channels/<id>/brand/         avatar.png (+ its own avatar mark code, if any)
 //   channels/<id>/series.json    its recurring series        channels/<id>/backlog.json   episode ideas
 //   channels/<id>/templates/     its own templates           channels/<id>/characters/   its own cast
 //   channels/<id>/audio/         its own music and stings    projects/<id>/              its videos
@@ -104,6 +107,21 @@ Fill every section before the first episode. Every video for this channel follow
 ## Thumbnails and titles
 ## Monetization notes
 `);
+  fs.writeFileSync(path.join(dir, 'BRIEF.md'), `# ${name}: brief
+Digest of BIBLE.md for routine episodes (studio brief --compact). Write it once the bible is filled: at most ~400 words,
+every hard rule (never / always / must, safety, legal, money, health) kept. Read BIBLE.md in full for a new series or a pilot.
+
+## Audience and promise
+## Voice and tone
+## Hook formulas
+## Series
+## Look
+## Do
+## Don't
+## Titles
+`);
+  // dated before the bible, so the brief reports it as not written yet until it is edited
+  fs.utimesSync(path.join(dir, 'BRIEF.md'), new Date(0), new Date(0));
   for (const d of ['templates', 'characters', 'audio']) fs.writeFileSync(path.join(dir, d, '.gitkeep'), '');
   return dir;
 }

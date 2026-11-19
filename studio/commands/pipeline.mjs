@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { loadProject, createProject } from '../lib/project.mjs';
 import { listTemplates } from '../lib/templates.mjs';
 import { loadChannel } from '../lib/channels.mjs';
-import { runPipeline, selectSteps, STEPS } from '../lib/pipeline.mjs';
+import { runPipeline, selectSteps, stepsFor, STEPS, PLATE } from '../lib/pipeline.mjs';
 
 const list = (s) => (s ? s.split(',').map((x) => x.trim()).filter(Boolean) : undefined);
 
@@ -19,13 +19,13 @@ export function meanVolume(file) {
 export const commands = [
   {
     name: 'build', group: 'pipeline', summary: 'the whole pipeline: timing → check → cues → mix → sheet → render',
-    usage: 'build <project> [--timing voice|estimate|audio:<file>|keep] [--from step] [--only a,b] [--skip a,b] [--draft] [--voice id]',
-    details: `steps: ${STEPS.map((s) => `${s.name} (${s.describe})`).join(' · ')}`,
-    options: { timing: { type: 'string' }, from: { type: 'string' }, only: { type: 'string' }, skip: { type: 'string' }, draft: { type: 'boolean' }, voice: { type: 'string' } },
+    usage: 'build <project> [--timing voice|estimate|audio:<file>|keep] [--from step] [--only a,b] [--skip a,b] [--draft] [--voice id] [--verbose]',
+    details: `steps: ${STEPS.map((s) => `${s.name} (${s.describe})`).join(' · ')}\nOptional: ${PLATE.name} (${PLATE.describe}), run after timing only for those projects.\nOutput is one line per step plus anything that needs attention (lint warnings, failures with their full log); --verbose streams every tool's output.`,
+    options: { timing: { type: 'string' }, from: { type: 'string' }, only: { type: 'string' }, skip: { type: 'string' }, draft: { type: 'boolean' }, voice: { type: 'string' }, verbose: { type: 'boolean' } },
     async run({ positionals: [ref], values, cfg }) {
       const p = loadProject(ref, cfg);
-      const opts = { timing: values.timing || 'voice', draft: values.draft, voice: values.voice, from: values.from, only: list(values.only), skip: list(values.skip) };
-      await runPipeline(p, cfg, opts, { steps: selectSteps(opts) });
+      const opts = { timing: values.timing || 'voice', draft: values.draft, voice: values.voice, from: values.from, only: list(values.only), skip: list(values.skip), quiet: !values.verbose };
+      await runPipeline(p, cfg, opts, { steps: selectSteps(opts, stepsFor(p)) });
       console.log(`done. Look at ${path.join(p.dir, 'review/all.jpg')} before sharing.`);
     },
   },
@@ -46,7 +46,7 @@ export const commands = [
           const dir = createProject({ template: t, name: t.id, cfg, parent: root, channel });
           const p = loadProject(dir, cfg);
           const opts = { timing: values['no-voice'] ? 'estimate' : 'voice', draft: true, start: 2, end: 6, out: path.join(dir, 'renders/selftest.mp4'), quiet: true, skip: ['lint'] };
-          await runPipeline(p, cfg, opts, { steps: selectSteps(opts), log: (m) => logs.push(m) });
+          await runPipeline(p, cfg, opts, { steps: selectSteps(opts, stepsFor(p)), log: (m) => logs.push(m) });
           const db = meanVolume(path.join(dir, 'renders/selftest.mp4'));
           if (db <= -50) throw new Error(`clip is silent (${db} dB)`);
           console.log(`${t.id.padEnd(13)} ok, ${((Date.now() - t0) / 1000).toFixed(0)} s · sheet: ${path.join(dir, 'review/all.jpg')}`);

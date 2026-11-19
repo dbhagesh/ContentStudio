@@ -2,7 +2,7 @@
 import { loadChannel } from '../lib/channels.mjs';
 import { loadProject } from '../lib/project.mjs';
 import { loadBacklog, loadSeries, episodeStatus, addEpisode, STATUSES } from '../lib/backlog.mjs';
-import { lintProject, formatLint } from '../lib/lint.mjs';
+import { lintAll, formatLint } from '../lib/lint.mjs';
 
 export const commands = [
   {
@@ -35,10 +35,12 @@ export const commands = [
     },
   },
   {
-    name: 'lint', group: 'channel', summary: 'the quality gate: title, description, sources, hook, pace, captions, originality',
-    usage: 'lint <project>',
-    run({ positionals: [ref], cfg }) {
-      const p = loadProject(ref, cfg), r = lintProject(p, cfg);
+    name: 'lint', group: 'channel', summary: 'the quality gate: title, description, sources, hook, pace, captions, originality, clipped / overlapping text',
+    usage: 'lint <project> [--no-picture]',
+    details: 'The picture rules draw every frame in headless Chrome (every quality.textStep s) and catch text cut off by the frame edge, and text over the captions or over other text. --no-picture runs only the script rules (instant).',
+    options: { 'no-picture': { type: 'boolean' } },
+    async run({ positionals: [ref], values, cfg }) {
+      const p = loadProject(ref, cfg), r = await lintAll(p, cfg, { picture: !values['no-picture'] });
       if (r.errors.length || r.warnings.length) console.log(formatLint(r));
       console.log(r.errors.length ? `${r.errors.length} error(s): fix before building` : `LINT OK${p.channel ? '' : ' (no channel: scratch rules)'}`);
       return r.errors.length ? 1 : 0;

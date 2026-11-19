@@ -9,6 +9,7 @@ export const PAGES = {
   film: { file: 'index.html', ready: READY.film },
   sheet: { file: 'sheet.html', ready: READY.sheet, width: 1920, height: 1080 },
   character: { file: 'character.html', ready: READY.sheet, width: 2400, height: 2000 },
+  avatar: { file: 'avatar.html', ready: READY.sheet, width: 800, height: 800 },
 };
 
 export async function withSession(project, cfg, fn, { page = 'film', query = '' } = {}) {

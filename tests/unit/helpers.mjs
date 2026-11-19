@@ -4,8 +4,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { loadStudioConfig } from '../../studio/lib/config.mjs';
 
+// every temp folder a test makes is removed when the test process ends (renders and audio add up fast)
+const made = [];
+process.on('exit', () => { for (const d of made) fs.rmSync(d, { recursive: true, force: true }); });
+
 export function tmpDir(prefix = 'studio-test-') {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  made.push(d);
+  return d;
 }
 
 /** the generic test workspace (one demo channel with a simple mascot), never your real channels */

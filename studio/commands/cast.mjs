@@ -1,7 +1,8 @@
 // Characters and channels: the permanent cast and the brands that use it.
+import fs from 'node:fs';
 import path from 'node:path';
 import { listCharacters, loadCharacter, validateCharacter, castEntry, castMounts, characterChannels } from '../lib/characters.mjs';
-import { listChannels, validateChannel, channelTemplates, scaffoldChannel } from '../lib/channels.mjs';
+import { listChannels, loadChannel, validateChannel, channelTemplates, scaffoldChannel } from '../lib/channels.mjs';
 import { createOverlay } from '../lib/overlay.mjs';
 import { ENGINE_DIR } from '../lib/paths.mjs';
 import { withSession } from '../render/session.mjs';
@@ -17,6 +18,20 @@ export function characterStage(c, cfg) {
       fonts: [{ family: 'Inter', weight: 900, file: 'fonts/Inter-Black.otf' }, { family: 'Inter', weight: 800, file: 'fonts/Inter-ExtraBold.otf' }],
       cast: [castEntry(c)],
     },
+  };
+}
+
+/** the stage for a channel's profile picture: its avatar settings, its cast, and its brand/ folder at /brand/ */
+export function avatarStage(ch, cfg) {
+  const a = ch.manifest.brand?.avatar;
+  if (!a) throw new Error(`channel "${ch.id}" has no "brand": { "avatar": { … } } in channel.json (studio help avatar)`);
+  if (a.character && !(ch.manifest.cast || []).includes(a.character)) throw new Error(`avatar character "${a.character}" is not in ${ch.id}'s cast`);
+  const chars = a.character ? [loadCharacter(a.character, cfg)] : [];
+  return {
+    dir: ch.dir, name: `${ch.id}-avatar`, isExample: true,
+    overlay: createOverlay([ENGINE_DIR], { mounts: { ...castMounts(chars), '/brand/': path.join(ch.dir, 'brand') } }),
+    runtime: { id: 'avatar', title: ch.manifest.name, format: {}, player: {}, captions: {}, engine3d: {}, sheet: {}, avatar: a,
+      fonts: [{ family: 'Inter', weight: 900, file: 'fonts/Inter-Black.otf' }], cast: chars.map(castEntry) },
   };
 }
 
@@ -54,6 +69,23 @@ export const commands = [
       const c = loadCharacter(id, cfg), file = out ? path.resolve(out) : path.join(c.dir, 'sheet.png');
       await withSession(characterStage(c, cfg), cfg, (s) => modes.stylesheet(s, file), { page: 'character', query: `id=${encodeURIComponent(id)}` });
       console.log(file);
+    },
+  },
+  {
+    name: 'avatar', group: 'cast', summary: "render a channel's profile picture from code (channel.json brand.avatar) → brand/avatar.png",
+    usage: 'avatar --channel <id> [--size 800]',
+    details: 'Writes <channel>/brand/avatar.png (square, what you upload; every platform crops it to a circle) and brand/avatar-preview.png (that circle, to check the crop). Settings: engine/src/core/avatar.js. The mascot is drawn by its own character code, as in the videos.',
+    options: { channel: { type: 'string' }, size: { type: 'string' } },
+    async run({ values, cfg }) {
+      if (!values.channel) throw new Error('which channel? --channel <id>');
+      const ch = loadChannel(values.channel, cfg), stage = avatarStage(ch, cfg);
+      if (values.size) stage.runtime.avatar = { ...stage.runtime.avatar, size: +values.size };
+      const dir = path.join(ch.dir, 'brand'), files = [path.join(dir, 'avatar.png'), path.join(dir, 'avatar-preview.png')];
+      fs.mkdirSync(dir, { recursive: true });
+      for (const [f, q] of [[files[0], ''], [files[1], 'preview=1']]) {
+        await withSession(stage, cfg, async (s) => { await modes.stylesheet(s, f); if (s.logs.length) throw new Error(s.logs.join('\n')); }, { page: 'avatar', query: q });
+      }
+      console.log(files.join('\n'));
     },
   },
   {

@@ -7,7 +7,7 @@ after it; ``"break": true`` forces a sentence to close.
 
 Several voices: a line's ``"speaker"`` picks a voice from ``speakers`` ({id: {"tts", "voice", "speed", ...}}, built by
 the studio from the cast's character voices, the channel and script.json, in data/voices.json). Lines without one use
-the narrator (script "voice"/"speed"). A sentence never spans two speakers; other sample rates are resampled.
+the narrator (script "voice"/"speed"). ``pitch`` (semitones), ``lowcut`` and ``lowpass`` (Hz) shape any voice, per speaker too. A sentence never spans two speakers; other sample rates are resampled.
 
 Outputs data/narration.wav (16-bit, provider rate) and data/lines.json (exact line times).
 """
@@ -20,7 +20,7 @@ from scipy.io import wavfile
 
 from ..project import data_dir, load_script, write_json
 from .registry import DEFAULT, get_provider
-from scipy.signal import resample_poly
+from scipy.signal import butter, resample_poly, sosfilt
 
 
 def trim(x, sr, thr=0.008):
@@ -78,27 +78,39 @@ def build_narration(script: dict, provider, voice=None, speed=None, log=print, s
     ``provider`` speaks the narrator; ``provider_for(name, opts)`` makes the providers other speakers ask for."""
     voice = voice or script.get('voice', provider.default_voice)
     speed = speed or script.get('speed', 1.0)
+    pitch = float(script.get('pitch', 0) or 0)
+    tone = (float(script.get('lowcut', 0) or 0), float(script.get('lowpass', 0) or 0))
     SL = script['lines']
     speakers = speakers or {}
     cache = {}
     sr_box = {}
 
     def voice_of(i):
-        """(provider, voice, speed) for line i"""
+        """(provider, voice, speed, pitch in semitones, tone (lowcut Hz, lowpass Hz)) for line i"""
         sp = SL[i].get('speaker')
         if not sp or sp not in speakers:
             if sp: raise SystemExit(f'line {i + 1}: speaker "{sp}" has no voice (known: {", ".join(sorted(speakers)) or "none"})')
-            return provider, voice, speed
+            return provider, voice, speed, pitch, tone
         spec = dict(speakers[sp]); tts = spec.pop('tts', DEFAULT)
-        v = spec.pop('voice', None); s = spec.pop('speed', 1.0); spec.pop('note', None)
+        v = spec.pop('voice', None); s = spec.pop('speed', 1.0); st = float(spec.pop('pitch', 0) or 0); spec.pop('note', None)
+        tn = (float(spec.pop('lowcut', 0) or 0), float(spec.pop('lowpass', 0) or 0))
         key = (tts, json.dumps(spec, sort_keys=True))
         if key not in cache: cache[key] = (provider_for or (lambda n, o: get_provider(n, **o)))(tts, spec)
-        return cache[key], v or cache[key].default_voice, s
+        return cache[key], v or cache[key].default_voice, s, st, tn
 
     def say(text, i):
-        p, v, s = voice_of(i)
-        x, sr = p.synthesize(text, v, s)
-        x = trim(np.asarray(x, dtype=np.float64), sr)
+        p, v, s, st, (lo, hi) = voice_of(i)
+        if st:
+            # pitch up/down by `st` semitones at the same pace: speak slower/faster, then resample (pitch and tempo move together)
+            k = 2 ** (st / 12)
+            x, sr = p.synthesize(text, v, min(2.0, max(0.5, s / k)))
+            r = 1000; x = resample_poly(np.asarray(x, dtype=np.float64), r, int(round(r * k)))
+        else:
+            x, sr = p.synthesize(text, v, s)
+        x = np.asarray(x, dtype=np.float64)
+        if lo: x = sosfilt(butter(2, lo, 'hp', fs=sr, output='sos'), x)    # thin out the bass (a softer, lighter voice)
+        if hi: x = sosfilt(butter(2, hi, 'lp', fs=sr, output='sos'), x)    # take the edge off the highs
+        x = trim(x, sr)
         target = sr_box.setdefault('sr', sr)
         if sr != target:
             g = np.gcd(int(sr), int(target)); x = resample_poly(x, target // g, sr // g)

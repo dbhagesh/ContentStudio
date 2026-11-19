@@ -1,7 +1,8 @@
 # The quality bar
 
 No video ships below this bar. `studio lint` checks what a program can check (metadata, sources, captions, pace,
-hook length, originality). This rubric covers what it can't. Score every pilot and every first video of a new
+hook length, originality, and in every frame: text cut off by the frame edge, text over the captions or over other
+text). This rubric covers what it can't. Score every pilot and every first video of a new
 series. Anything under 4/5 on a line gets fixed and rebuilt before the user sees it.
 
 ## 1. Hook (the first 2 seconds decide everything)
@@ -26,7 +27,8 @@ to" where sources disagree.
 - Key reveals land on their word.
 - Characters stay on-model (only through `cast()`).
 - Template palette only.
-- No collisions with the caption zone, labels or each other.
+- No collisions with the caption zone, labels or each other (lint catches text against text and the frame edge;
+  pictures against text are for your eyes).
 - Readable at phone size: check the contact sheet at 25% zoom.
 
 ## 5. Captions
@@ -49,7 +51,7 @@ there's no clipping. A speaker change in dialogue is obvious from the voice alon
 - `lint` blocks repeats within a channel. Also never reuse a topic another of our channels covered the same month.
 
 ## Review routine (every build)
-1. `studio build <channel>/<ep>`: `lint` must say LINT OK, and `check` CHECK OK.
+1. `studio build <channel>/<ep>`: `lint` must say LINT OK (script and picture rules), and `check` CHECK OK.
 2. Read `review/all.jpg`, then key frames full size (`studio frames`).
 3. Score sections 1-8. Fix anything under 4, then rebuild from the step that changed.
 4. Tell the user what you caught and fixed.

@@ -135,7 +135,7 @@ export function createProject({ template, name, title, cfg, parent, channel }) {
     manifest.channel = channel.id;
     manifest.cast = Object.fromEntries((ch.cast || []).map((id) => [id, loadCharacter(id, cfg).manifest.version]));
     const sf = path.join(dir, 'script.json'), script = readJson(sf);
-    for (const k of ['voice', 'speed', 'music']) if (ch.defaults?.[k] != null) script[k] = ch.defaults[k];
+    for (const k of ['voice', 'speed', 'pitch', 'lowcut', 'lowpass', 'music']) if (ch.defaults?.[k] != null) script[k] = ch.defaults[k];
     fs.writeFileSync(sf, JSON.stringify(script, null, 2) + '\n');
   }
   fs.writeFileSync(path.join(dir, 'project.json'), JSON.stringify(manifest, null, 2) + '\n');
